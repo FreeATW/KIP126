@@ -6,6 +6,13 @@ on:
     paths:
       - "KIP126.lean"
       - "KIP126/**/*.lean"
+      - "KIPBase.lean"
+      - "KIPBase/**/*.lean"
+      - "migration/kip-base/**"
+      - "scripts/kipbase-migration.py"
+      - "scripts/KIPBaseAudit.lean"
+      - "scripts/test_kipbase_migration.py"
+      - "scripts/test_workflow_routing.py"
       - "lakefile.lean"
       - "lake-manifest.json"
       - "lean-toolchain"

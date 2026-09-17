@@ -1,0 +1,1134 @@
+% Prerequisites: foundational infrastructure for the formalization.
+% Structure follows template.tex: §0.1 Spectral Sequences, §0.2 Stable Homotopy Theory, §0.3 Synthetic Spectra.
+
+\section{Prerequisites}\label{sec:prereq}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spectral Sequences}\label{sec:prereq-ss}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Spectral Sequences}\label{sec:prereq-ss-def}
+
+\begin{definition}\label{prereq:def:ss-data}
+    \lean{KIPBase.SpectralSequence.SSData}\leanok
+    Let $\mathcal{C}$ be an abelian category. The \emph{nested subspace data} (or \emph{SS data}) for a spectral sequence at a single grading index consists of:
+    \begin{enumerate}
+        \item An ambient object $V \in \mathcal{C}$.
+        \item A decreasing family of subobjects $\{Z_r\}_{r \in \mathbb{N} \cup \{\infty\}}$ of $V$, called \emph{$r$-cycles}:
+        $$V = Z_0 \supseteq Z_1 \supseteq Z_2 \supseteq \cdots \supseteq Z_\infty.$$
+        \item An increasing family of subobjects $\{B_r\}_{r \in \mathbb{N} \cup \{\infty\}}$ of $V$, called \emph{$r$-boundaries}:
+        $$B_0 \subseteq B_1 \subseteq B_2 \subseteq \cdots \subseteq B_\infty.$$
+        \item The containment $B_r \subseteq Z_r$ for all $r$.
+        \item $Z_\infty$ is the greatest lower bound of the finite cycles: for any subobject $X \subseteq V$, if $X \subseteq Z_i$ for all $i \in \mathbb{N}$, then $X \subseteq Z_\infty$. Together with the monotonicity of $Z$, this gives $Z_\infty = \bigcap_{i \in \mathbb{N}} Z_i$.
+        \item $B_\infty$ is the least upper bound of the finite boundaries: for any subobject $X \subseteq V$, if $B_i \subseteq X$ for all $i \in \mathbb{N}$, then $B_\infty \subseteq X$. Together with the monotonicity of $B$, this gives $B_\infty = \bigcup_{i \in \mathbb{N}} B_i$.
+    \end{enumerate}
+    Together these form the nested chain
+    $$V \supseteq Z_0 \supseteq Z_1 \supseteq \cdots \supseteq Z_\infty \supseteq B_\infty \supseteq \cdots \supseteq B_1 \supseteq B_0.$$
+    The \emph{$r$-th page} at this index is defined as $E_r = Z_r / B_r$. The \emph{$E_\infty$-page} is $E_\infty = Z_\infty / B_\infty$.
+\end{definition}
+
+\begin{definition}\label{prereq:def:spectral-sequence}
+    \uses{prereq:def:ss-data}
+    \lean{KIPBase.SpectralSequence.SpectralSequence}\leanok
+    A \emph{spectral sequence} in an abelian category $\mathcal{C}$ with index type $\iota$ (typically $\mathbb{Z}^n$) consists of:
+    \begin{enumerate}
+        \item A starting page index $r_0 \in \mathbb{Z}$.
+        \item For each $r \ge r_0$ and index $\mathbf{k} \in \iota$, an object $E_r^{\mathbf{k}} \in \mathcal{C}$ (the \emph{$E_r$-page} at index $\mathbf{k}$).
+        \item A \emph{differential degree function} $\mathbf{d}: \mathbb{Z} \to \iota$, and differentials
+        $$d_r^{\mathbf{k}}: E_r^{\mathbf{k}} \to E_r^{\mathbf{k} + \mathbf{d}(r)}$$
+        satisfying $d_r \circ d_r = 0$ componentwise.
+        \item For each index $\mathbf{k}$, nested subspace data $(V^{\mathbf{k}}, Z_r^{\mathbf{k}}, B_r^{\mathbf{k}})$ such that $E_r^{\mathbf{k}} = Z_r^{\mathbf{k}} / B_r^{\mathbf{k}}$ for $r \ge r_0$.
+        \item An isomorphism $H(E_r, d_r) \cong E_{r+1}$ for each $r$. By the nesting $B_r \subseteq B_{r+1} \subseteq Z_{r+1} \subseteq Z_r$, the differential $d_r$ has kernel $Z_{r+1}/B_r$ and image $B_{r+1}/B_r$, so
+        $$H(E_r, d_r) = \frac{Z_{r+1}/B_r}{B_{r+1}/B_r} \cong Z_{r+1}/B_{r+1} = E_{r+1}$$
+        by the third isomorphism theorem.
+    \end{enumerate}
+\end{definition}
+
+\begin{remark}\label{prereq:rem:decreasing-filtration}
+    All filtrations considered in this project are decreasing.
+\end{remark}
+
+\begin{definition}\label{prereq:def:einfty-data}
+    \uses{prereq:def:ss-data}
+    \lean{KIPBase.SpectralSequence.SSData.eInfty}\leanok
+    The \emph{$E_\infty$-page} of a spectral sequence $E$ at index $\mathbf{k}$ is given by the nested subspace data: $E_\infty^{\mathbf{k}} = Z_\infty^{\mathbf{k}} / B_\infty^{\mathbf{k}}$. For bounded or degenerate spectral sequences, $E_\infty = E_r$ for all sufficiently large $r$.
+\end{definition}
+
+\begin{definition}\label{prereq:def:ss-morphism}
+    \uses{prereq:def:spectral-sequence}
+    \lean{KIPBase.SpectralSequence.SpectralSequenceMorphism}\leanok
+    A \emph{morphism of spectral sequences} $f: E \to E'$ consists of a family of maps $\varphi_{\mathbf{k}}: V^{\mathbf{k}} \to V'^{\mathbf{k}}$ on the underlying objects at each index, preserving the cycle and boundary subobjects:
+    $$\varphi_{\mathbf{k}}(Z_r^{\mathbf{k}}) \subseteq Z'^{\mathbf{k}}_r, \qquad \varphi_{\mathbf{k}}(B_r^{\mathbf{k}}) \subseteq B'^{\mathbf{k}}_r$$
+    for all $r$, and commuting with differentials on the induced page maps. A morphism induces maps on all pages $E_r \to E'_r$ and on the $E_\infty$-page.
+\end{definition}
+
+\subsubsection{Convergence of Spectral Sequences}\label{sec:prereq-convergence}
+
+\begin{definition}\label{prereq:def:convergence}
+    \uses{prereq:def:spectral-sequence,prereq:def:einfty-data,prereq:def:filtration,prereq:def:associated-graded}
+    \lean{KIPBase.SpectralSequence.Convergence}\leanok
+    Let $E$ be a spectral sequence with $n$-grading and let $A$ be an $(n-1)$-graded object equipped with a decreasing filtration (Definition~\ref{prereq:def:filtration}). We say $E$ \emph{converges} to $A$, written $E_{r_0} \Longrightarrow A$, if there exists an isomorphism of $n$-graded objects
+    $$E_\infty \cong \mathrm{gr}\, A,$$
+    where the $n$-grading on $\mathrm{gr}\, A$ is obtained from the $(n-1)$-grading of $A$ together with the filtration index, possibly composed with a fixed reindexing map.
+\end{definition}
+
+\begin{remark}\label{prereq:rem:weak-convergence}
+    This is convergence in the weak sense: we only require an isomorphism between $E_\infty$ and $\mathrm{gr}\, A$. Conditional convergence and strong convergence (in the sense of Boardman~\cite{Boardman}) are not considered in this project.
+\end{remark}
+
+\begin{definition}\label{prereq:def:converging-ss-morphism}
+    \uses{prereq:def:convergence,prereq:def:ss-morphism,prereq:def:filtration,prereq:def:filtered-morphism}
+    \lean{KIPBase.SpectralSequence.ConvergenceMorphism}\leanok
+    Given a reindexing rule, the \emph{category of converging spectral sequences} has objects $(E, A, F, \varphi)$ where $E$ is a spectral sequence, $A$ is a filtered graded object, and $\varphi: E_\infty \xrightarrow{\sim} \mathrm{gr}\, A$ is the convergence isomorphism. A morphism $(E_1, A_1) \to (E_2, A_2)$ consists of:
+    \begin{enumerate}
+        \item A morphism of spectral sequences $E_1 \to E_2$ (Definition~\ref{prereq:def:ss-morphism}), inducing maps on $E_\infty$-pages.
+        \item A filtration-preserving map $A_1 \to A_2$.
+        \item Compatibility: the induced $E_\infty$-map and the associated graded map commute with the convergence isomorphisms.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}\label{prereq:def:stem}
+    \uses{prereq:def:convergence}
+    \lean{KIPBase.SpectralSequence.Convergence.stemDegree}\leanok
+    In the setting of Definition~\ref{prereq:def:convergence}, the component of the $n$-grading on $E$ that corresponds to the original $(n-1)$-grading of $A$ is called the \emph{stem} (or \emph{topological degree}).
+\end{definition}
+
+\begin{definition}\label{prereq:def:filtration-degree}
+    \uses{prereq:def:convergence}
+    \lean{KIPBase.SpectralSequence.Convergence.filtrationDegree}\leanok
+    The component of the $n$-grading on $E$ that corresponds to the filtration on $A$ is called the \emph{filtration degree}.
+\end{definition}
+
+\begin{definition}\label{prereq:def:detect}
+    \uses{prereq:def:convergence}
+    \lean{KIPBase.SpectralSequence.Detects}\leanok
+    Suppose $E$ converges to $A$. Let $x \in A$ be an element with filtration at least $r$, i.e., $x \in F^r A$. Let $\bar{x}$ denote the image of $x$ in $\mathrm{gr}^r A = F^r A / F^{r+1} A$, and let $y \in E_\infty$ be the element corresponding to $\bar{x}$ under the convergence isomorphism. We say $y$ \emph{detects} $x$.
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:detect-zero}
+    \uses{prereq:def:detect}
+    \lean{KIPBase.SpectralSequence.detect_zero}\leanok
+    An element $x \in F^r A$ is detected by $0 \in E_\infty$ if and only if $x \in F^{r+1} A$.
+\end{proposition}
+\begin{proof}\leanok Immediate from the definition of detection and the convergence isomorphism.\end{proof}
+
+\begin{proposition}\label{prereq:prop:detect-difference}
+    \uses{prereq:def:detect}
+    \lean{KIPBase.SpectralSequence.detect_difference}\leanok
+    Two elements $x, x' \in F^r A$ are both detected by the same $y \in E_\infty$ if and only if $x - x' \in F^{r+1} A$.
+\end{proposition}
+\begin{proof}\leanok Follows from Proposition~\ref{prereq:prop:detect-zero} applied to $x - x'$.\end{proof}
+
+\subsubsection{Filtered Complex}\label{sec:prereq-filtered-complex}
+
+\begin{definition}\label{prereq:def:filtration}
+    \lean{KIPBase.SpectralSequence.Filtration}\leanok
+    A \emph{filtered $n$-graded abelian group} is an $n$-graded abelian group $A$ equipped with a decreasing filtration: for each index $\mathbf{k} \in \mathbb{Z}^n$, a family of subgroups
+    $$\cdots \supseteq F^{s-1} A^{\mathbf{k}} \supseteq F^s A^{\mathbf{k}} \supseteq F^{s+1} A^{\mathbf{k}} \supseteq \cdots$$
+\end{definition}
+
+\begin{definition}\label{prereq:def:filtered-morphism}
+    \uses{prereq:def:filtration}
+    \lean{KIPBase.SpectralSequence.FilteredMorphism}\leanok
+    A \emph{morphism of filtered graded abelian groups} is a graded homomorphism $f: A \to B$ that preserves the filtration: $f(F^s A^{\mathbf{k}}) \subseteq F^s B^{\mathbf{k}}$ for all $s$ and $\mathbf{k}$. Filtered graded abelian groups and their morphisms form a category.
+\end{definition}
+
+\begin{definition}\label{prereq:def:filtered-complex}
+    \uses{prereq:def:filtration}
+    \lean{KIPBase.SpectralSequence.FilteredComplex}\leanok
+    A \emph{filtered chain complex} is a chain complex $(C_*, d)$ in the category of filtered graded abelian groups: the differential $d: C_n \to C_{n-1}$ preserves the filtration, i.e., $d(F^s C_n) \subseteq F^s C_{n-1}$ for all $s$ and $n$.
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:homology-filtration}
+    \uses{prereq:def:filtered-complex}
+    \lean{KIPBase.SpectralSequence.FilteredComplex.homologyFiltration}\leanok
+    A filtered chain complex $(C_*, d, F^s)$ induces a natural filtration on its homology:
+    $$F^s H_n(C_*) = \mathrm{im}(H_n(F^s C_*) \to H_n(C_*)) = \ker(H_n(C_*) \to H_n(C_* / F^s C_*)).$$
+\end{proposition}
+
+\begin{definition}\label{prereq:def:associated-graded}
+    \uses{prereq:def:filtration}
+    \lean{KIPBase.SpectralSequence.Filtration.associatedGraded}\leanok
+    Given a filtered graded abelian group $(A, F)$, the \emph{associated graded} is
+    $$\mathrm{gr}^s A^{\mathbf{k}} = F^s A^{\mathbf{k}} / F^{s+1} A^{\mathbf{k}}.$$
+\end{definition}
+
+\begin{definition}\label{prereq:def:associated-graded-complex}
+    \uses{prereq:def:filtered-complex,prereq:def:associated-graded}
+    \lean{KIPBase.SpectralSequence.FilteredComplex.assocGraded}\leanok
+    Given a filtered chain complex $(C_*, d, F^s)$, the \emph{associated graded complex} is the bigraded object $\mathrm{gr}^s C_n$ equipped with the induced differential $\bar{d}: \mathrm{gr}^s C_n \to \mathrm{gr}^s C_{n-1}$ (well-defined since $d$ preserves the filtration).
+\end{definition}
+
+\begin{definition}\label{prereq:def:exhaustive}
+    \uses{prereq:def:filtered-complex}
+    \lean{KIPBase.SpectralSequence.Filtration.IsExhaustive}\leanok
+    A filtered chain complex $(C_*, d, F^s)$ is \emph{exhaustive} if $\bigcup_s F^s C_n = C_n$ for all $n$.
+\end{definition}
+
+\begin{definition}\label{prereq:def:hausdorff}
+    \uses{prereq:def:filtered-complex}
+    \lean{KIPBase.SpectralSequence.Filtration.IsHausdorff}\leanok
+    A filtered chain complex $(C_*, d, F^s)$ is \emph{Hausdorff} (or \emph{separated}) if $\bigcap_s F^s C_n = 0$ for all $n$.
+\end{definition}
+
+\begin{definition}\label{prereq:def:bounded-filtration}
+    \uses{prereq:def:exhaustive,prereq:def:hausdorff}
+    \lean{KIPBase.SpectralSequence.FilteredComplex.IsBounded}\leanok
+    A filtered chain complex $(C_*, d, F^s)$ is \emph{bounded} if for each $n$, there exist $a \le b$ with $F^a C_n = C_n$ and $F^{b+1} C_n = 0$. A bounded filtration is both exhaustive and Hausdorff.
+\end{definition}
+
+\begin{definition}\label{prereq:def:filtered-complex-ssdata}
+    \uses{prereq:def:ss-data,prereq:def:filtered-complex,prereq:def:associated-graded-complex}
+    \lean{KIPBase.SpectralSequence.FilteredComplex.toSSData}\leanok
+    Given a filtered chain complex $(C_*, d, F^s)$, we construct an SSData structure. The spectral sequence starts at $E_0$ with $(n+1)$-grading.
+    \begin{enumerate}
+        \item Define $V^{s,t} = \mathrm{gr}^s C_{s+t}$, the associated graded.
+        \item Define $Z_r^{s,t}$ as the image in $\mathrm{gr}^s C_{s+t}$ of those $x \in F^s C_{s+t}$ with $dx \in F^{s+r} C_{s+t-1}$.
+        \item Define $B_r^{s,t}$ as the image in $\mathrm{gr}^s C_{s+t}$ of those elements of the form $dy$ with $y \in F^{s-r} C_{s+t+1}$.
+    \end{enumerate}
+    The differential $d_r: E_r^{s,t} \to E_r^{s+r,t-r+1}$ is induced by $d$: for $[x] \in Z_r^{s,t}$, define $d_r[x] = [dx] \in E_r^{s+r,t-r+1}$.
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:filtered-complex-ssdata-wd}
+    \uses{prereq:def:filtered-complex-ssdata}
+    \lean{KIPBase.SpectralSequence.FilteredComplex.pageDifferential_comp}\leanok
+    The differential $d_r$ in Definition~\ref{prereq:def:filtered-complex-ssdata} is well-defined and satisfies $d_r \circ d_r = 0$.
+\end{proposition}
+\begin{proof}\leanok This is verified by a direct computation in the filtered complex, showing that the composition of two successive page differentials factors through zero.\end{proof}
+
+\begin{theorem}\label{prereq:thm:filtered-complex-ss}
+    \uses{prereq:def:spectral-sequence,prereq:def:filtered-complex-ssdata,prereq:prop:filtered-complex-ssdata-wd}
+    \lean{KIPBase.SpectralSequence.FilteredComplex.toSpectralSequence}\leanok
+    The nested subspace data and differentials from Definition~\ref{prereq:def:filtered-complex-ssdata} satisfy the axioms of a spectral sequence. Specifically:
+    \begin{enumerate}
+        \item $B_r \subseteq B_{r+1} \subseteq Z_{r+1} \subseteq Z_r$ for all $r$.
+        \item $E_r^{s,t} = Z_r^{s,t} / B_r^{s,t}$.
+        \item $H(E_r, d_r) \cong E_{r+1}$.
+    \end{enumerate}
+    The spectral sequence starts at $E_0^{s,t} = F^s C_{s+t} / F^{s+1} C_{s+t}$ with differentials $d_r: E_r^{s,t} \to E_r^{s+r,t-r+1}$.
+\end{theorem}
+
+\begin{theorem}\label{prereq:thm:filtered-complex-convergence}
+    \uses{prereq:thm:filtered-complex-ss,prereq:def:convergence,prereq:prop:homology-filtration,prereq:def:exhaustive,prereq:def:hausdorff}
+    \lean{KIPBase.SpectralSequence.FilteredComplex.weakConvergence}\leanok
+    If the filtration on a filtered chain complex is exhaustive and Hausdorff, then the associated spectral sequence converges to the homology:
+    $$E_r^{s,t} \Longrightarrow H_{s+t}(C_*).$$
+    The convergence isomorphism is $E_\infty^{s,t} \cong \mathrm{gr}^s H_{s+t}(C_*)$ with respect to the induced filtration from Proposition~\ref{prereq:prop:homology-filtration}.
+\end{theorem}
+
+\begin{definition}\label{prereq:def:filtered-complex-morphism}
+    \uses{prereq:def:filtered-complex}
+    A \emph{morphism of filtered chain complexes} $f: (C_*, F) \to (D_*, G)$ is a chain map $f: C_* \to D_*$ preserving the filtration: $f(F^s C_n) \subseteq G^s D_n$ for all $s, n$.
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:filtered-complex-functoriality}
+    \uses{prereq:thm:filtered-complex-ss,prereq:def:filtered-complex-morphism,prereq:def:ss-morphism}
+    A morphism of filtered chain complexes induces a morphism of the associated spectral sequences. This construction is functorial.
+\end{proposition}
+
+\subsubsection{Crossing of Differentials}\label{sec:prereq-crossing}
+
+\begin{definition}\label{prereq:def:essential-differential}
+    \uses{prereq:def:spectral-sequence}
+    \lean{KIPBase.SpectralSequence.IsEssentialAt}\leanok
+    Let $E$ be a spectral sequence. A differential $d_r(x) = y$ is called \emph{essential} if $y \ne 0$ on the $E_r$-page. Equivalently, $d_r(x) = y$ is essential if $x$ is not a boundary and $y$ is not zero in $E_r$. A differential is \emph{inessential} if $y = 0$ on the $E_r$-page.
+\end{definition}
+
+\begin{definition}\label{prereq:def:differential-data}
+    \uses{prereq:def:spectral-sequence,prereq:def:essential-differential}
+    \lean{KIPBase.SpectralSequence.DifferentialDatum}\leanok
+    A \emph{differential datum} in a spectral sequence $E$ is a triple $(r, x, y)$ where $r \ge r_0$, $x \in E_r^{\mathbf{k}}$, and $y \in E_r^{\mathbf{k}+\mathbf{d}(r)}$ with $d_r(x) = y$. We say the differential datum is \emph{essential} if $y \ne 0$, and denote it $d_r(x) = y$.
+\end{definition}
+
+\begin{definition}\label{prereq:def:crossing}
+    \uses{prereq:def:convergence,prereq:def:essential-differential,prereq:def:differential-data}
+    \lean{KIPBase.SpectralSequence.HasCrossingAt}\leanok
+    Let $f: V_1 \to V_2$ be a morphism of converging spectral sequences, and suppose $d_n^f(x) = y$ is an $f$-extension differential with $x \in E_\infty^{s}(V_1)$ and $y \in E_\infty^{s+n}(V_2)$.
+    \begin{enumerate}
+        \item We say that $d_n^f(x) = y$ \emph{has a crossing that hits filtration $p$} for some $p \le s+n$, if there exists $x' \in E_\infty^{s+a}(V_1)$ with $a > 0$ and an essential differential $d_{n-a}^f(x') = y'$ for $0 \ne y' \in E_\infty^{s+a+(n-a)}(V_2)$ such that
+        $$p \le \mathrm{Fil}(y') \le \mathrm{Fil}(y) = s + n.$$
+        \item We say that $d_n^f(x) = y$ \emph{has no crossing that hits the range $\mathrm{Fil} \ge p$} if there does not exist such $x'$ and $y'$ with $p \le \mathrm{Fil}(y') \le \mathrm{Fil}(y)$.
+        \item We say that $d_n^f(x) = y$ \emph{has no crossing} if it has no crossing that hits the range $\mathrm{Fil} \ge \mathrm{Fil}(x) + 1 = s + 1$.
+    \end{enumerate}
+\end{definition}
+
+\begin{remark}\label{prereq:rem:no-crossing-equiv}
+    \uses{prereq:def:crossing}
+    The following are equivalent:
+    \begin{itemize}
+        \item An $f$-extension $d_n^f(x) = y$ has no crossing that hits the range $\mathrm{Fil} \ge p$.
+        \item For any $a > 0$, if there is an $f$-extension from $x' \in E_\infty^{s+a}(V_1)$ to some nontrivial $y'$, then $\mathrm{Fil}(y') < p$ or $\mathrm{Fil}(y') > \mathrm{Fil}(y)$.
+    \end{itemize}
+\end{remark}
+
+\begin{axiom}\label{prereq:ax:no-crossing-iff}
+    \uses{prereq:def:crossing,prereq:ax:f-ext-characterization,prereq:ax:f-ext-inessential}
+    \notready
+    An $f$-extension from $x$ to $y$ has no crossing in the range $\mathrm{Fil} \ge p$ if and only if for all $[x] \in \{x\}$ such that $\mathrm{Fil}(f_A[x]) \ge p$ we have $f_A[x] \in \{y\}$. In particular:
+    \begin{enumerate}
+        \item An $f$-extension from $x$ to $y$ has no crossing if and only if for all $[x] \in \{x\}$ we have $f_A[x] \in \{y\}$.
+        \item An $f$-extension $d_n^f(x) = 0$ has no crossing if and only if for all $[x] \in \{x\}$, $\mathrm{Fil}(f_A[x]) > \mathrm{Fil}(x) + n$.
+        \item If $\mathrm{AF}(f) = n$, then all $d_n^f$-differentials have no crossing.
+    \end{enumerate}
+\end{axiom}
+\begin{proof}\leanok
+    \emph{Only if.} Suppose the extension has no crossing in $\mathrm{Fil} \ge p$. Assume for contradiction that there exists $[x] \in \{x\}$ with $\mathrm{Fil}(f_A[x]) \ge p$ but $f_A[x] \notin \{y\}$. Let $y'$ be the element of $E_\infty(V_2)$ detecting $f_A[x]$, so $f_A[x] \in \{y'\}$ with $\mathrm{Fil}(y') \ge p$. By Proposition~\ref{prereq:ax:f-ext-characterization} there is an $f$-extension from $x$ to $y'$. By Proposition~\ref{prereq:ax:f-ext-inessential}~(2), $y'$ (if $\mathrm{Fil}(y) > \mathrm{Fil}(y')$) or $y - y'$ (if $\mathrm{Fil}(y) = \mathrm{Fil}(y')$) is hit by a shorter $d^f$-differential from some $x'$ with $\mathrm{Fil}(x') > \mathrm{Fil}(x)$. This gives a crossing that hits $\mathrm{Fil} \ge p$, contradicting the assumption.
+
+    \emph{If.} Suppose the extension has a crossing: there exist $x' \in E_\infty^{s+a}(V_1)$ with $a > 0$ and essential $d_{n-a}^f(x') = y'$ with $p \le \mathrm{Fil}(y') \le \mathrm{Fil}(y)$. By Proposition~\ref{prereq:ax:f-ext-characterization}, there exists $[x'] \in \{x'\}$ with $f_A([x']) \in \{y'\}$. Since $\mathrm{Fil}(x') > \mathrm{Fil}(x)$, the element $[x] + [x'] \in \{x\}$ (as $[x']$ lies in higher filtration). Then
+    $$f_A([x] + [x']) = f_A([x]) + f_A([x']),$$
+    and this element is detected by $y'$ (if $\mathrm{Fil}(y') < \mathrm{Fil}(y)$) or by $y + y'$ (if $\mathrm{Fil}(y') = \mathrm{Fil}(y)$). In either case $f_A([x] + [x']) \notin \{y\}$ while $\mathrm{Fil}(f_A([x] + [x'])) \ge p$, contradicting the assumption.
+
+    Parts~(1) and~(2) are special cases. Part~(3) holds for degree reasons: if $\mathrm{AF}(f) = n$, then $f_A$ raises filtration by at least $n$, so $\mathrm{Fil}(f_A[x]) \ge s + n$ for all $[x] \in F^s A_1$.
+\end{proof}
+
+\subsubsection{Extension Spectral Sequence}\label{sec:prereq-ess}
+
+\begin{definition}\label{prereq:def:ess-underlying-complex}
+    \uses{prereq:def:filtered-complex,prereq:def:convergence}
+    Let $f: V_1 \to V_2$ be a morphism of converging spectral sequences, with underlying map $f_A: A_1 \to A_2$ on the target groups. The \emph{underlying filtered chain complex} of $f$ is the two-term chain complex
+    $$C_1 = A_1 \xrightarrow{f_A} C_0 = A_2,$$
+    equipped with the filtrations on $A_1$ and $A_2$ inherited from the convergence data: $F^s C_1 = F^s A_1$ and $F^s C_0 = F^s A_2$. Since $f_A$ preserves the filtration, this is a filtered chain complex in the sense of Definition~\ref{prereq:def:filtered-complex}.
+\end{definition}
+
+\begin{definition}\label{prereq:def:ess}
+    \uses{prereq:def:ess-underlying-complex,prereq:thm:filtered-complex-ss,prereq:thm:filtered-complex-convergence}
+    \lean{KIPBase.SpectralSequence.BoundedExtensionSS}\leanok
+    The \emph{$f$-extension spectral sequence} ($f$-ESS) is the spectral sequence
+    $$\mathrm{ESS}(f) = \mathrm{FilteredComplex.toSpectralSequence}(C_*(f)),$$
+    obtained by applying the filtered complex construction (Theorem~\ref{prereq:thm:filtered-complex-ss}) to the underlying filtered chain complex of Definition~\ref{prereq:def:ess-underlying-complex}. By Theorem~\ref{prereq:thm:filtered-complex-convergence}, if the filtrations on $A_1$ and $A_2$ are exhaustive and Hausdorff (which holds when they are bounded), then the $f$-ESS converges to the homology of the underlying complex, i.e., to $\ker(f_A) \oplus \mathrm{coker}(f_A)$.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:ess-e0-iso}
+    \uses{prereq:def:ess,prereq:def:associated-graded}
+    \notready
+    The $E_0$-page of the $f$-ESS is canonically isomorphic to the direct sum of the $E_\infty$-pages of the source and target:
+    $$\mathrm{ESS}(f)_0^{s} \cong E_\infty^{s}(V_1) \oplus E_\infty^{s}(V_2).$$
+    This follows from $E_0^s = \mathrm{gr}^s C_* = \mathrm{gr}^s A_1 \oplus \mathrm{gr}^s A_2 \cong E_\infty^s(V_1) \oplus E_\infty^s(V_2)$.
+\end{axiom}
+
+\begin{proposition}\label{prereq:prop:ess-diff-components}
+    \uses{prereq:ax:ess-e0-iso}
+    Under the decomposition $\mathrm{ESS}(f)_0^{s} \cong E_\infty^{s}(V_1) \oplus E_\infty^{s}(V_2)$, the differentials of the $f$-ESS have the form
+    $$d_n^{\mathrm{ESS}}: E_\infty^{s}(V_1) \oplus E_\infty^{s}(V_2) \to E_\infty^{s+n}(V_1) \oplus E_\infty^{s+n}(V_2),$$
+    and only the component $E_\infty^{s}(V_1) \to E_\infty^{s+n}(V_2)$ can be nonzero; the other three components (source-to-source, target-to-source, target-to-target) vanish. This follows from the chain complex structure: the differential of $C_*$ maps $C_1 = A_1$ to $C_0 = A_2$ and is zero in the reverse direction.
+\end{proposition}
+
+\begin{definition}\label{prereq:def:f-extension-diff}
+    \uses{prereq:prop:ess-diff-components}
+    \lean{KIPBase.SpectralSequence.HasFExtension}
+    The \emph{$f$-extension differential} $d_n^f: E_\infty^{s}(V_1) \to E_\infty^{s+n}(V_2)$ is the unique nonzero component of the $n$-th differential of the $f$-ESS (Proposition~\ref{prereq:prop:ess-diff-components}). We say there is an \emph{$f$-extension} from $x \in E_\infty^{s}(V_1)$ to $y \in E_\infty^{s+n}(V_2)$ if $d_n^f(x) = y$. The extension is \emph{essential} if $y$ is nontrivial on the $E_n$-page; otherwise it is \emph{inessential}.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:ess-d0}
+    \uses{prereq:def:f-extension-diff,prereq:def:associated-graded}
+    \notready
+    The zeroth extension differential $d_0^f$ equals the map induced by $f$ on the associated graded:
+    $$d_0^f = \mathrm{gr}^s(f_A): \mathrm{gr}^s A_1 \to \mathrm{gr}^s A_2.$$
+    Under the identification $\mathrm{gr}^s A_i \cong E_\infty^s(V_i)$, this is the map $E_\infty^s(V_1) \to E_\infty^s(V_2)$ induced by $f$ on $E_\infty$-pages.
+\end{axiom}
+\begin{proof}\leanok This is the standard formula for the $E_0$-differential of a filtered complex (Definition~\ref{prereq:def:filtered-complex-ssdata}): $d_0$ is induced by the chain differential on the associated graded.\end{proof}
+
+\begin{notation}\label{prereq:not:representatives}
+    \uses{prereq:def:detect}
+    \lean{KIPBase.SpectralSequence.DetectionSet}\leanok
+    For $x \in E_\infty^{s}(V_1)$, let $\{x\} \subseteq A_1$ denote the set of elements detected by $x$:
+    $$\{x\} = \{ \alpha \in F^s A_1 \mid \bar{\alpha} \mapsto x \text{ under } E_\infty^{s} \cong \mathrm{gr}^s A_1 \}.$$
+    For $[x] \in \{x\}$, we call $[x]$ a \emph{representative} of $x$. Note that $\{x\}$ is a coset of $F^{s+1}A_1$ in $F^s A_1$.
+\end{notation}
+
+\begin{axiom}\label{prereq:ax:f-ext-characterization}
+    \uses{prereq:def:f-extension-diff,prereq:not:representatives}
+    \notready
+    An $f$-extension $d_n^f(x) = y$ holds if and only if there exists $[x] \in \{x\}$ such that $f_A[x] \in \{y\}$.
+\end{axiom}
+\begin{proof}\leanok Follows directly from the filtered complex construction: $d_n^f(x) = y$ means there is a lift of $x$ in $F^s A_1$ whose image under $f_A$ lies in $F^{s+n} A_2$ and represents $y$ in $\mathrm{gr}^{s+n} A_2$.\end{proof}
+
+\begin{axiom}\label{prereq:ax:f-ext-inessential}
+    \uses{prereq:ax:f-ext-characterization,prereq:not:representatives}
+    \notready
+    Consider $f: V_1 \to V_2$, $x \in E_\infty^{s}(V_1)$, $y \in E_\infty^{s+n}(V_2)$ and $y' \in E_\infty^{s+m}(V_2)$ for $m, n \ge 0$.
+    \begin{enumerate}
+        \item An $f$-extension from $x$ to $y$ is inessential, i.e., $y$ is trivial on the $E_n$-page of the $f$-ESS, if and only if there exists $x' \in E_\infty^{s+a}(V_1)$ for some $0 < a \le n$ with an essential differential $d_{n-a}^f(x') = y$. Equivalently, there exists $[x'] \in \{x'\} \subseteq A_1$ with $\mathrm{Fil}(x') > \mathrm{Fil}(x)$ such that $f_A[x'] \in \{y\}$.
+        \item Suppose $d_n^f(x) = y$ and $d_m^f(x) = y'$.
+        \begin{enumerate}
+            \item If $m = n$, then $y - y' \in {}^f\!B_{n-1}^{s+n}(V_2)$: there exists $x' \in E_\infty^{s+a}(V_1)$ for some $0 < a \le n$ with an essential differential $d_{n-a}^f(x') = y - y'$.
+            \item If $m > n$, then the $f$-extension from $x$ to $y$ is inessential.
+        \end{enumerate}
+    \end{enumerate}
+\end{axiom}
+\begin{proof}\leanok Part~(1) follows from the definition of the page boundaries in the filtered complex construction. Parts~(2a) and~(2b) follow from Part~(1) and Proposition~\ref{prereq:ax:f-ext-characterization}.\end{proof}
+
+\begin{axiom}\label{prereq:ax:ess-exactness}
+    \uses{prereq:ax:f-ext-characterization,prereq:ax:composition-zero,prereq:not:representatives}
+    \notready
+    Suppose the sequence of converging spectral sequences $V_1 \xrightarrow{f} V_2 \xrightarrow{g} V_3$ induces an exact sequence on target groups $A_1 \xrightarrow{f_A} A_2 \xrightarrow{g_A} A_3$ that is exact at $A_2$. Then all permanent $d^g$-cycles in $E_\infty(V_2)$ are boundaries in the $f$-ESS.
+\end{axiom}
+\begin{proof}\leanok
+    \emph{First proof} (via chain complexes). Treat the three-term sequence $A_1 \xrightarrow{f_A} A_2 \xrightarrow{g_A} A_3$ as a filtered chain complex. Its associated spectral sequence comprises both the $d^f$ and $d^g$ differentials. By exactness at $A_2$, the abutment projected to the $A_2$-component is zero. Therefore every permanent $d^g$-cycle must be killed by a $d^f$-differential.
+
+    \emph{Second proof} (via representatives). Let $y \in E_\infty(V_2)$ be a permanent $d^g$-cycle. By convergence, there exists $[y] \in \{y\}$ with $g_A([y]) = 0$. By exactness, there exists $[x] \in A_1$ with $f_A([x]) = [y]$. Let $x \in E_\infty(V_1)$ detect $[x]$. Then $f_A[x] \in \{y\}$, so by Proposition~\ref{prereq:ax:f-ext-characterization} there is an $f$-extension from $x$ to $y$.
+\end{proof}
+
+\paragraph{Unbounded Extension Spectral Sequence.}\label{sec:prereq-unbounded-ess}
+
+Throughout this subsection, all filtrations are assumed to be \emph{bounded below}: the filtration $F^\bullet A$ satisfies $F^p A = A$ for all sufficiently negative $p$. Filtrations need not be bounded above. We extend the $f$-ESS construction to this setting by defining it as the inverse limit of bounded truncations.
+
+\begin{definition}\label{prereq:def:truncated-ss}
+    \uses{prereq:def:spectral-sequence,prereq:def:convergence,prereq:def:filtration,prereq:def:bounded-filtration}
+    \lean{KIPBase.SpectralSequence.Filtration.truncatedFiltration}\leanok
+    Let $(E, A, F)$ be a converging spectral sequence with filtration $F^\bullet A$ bounded below. For an integer $s$, the \emph{$s$-truncation} of $(E, A, F)$ is the converging spectral sequence $(E^{[\le s]}, A^{[\le s]}, F^{[\le s]})$ defined as follows:
+    \begin{enumerate}
+        \item The \emph{truncated spectral sequence}: for each filtration degree $p$, set
+        $$V^{[\le s],p} = \begin{cases} V^p & \text{if } p \le s, \\ 0 & \text{otherwise,} \end{cases}$$
+        so that $E_r^{[\le s],p} = E_r^p$ for $p \le s$ and $E_r^{[\le s],p} = 0$ for $p > s$.
+        \item The \emph{truncated abutment} is the quotient
+        $$A^{[\le s]} = A \big/ F^{s+1} A,$$
+        equipped with the induced filtration
+        $$F^{[\le s],p} A^{[\le s]} = \begin{cases} \big(F^p A + F^{s+1} A\big) \big/ F^{s+1} A & \text{if } p \le s, \\ 0 & \text{if } p > s. \end{cases}$$
+        When $F^p A = A$ (which holds for all sufficiently negative $p$ by the bounded below assumption), this reduces to $F^{[\le s],p} A^{[\le s]} = A^{[\le s]}$.
+    \end{enumerate}
+    The truncation $(E^{[\le s]}, A^{[\le s]}, F^{[\le s]})$ is a converging spectral sequence with bounded (hence exhaustive and Hausdorff) filtration.
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:truncations-inverse-system}
+    \uses{prereq:def:truncated-ss,prereq:def:converging-ss-morphism}
+    \lean{KIPBase.SpectralSequence.Filtration.truncationTransition_comp}\leanok
+    The collection $\{(E^{[\le s]}, A^{[\le s]})\}_{s \in \bZ}$ forms an \emph{inverse system} in the category of converging spectral sequences, indexed by $s$ with order $s \ge s'$. For $s \ge s'$, the transition morphism is the natural projection
+    $$A^{[\le s]} = A \big/ F^{s+1} A \;\longrightarrow\; A \big/ F^{s'+1} A = A^{[\le s']},$$
+    which is compatible with the truncated filtrations and with the spectral sequence page maps.
+\end{proposition}
+
+\begin{proposition}\label{prereq:prop:invlim-of-truncations-ss}
+    \uses{prereq:prop:truncations-inverse-system,prereq:def:spectral-sequence}
+    Let $(E, A, F)$ be a converging spectral sequence with filtration bounded below. Then the spectral sequence $E$ is the inverse limit of the spectral sequences of the truncations: at each filtration degree $p$ and page $r$ one has
+    $$E_r^p \cong \varprojlim_{s \ge p}\, E_r^{[\le s],p}.$$
+\end{proposition}
+
+\begin{proposition}\label{prereq:prop:invlim-of-truncations-complete}
+    \uses{prereq:prop:truncations-inverse-system,prereq:prop:invlim-of-truncations-ss,prereq:def:spectral-sequence,prereq:def:convergence,prereq:def:filtration-completion}
+    Let $(E, A, F)$ be a converging spectral sequence with filtration bounded below. If the filtration on $A$ is \emph{complete} (Definition~\ref{prereq:def:filtration-completion}), then the converging spectral sequence $(E, A)$ is the inverse limit of the inverse system of truncations in the category of converging spectral sequences:
+    $$(E, A) \cong \varprojlim_{s}\, (E^{[\le s]}, A^{[\le s]}).$$
+\end{proposition}
+
+\begin{definition}\label{prereq:def:unbounded-ess}
+    \uses{prereq:def:ess,prereq:def:truncated-ss,prereq:prop:truncations-inverse-system,prereq:prop:unbounded-ess-stabilization}
+    \lean{KIPBase.SpectralSequence.UnboundedExtensionSS}
+    Let $f: (E_1, A_1) \to (E_2, A_2)$ be a morphism of converging spectral sequences with filtrations bounded below (not necessarily bounded above). For each integer $s$, let $f^{[\le s]}: (E_1^{[\le s]}, A_1^{[\le s]}) \to (E_2^{[\le s]}, A_2^{[\le s]})$ denote the induced morphism of truncated converging spectral sequences. The \emph{unbounded $f$-extension spectral sequence} is the spectral sequence (without converging data) defined as the inverse limit in the category of spectral sequences:
+    $$\mathrm{ESS}^{\mathrm{unbd}}(f) = \varprojlim_{s}\, \mathrm{ESS}(f^{[\le s]}),$$
+    where each $\mathrm{ESS}(f^{[\le s]})$ is the (bounded) extension spectral sequence of Definition~\ref{prereq:def:ess}. The inverse limit is well-defined as a spectral sequence by the stabilization property (Proposition~\ref{prereq:prop:unbounded-ess-stabilization}).
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:unbounded-ess-stabilization}
+    \uses{prereq:def:ess,prereq:def:f-extension-diff,prereq:def:truncated-ss,prereq:prop:truncations-inverse-system}
+    \lean{KIPBase.SpectralSequence.truncatedESS_pageStabilization}
+    Let $f: (E_1, A_1) \to (E_2, A_2)$ be a morphism of converging spectral sequences with filtrations bounded below. Fix a filtration degree $p \in \bZ$ and a page index $r \ge 1$. Then for all integers $s \ge p + r$, the component of the $s$-truncated extension spectral sequence at filtration degree $p$ and page $r$ is canonically isomorphic to the corresponding component of the $s'$-truncated extension spectral sequence for any $s' \ge s$:
+    $$\mathrm{ESS}(f^{[\le s]})_r^{p,*} \;\cong\; \mathrm{ESS}(f^{[\le s']})_r^{p,*}.$$
+    In other words, once the truncation level $s \ge p + r$ (so that the truncated ESS retains both the source filtration degree $p$ and the target filtration degree $p + r$), the $d_r^f$-differential at filtration degree $p$ is fully determined and independent of the truncation level.
+\end{proposition}
+
+\begin{definition}\label{prereq:def:filtration-completion}
+    \uses{prereq:def:truncated-ss,prereq:prop:truncations-inverse-system,prereq:def:filtration}
+    \lean{KIPBase.SpectralSequence.Filtration.completion}\leanok
+    Let $(E, A, F)$ be a converging spectral sequence with filtration bounded below. The \emph{completion} of $A$ with respect to the filtration $F$ is the inverse limit
+    $$\widehat{A} = \varprojlim_{s}\, A^{[\le s]} = \varprojlim_{s}\, A \big/ F^{s+1} A.$$
+    There is a natural map $\iota: A \to \widehat{A}$ induced by the projections $A \to A/F^{s+1}A$. The filtration is called \emph{complete} if $\iota$ is an isomorphism. The Hausdorff condition (Definition~\ref{prereq:def:hausdorff}) ensures $\iota$ is injective; completeness further requires $\iota$ to be surjective.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:unbounded-ess-convergence}
+    \uses{prereq:def:unbounded-ess,prereq:def:filtration-completion,prereq:prop:unbounded-ess-stabilization}
+    \lean{KIPBase.SpectralSequence.UnboundedExtensionSS.weakConvergence}
+    Let $f: (E_1, A_1) \to (E_2, A_2)$ be a morphism of converging spectral sequences with filtrations bounded below. Suppose that the inverse systems $\{A_i^{[\le s]}\}_{s \in \bZ}$ (for $i = 1, 2$) satisfy the \emph{Mittag-Leffler condition}: for each $s$, the images of the transition maps $A_i^{[\le s']} \to A_i^{[\le s]}$ stabilize as $s' \to \infty$. Then the unbounded $f$-extension spectral sequence $\mathrm{ESS}^{\mathrm{unbd}}(f)$ converges to the bigraded associated-graded homology of the completions:
+    $$E_\infty\!\left(\mathrm{ESS}^{\mathrm{unbd}}(f)\right) \cong H_*\!\left(\widehat{A}_1 \xrightarrow{\hat{f}_A} \widehat{A}_2\right),$$
+    where $\hat{f}_A: \widehat{A}_1 \to \widehat{A}_2$ is the completion of $f_A$, and the right-hand side denotes the bigraded associated-graded homology of the two-term complex equipped with the filtrations induced on $\widehat{A}_1$ and $\widehat{A}_2$.
+\end{axiom}
+
+\subsubsection{Commutativity of Extension Differentials}\label{sec:prereq-commutativity}
+
+\begin{axiom}\label{prereq:ax:four-spectra}
+    \uses{prereq:ax:no-crossing-iff,prereq:ax:f-ext-characterization}
+    \notready
+    Consider a homotopy commutative diagram of converging spectral sequences
+    $$\begin{CD}
+    V_1 @>{f}>> V_2 \\
+    @V{p}VV @VV{q}V \\
+    V_3 @>{g}>> V_4
+    \end{CD}$$
+    Suppose $m, n, l \ge 0$, $0 < k \le m + l - n$,
+    $$x \in E_\infty^{s}(V_1), \quad y \in E_\infty^{s+n}(V_2), \quad z \in E_\infty^{s+m}(V_3), \quad w \in E_\infty^{s+m+l}(V_4),$$
+    and
+    \begin{enumerate}
+        \item $d_n^f(x) = y$,
+        \item $d_m^p(x) = z$,
+        \item the differential in (1) or (2) has no crossing,
+        \item $d_l^g(z) = w$, and has no crossing that hits $\mathrm{Fil} \ge s + n + k$,
+        \item $d_{k-1}^q y = 0$, and has no crossing.
+    \end{enumerate}
+    Then $d_{m+l-n}^q(y) = w$.
+\end{axiom}
+\begin{proof}\leanok
+    First we find a representative $[x] \in \{x\}$ such that $p_A[x] \in \{z\}$ and $f_A[x] \in \{y\}$.
+
+    If the differential in~(2) has no crossing, by Proposition~\ref{prereq:ax:no-crossing-iff} we can pick $[x] \in \{x\}$ such that $p_A[x] \in \{z\}$; by Proposition~\ref{prereq:ax:f-ext-characterization}, $f_A[x] \in \{y'\}$ for some $y'$, but the no-crossing condition forces $f_A[x] \in \{y\}$. Symmetrically, if the differential in~(1) has no crossing, we pick $[x]$ with $f_A[x] \in \{y\}$ and the no-crossing forces $p_A[x] \in \{z\}$.
+
+    By~(5) and Proposition~\ref{prereq:ax:no-crossing-iff}~(2), since $d_{k-1}^q y = 0$ has no crossing, $\mathrm{Fil}(q_A f_A[x]) \ge s + n + k$. Since the diagram commutes on target groups, $g_A p_A[x] = q_A f_A[x]$, so $\mathrm{Fil}(g_A p_A[x]) \ge s + n + k$.
+
+    Combining with~(4) ($d_l^g(z) = w$ has no crossing that hits $\mathrm{Fil} \ge s + n + k$) and $p_A[x] \in \{z\}$, Proposition~\ref{prereq:ax:no-crossing-iff} gives $g_A p_A[x] \in \{w\}$.
+
+    Therefore $q_A f_A[x] \in \{w\}$, and since $f_A[x] \in \{y\}$, there is a $q$-extension from $y$ to $w$ by Proposition~\ref{prereq:ax:f-ext-characterization}.
+\end{proof}
+
+\begin{axiom}\label{prereq:ax:four-spectra-cor}
+    \uses{prereq:ax:four-spectra}
+    \notready
+    In the setting of Theorem~\ref{prereq:ax:four-spectra}, if condition~(4) is strengthened to ``$d_l^g(z) = w$ has no crossing'' (and condition~(5) is dropped), then $d_{m+l-n}^q(y) = w$.
+\end{axiom}
+\begin{proof}\leanok If $d_l^g(z) = w$ has no crossing, then in particular it has no crossing that hits $\mathrm{Fil} \ge s + n + k$ for any $k$. Taking $k = 1$ and observing that $d_0^q y = 0$ trivially has no crossing, the result follows from Theorem~\ref{prereq:ax:four-spectra}.\end{proof}
+
+\begin{axiom}\label{prereq:ax:triangle-map}
+    \uses{prereq:ax:four-spectra-cor}
+    \lean{KIPBase.SpectralSequence.essCommutativity_triangle}\leanok
+    Consider a homotopy commutative diagram of converging spectral sequences $V_1 \xrightarrow{f} V_2 \xrightarrow{q} V_3$ with $p = q \circ f$. If $d_n^f(x) = y$, $d_m^p(x) = z$, and one of the two extensions has no crossing, then $d_{m-n}^q(y) = z$.
+\end{axiom}
+\begin{proof}\leanok This is the special case of Corollary~\ref{prereq:ax:four-spectra-cor} with $V_3 = V_4$ and $g = \mathrm{id}_{V_3}$: since $d_0^g(z) = z$ and the identity extension always has no crossing, the conditions are satisfied with $l = 0$.\end{proof}
+
+\begin{axiom}\label{prereq:ax:composition-ext}
+    \uses{prereq:ax:four-spectra-cor}
+    \notready
+    Consider a homotopy commutative diagram of converging spectral sequences $V_1 \xrightarrow{p} V_3 \xrightarrow{g} V_4$ with $q = g \circ p$. If $d_m^p(x) = z$ and $d_l^g(z) = w$ has no crossing, then $d_{m+l}^q(x) = w$.
+\end{axiom}
+\begin{proof}\leanok This is the special case of Corollary~\ref{prereq:ax:four-spectra-cor} with $V_1 = V_2$ and $f = \mathrm{id}_{V_1}$: since $d_0^f(x) = x$ with $n = 0$ and the identity extension has no crossing, the conditions give $d_{m+l-0}^q(y) = d_{m+l}^q(x) = w$.\end{proof}
+
+\begin{axiom}\label{prereq:ax:composition-zero}
+    \uses{prereq:ax:four-spectra-cor,prereq:ax:f-ext-characterization}
+    \notready
+    If $g \circ f = 0$ (as morphisms of converging spectral sequences) and $d_n^f(x) = y$, then $y$ is a permanent cycle in the $g$-ESS: $d_m^g(y) = 0$ for all $m \ge 0$.
+\end{axiom}
+\begin{proof}\leanok
+    Consider the commutative diagram
+    $$\begin{CD}
+    V_1 @>{f}>> V_2 \\
+    @VVV @VV{g}V \\
+    0 @>>> V_3
+    \end{CD}$$
+    with $p = 0$ and $g \circ f = 0$. All extensions from $x$ to $0$ are trivial and have no crossing. By Corollary~\ref{prereq:ax:four-spectra-cor}, $d_m^g(y) = 0$.
+
+    \emph{Alternative proof.} By Proposition~\ref{prereq:ax:f-ext-characterization}, there exists $[x] \in \{x\}$ with $f_A[x] \in \{y\}$. Let $[y] = f_A[x]$. Then $g_A([y]) = g_A(f_A([x])) = 0$. Hence $y$ is a permanent $d^g$-cycle.
+\end{proof}
+
+\begin{axiom}\label{prereq:ax:ess-naturality}
+    \uses{prereq:def:ess,prereq:ax:four-spectra-cor}
+    \lean{KIPBase.SpectralSequence.essCommutativity_induces_map}\leanok
+    Consider a homotopy commutative diagram of converging spectral sequences
+    $$\begin{CD}
+    V_1 @>{f}>> V_2 \\
+    @V{p}VV @VV{q}V \\
+    V_3 @>{g}>> V_4
+    \end{CD}$$
+    Assume ${}^{p}\!E_0 = {}^{p}\!E_r$ and ${}^{q}\!E_0 = {}^{q}\!E_r$ for some $r \ge 0$ (i.e., the $p$-ESS and $q$-ESS have stationary pages up to $r$). Then $(d_r^p, d_r^q)$ induces a map from the $f$-ESS to the $g$-ESS.
+\end{axiom}
+\begin{proof}\leanok
+    Since ${}^{p}\!E_0 = {}^{p}\!E_r$ and ${}^{q}\!E_0 = {}^{q}\!E_r$, the differentials $d_r^p$ and $d_r^q$ have no crossings. By Corollary~\ref{prereq:ax:four-spectra-cor}, $d_0^g \circ d_r^p = d_r^q \circ d_0^f$ and therefore $(d_r^p, d_r^q)$ induces a map from ${}^{f}\!E_1$ to ${}^{g}\!E_1$. Inductively, applying Corollary~\ref{prereq:ax:four-spectra-cor} shows that $(d_r^p, d_r^q)$ induces a map from ${}^{f}\!E_n$ to ${}^{g}\!E_n$ and $d_n^g \circ d_r^p = d_r^q \circ d_n^f$ for all $n$.
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stable Homotopy Theory}\label{sec:prereq-stable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Stable Homotopy Theory}\label{sec:prereq-stable-homotopy}
+
+\begin{definition}\label{prereq:def:triangulated-category}
+    \lean{CategoryTheory.Pretriangulated}\leanok
+    A \emph{triangulated category} is an additive category $\mathcal{T}$ equipped with:
+    \begin{enumerate}
+        \item An additive autoequivalence $\Sigma: \mathcal{T} \to \mathcal{T}$, called the \emph{shift} (or \emph{suspension}) functor.
+        \item A class of \emph{distinguished triangles} $X \to Y \to Z \to \Sigma X$, satisfying the axioms (TR1)--(TR4):
+        \begin{itemize}
+            \item[\textup{(TR1)}] Every morphism $f: X \to Y$ extends to a distinguished triangle $X \xrightarrow{f} Y \to Z \to \Sigma X$. The triangle $X \xrightarrow{\mathrm{id}} X \to 0 \to \Sigma X$ is distinguished.
+            \item[\textup{(TR2)}] A triangle $X \to Y \to Z \to \Sigma X$ is distinguished if and only if $Y \to Z \to \Sigma X \to \Sigma Y$ is distinguished.
+            \item[\textup{(TR3)}] Given a morphism of the first two terms of two distinguished triangles, there exists a (not necessarily unique) morphism of the third terms making the diagram commute.
+            \item[\textup{(TR4)}] The octahedral axiom.
+        \end{itemize}
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}\label{prereq:def:cofiber-sequence}
+    \uses{prereq:def:triangulated-category}
+    \lean{KIPBase.StableHomotopy.HoCofiberSequence}\leanok
+    In a triangulated category, a distinguished triangle $X \xrightarrow{f} Y \to C_f \to \Sigma X$ is called a \emph{cofiber sequence}, and $C_f$ is the \emph{cofiber} (or \emph{cone}) of $f$. By (TR1), every morphism admits a cofiber sequence.
+\end{definition}
+
+\begin{definition}\label{prereq:def:functorial-cofiber}
+    \uses{prereq:def:cofiber-sequence}
+    \lean{KIPBase.StableHomotopy.HasFunctorialCofiber}\leanok
+    A \emph{functorial cofiber} on a triangulated category $\mathcal{T}$ is an assignment that to each morphism $f: X \to Y$ in $\mathcal{T}$ associates a distinguished triangle $X \xrightarrow{f} Y \to Cf \to \Sigma X$ that is functorial: given a commutative square
+    $$\begin{CD}
+    X @>{f}>> Y \\
+    @V{\alpha}VV @VV{\beta}V \\
+    X' @>{f'}>> Y'
+    \end{CD}$$
+    there is an induced map $C\alpha\beta: Cf \to Cf'$ making the diagram of distinguished triangles commute.
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:les-hom}
+    \uses{prereq:def:cofiber-sequence}
+    \lean{CategoryTheory.Pretriangulated.Triangle.coyoneda_exact₂}\leanok
+    For a distinguished triangle $X \to Y \to Z \to \Sigma X$ and any object $W$, the long exact sequence on hom-sets
+    $$\cdots \to [W, X] \to [W, Y] \to [W, Z] \to [W, \Sigma X] \to \cdots$$
+    holds (covariant), and dually for the contravariant case.
+\end{proposition}
+
+\begin{definition}\label{prereq:def:closed-symmetric-monoidal}
+    \lean{CategoryTheory.MonoidalClosed}\leanok
+    A \emph{closed symmetric monoidal category} is a category $\mathcal{C}$ equipped with:
+    \begin{enumerate}
+        \item A unit object $S$.
+        \item A bifunctor $(X, Y) \mapsto X \wedge Y$ (the \emph{smash product} or \emph{tensor product}) from $\mathcal{C} \times \mathcal{C}$ to $\mathcal{C}$, which is associative and commutative up to coherent natural isomorphism, with $S \wedge X \cong X$ up to coherent natural isomorphism.
+        \item Function objects $F(X, Y)$, functorial contravariantly in $X$ and covariantly in $Y$, satisfying the tensor-hom adjunction
+        $$[X, F(Y, Z)] \cong [X \wedge Y, Z]$$
+        naturally in all three variables.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}\label{prereq:def:closed-symmetric-tensor-triangulated}
+    \uses{prereq:def:closed-symmetric-monoidal,prereq:def:triangulated-category}
+    \lean{KIPBase.StableHomotopy.ClosedSymmetricTensorTriangulated}\leanok
+    A \emph{closed symmetric tensor triangulated category} is a triangulated category $\mathcal{C}$ equipped with a closed symmetric monoidal structure (Definition~\ref{prereq:def:closed-symmetric-monoidal}) that is \emph{compatible} with the triangulation:
+    \begin{enumerate}
+        \item The smash product preserves suspensions: there is a natural equivalence $e_{X,Y}: \Sigma X \wedge Y \xrightarrow{\sim} \Sigma(X \wedge Y)$, compatible with the unit and associativity isomorphisms.
+        \item The smash product is exact: if $X \xrightarrow{f} Y \xrightarrow{g} Z \xrightarrow{h} \Sigma X$ is an exact triangle, then for any object $W$,
+        $$X \wedge W \xrightarrow{f \wedge 1} Y \wedge W \xrightarrow{g \wedge 1} Z \wedge W \xrightarrow{h \wedge 1} \Sigma(X \wedge W)$$
+        is exact.
+        \item The functor $F(X, Y)$ is exact in $Y$; it is exact in $X$ up to sign.
+        \item The smash product interacts with suspension in a graded-commutative manner: the twist map $T: S^r \wedge S^s \to S^s \wedge S^r$ and the equivalence $S^r \wedge S^s \simeq S^{r+s}$ satisfy $T = (-1)^{rs}$.
+    \end{enumerate}
+    This definition follows Hovey--Palmieri--Strickland~\cite{HPS97}, Definition~A.2.1.
+\end{definition}
+
+\begin{definition}\label{prereq:def:tensor-triangulated-functorial-cofiber}
+    \uses{prereq:def:closed-symmetric-tensor-triangulated,prereq:def:functorial-cofiber}
+    \lean{KIPBase.StableHomotopy.TensorTriangulatedCatWithFunctorialCofiber}\leanok
+    A \emph{closed symmetric tensor triangulated category with functorial cofiber} is a closed symmetric tensor triangulated category $\mathcal{T}$ (Definition~\ref{prereq:def:closed-symmetric-tensor-triangulated}) equipped with:
+    \begin{enumerate}
+        \item A functorial cofiber (Definition~\ref{prereq:def:functorial-cofiber}).
+        \item A \emph{tensor-cofiber exchange}: for any morphism $f: X \to Y$ and any object $W$, a natural isomorphism
+        $$C(f \wedge W) \cong C(f) \wedge W,$$
+        where $f \wedge W : X \wedge W \to Y \wedge W$ denotes the right-tensoring of $f$ with $W$ (i.e., $f \otimes \mathrm{id}_W$), compatible with the triangulated structure.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}\label{prereq:def:stable-homotopy-category}
+    \uses{prereq:def:tensor-triangulated-functorial-cofiber}
+    \lean{KIPBase.StableHomotopy.StableHomotopyCategory}\leanok
+    The \emph{stable homotopy category} $\mathcal{S}$ is a closed symmetric tensor triangulated category with functorial cofiber (Definition~\ref{prereq:def:tensor-triangulated-functorial-cofiber}). Its objects are called \emph{spectra}.
+    % NOTE: The statement "Homotopy pullback squares and homotopy pushout squares in $\mathcal{S}$ coincide"
+    % has been removed, as it cannot be stated in the current axiomatic framework.
+    % Pullbacks are not defined. The pushout is defined separately below (Definition~\ref{prereq:def:pushout}).
+\end{definition}
+
+\begin{remark}
+    In this project, $\mathcal{S}$ refers to the homotopy category of spectra (in the sense of stable homotopy theory). It can be constructed as the homotopy category of a stable model category, but we take it as given and work axiomatically with its triangulated and closed symmetric monoidal structure.
+\end{remark}
+
+\begin{definition}\label{prereq:def:pushout}
+    \uses{prereq:def:stable-homotopy-category,prereq:def:cofiber-sequence,prereq:def:functorial-cofiber}
+    Given morphisms $f: X \to Y$ and $g: X \to Z$ in $\mathcal{S}$, the \emph{pushout} of the diagram $Y \xleftarrow{f} X \xrightarrow{g} Z$ is the cofiber $C(f, g)$ of the canonical morphism $(f, g): X \to Y \vee Z$, where $Y \vee Z$ denotes the coproduct (wedge sum) in $\mathcal{S}$.
+\end{definition}
+
+\begin{definition}\label{prereq:def:sphere-spectrum}
+    \uses{prereq:def:stable-homotopy-category}
+    \lean{KIPBase.StableHomotopy.SphereSpectrum}\leanok
+    The \emph{sphere spectrum} $\mathbb{S} \in \mathcal{S}$ is the unit object for the smash product.
+\end{definition}
+
+\begin{definition}\label{prereq:def:sphere-Sn}
+    \uses{prereq:def:sphere-spectrum}
+    \lean{KIPBase.StableHomotopy.Sphere}\leanok
+    For an integer $n \in \mathbb{Z}$, define
+    $$S^n = \Sigma^n \mathbb{S},$$
+    the $n$-fold suspension of the sphere spectrum.
+\end{definition}
+
+\begin{definition}\label{prereq:def:homotopy-groups}
+    \uses{prereq:def:sphere-Sn}
+    \lean{KIPBase.StableHomotopy.HomotopyGroup}\leanok
+    For a spectrum $X \in \mathcal{S}$, the \emph{$n$-th homotopy group} of $X$ is
+    $$\pi_n X = [S^n, X] = \Hom_{\mathcal{S}}(S^n, X).$$
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:homotopy-graded-abelian}
+    \uses{prereq:def:homotopy-groups}
+    \lean{KIPBase.StableHomotopy.HomotopyGroups}\leanok
+    For any spectrum $X$, the collection $\pi_* X = \{\pi_n X\}_{n \in \mathbb{Z}}$ is a graded abelian group.
+\end{proposition}
+
+\begin{definition}\label{prereq:def:smash-product}
+    \uses{prereq:def:stable-homotopy-category,prereq:def:closed-symmetric-tensor-triangulated,prereq:def:sphere-Sn}
+    \lean{KIPBase.StableHomotopy.smashSpheres_iso}\leanok
+    The \emph{smash product} $\wedge: \mathcal{S} \times \mathcal{S} \to \mathcal{S}$ is the symmetric monoidal product from the closed symmetric monoidal structure of $\mathcal{S}$ (Definition~\ref{prereq:def:closed-symmetric-tensor-triangulated}), with unit $\mathbb{S}$. It satisfies $S^m \wedge S^n \simeq S^{m+n}$ and induces a pairing on homotopy groups:
+    $$\pi_m X \otimes \pi_n Y \to \pi_{m+n}(X \wedge Y).$$
+\end{definition}
+
+\begin{definition}\label{prereq:def:mapping-spectra}
+    \uses{prereq:def:stable-homotopy-category,prereq:def:closed-symmetric-tensor-triangulated,prereq:def:smash-product}
+    \lean{KIPBase.StableHomotopy.MappingSpectrum}\leanok
+    For spectra $X, Y \in \mathcal{S}$, the \emph{mapping spectrum} $F(X, Y)$ is the internal hom (function object) from the closed symmetric monoidal structure (Definition~\ref{prereq:def:closed-symmetric-tensor-triangulated}), adjoint to the smash product:
+    $$[X \wedge Y, Z] \cong [X, F(Y, Z)].$$
+    In particular, $\pi_n F(X, Y) \cong [\Sigma^n X, Y]$.
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:les-homotopy}
+    \uses{prereq:def:cofiber-sequence,prereq:def:homotopy-groups}
+    \lean{KIPBase.StableHomotopy.les_homotopy_exact_f}\leanok
+    Let $X \xrightarrow{f} Y \to C_f \to \Sigma X$ be a cofiber sequence. Then there is a long exact sequence of homotopy groups:
+    $$\cdots \to \pi_{n+1}(C_f) \to \pi_n(X) \xrightarrow{f_*} \pi_n(Y) \to \pi_n(C_f) \to \pi_{n-1}(X) \to \cdots$$
+    This follows from Proposition~\ref{prereq:prop:les-hom} and the representability $\pi_n(-) = [S^n, -]$.
+\end{proposition}
+\begin{proof}\leanok Follows from the long exact Hom sequence applied to representable functors.\end{proof}
+
+\subsubsection{Cohomology}\label{sec:prereq-cohomology}
+
+\begin{axiom}\label{prereq:ax:eilenberg-maclane}
+    \uses{prereq:def:stable-homotopy-category}
+    \lean{KIPBase.StableHomotopy.EilenbergMacLane}\leanok
+    The \emph{Eilenberg--MacLane spectrum} $\HF$ is the spectrum representing mod~2 ordinary cohomology. It is a commutative ring spectrum in $\mathcal{S}$.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:eilenberg-maclane-homotopy}
+    \uses{prereq:ax:eilenberg-maclane,prereq:def:homotopy-groups}
+    \lean{KIPBase.StableHomotopy.HF2_pi0}\leanok
+    The homotopy groups of the Eilenberg--MacLane spectrum are
+    $$\pi_n(\HF) = \begin{cases} \bF_2 & \text{if } n = 0, \\ 0 & \text{if } n \neq 0.\end{cases}$$
+\end{axiom}
+
+\begin{definition}\label{prereq:def:mod2-cohomology}
+    \uses{prereq:ax:eilenberg-maclane,prereq:def:mapping-spectra}
+    \lean{KIPBase.StableHomotopy.Mod2CohomologyTotal}\leanok
+    The \emph{mod~2 cohomology} of a spectrum $X$ is
+    $$H^n(X; \bF_2) = [\Sigma^n X, \HF].$$
+\end{definition}
+
+\begin{definition}\label{prereq:def:mod2-homology}
+    \uses{prereq:ax:eilenberg-maclane,prereq:def:smash-product,prereq:def:homotopy-groups}
+    \lean{KIPBase.StableHomotopy.Mod2HomologyTotal}\leanok
+    The \emph{mod~2 homology} of a spectrum $X$ is
+    $$H_n(X; \bF_2) = \pi_n(\HF \wedge X).$$
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:universal-coefficient}
+    \uses{prereq:def:mod2-cohomology,prereq:def:mod2-homology}
+    \lean{KIPBase.StableHomotopy.universal_coefficient}\leanok
+    (Universal Coefficient Theorem) For any spectrum $X$ and $n \in \bZ$, the mod~2 cohomology is canonically isomorphic to the $\bF_2$-linear dual of the mod~2 homology:
+    $$H^n(X; \bF_2) \cong \Hom_{\bF_2}(H_n(X; \bF_2),\ \bF_2).$$
+\end{axiom}
+
+\subsubsection{Adams Spectral Sequence}\label{sec:prereq-adams}
+
+\paragraph{Construction.}
+
+\begin{axiom}\label{prereq:ax:adams-ss}
+    \uses{prereq:def:spectral-sequence,prereq:def:stable-homotopy-category,prereq:def:converging-ss-morphism}
+    \lean{KIPBase.StableHomotopy.AdamsSS}\leanok
+    The \emph{$\HF$-Adams spectral sequence} is a functor from $\mathcal{S}^{op} \times \mathcal{S}$ to the category of bigraded spectral sequences. For spectra $X$ and $Y$, it produces a spectral sequence $\{E_r^{s,t}(X, Y), d_r\}$ with $r \ge 2$ and differentials
+    $$d_r: E_r^{s,t} \to E_r^{s+r, t+r-1}.$$
+    A map $f: X' \to X$ induces maps $f^*: E_r^{s,t}(X, Y) \to E_r^{s,t}(X', Y)$, and a map $g: Y \to Y'$ induces maps $g_*: E_r^{s,t}(X, Y) \to E_r^{s,t}(X, Y')$, both compatible with differentials. When $X = \mathbb{S}$, we write $E_r^{s,t}(Y) = E_r^{s,t}(\mathbb{S}, Y)$.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:adams-e2-order2}
+    \uses{prereq:ax:adams-ss}
+    \lean{KIPBase.StableHomotopy.adams_2torsion}\leanok
+    All elements in the $E_2$-page of the mod~2 Adams spectral sequence have order~2, i.e., $2x = 0$ for all $x \in E_2^{s,t}(X)$. This holds because $E_2^{s,t}(X)$ is an $\bF_2$-vector space.
+\end{axiom}
+
+\begin{definition}\label{prereq:def:finite-spectra}
+    \uses{prereq:def:stable-homotopy-category,prereq:def:sphere-spectrum,prereq:def:cofiber-sequence}
+    The full subcategory $\calS^{fin} \subset \calS$ of \emph{finite spectra} is the smallest full subcategory containing the sphere spectrum $\bS$ and closed under suspension, desuspension, and taking cofibers.
+\end{definition}
+
+\begin{theorem}\label{prereq:thm:finite-spectra-char}
+    \uses{prereq:def:finite-spectra}
+    $Z \in \calS^{fin}$ if and only if $Z$ can be obtained from $\bS$ by finitely many operations of the following two types:
+    \begin{enumerate}
+        \item suspension or desuspension,
+        \item taking the cofiber of a map from a sphere spectrum $S^n$.
+    \end{enumerate}
+\end{theorem}
+
+\paragraph{Connectivity.}
+
+\begin{definition}\label{prereq:def:connected}
+    \uses{prereq:def:homotopy-groups}
+    A spectrum $X$ is \emph{$n$-connected} if $\pi_i(X) = 0$ for all $i \le n$.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:sphere-connected}
+    \uses{prereq:def:connected,prereq:def:sphere-spectrum}
+    \lean{KIPBase.StableHomotopy.sphere_connected}\leanok
+    The sphere spectrum $\bS$ is $(-1)$-connected.
+\end{axiom}
+
+\begin{definition}\label{prereq:def:bounded-below}
+    \uses{prereq:def:connected}
+    \lean{KIPBase.StableHomotopy.IsBoundedBelow}\leanok
+    A spectrum $X$ is \emph{bounded below} if it is $n$-connected for some $n \in \bZ$.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:connected-homology-vanishing}
+    \uses{prereq:def:connected,prereq:def:mod2-homology}
+    \lean{KIPBase.StableHomotopy.connected_homology_vanishing}\leanok
+    If $X$ is $n$-connected, then $H_i(X; \bF_2) = 0$ for all $i \le n$.
+\end{axiom}
+
+\paragraph{Finite type.}
+
+\begin{definition}\label{prereq:def:finite-type}
+    \uses{prereq:def:finite-spectra,prereq:def:connected}
+    A spectrum $X$ is of \emph{finite type} if for each $n$, there exists a finite spectrum $X_n \in \calS^{fin}$ and a map $X_n \to X$ whose cofiber is $n$-connected.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:finite-type-char}
+    \uses{prereq:def:finite-type,prereq:def:bounded-below,prereq:def:homotopy-groups}
+    \lean{KIPBase.StableHomotopy.finite_spectra_char}\leanok
+    A spectrum $X$ is of finite type if and only if:
+    \begin{enumerate}
+        \item $X$ is bounded below, and
+        \item for each $i$, the homotopy group $\pi_i(X)$ is finitely generated as an abelian group.
+    \end{enumerate}
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:finite-type-homology}
+    \uses{prereq:def:finite-type,prereq:def:mod2-homology}
+    If $X$ is of finite type, then $H_i(X; \bF_2)$ is a finite-dimensional $\bF_2$-vector space for each $i$.
+\end{axiom}
+
+\paragraph{Convergence and boundedness.}
+
+In this paragraph, assume $X \in \calS^{fin}$ and $Y$ is of finite type.
+
+\begin{axiom}\label{prereq:ax:adams-filtration}
+    \uses{prereq:ax:adams-ss,prereq:def:filtration,prereq:def:homotopy-groups}
+    \lean{KIPBase.StableHomotopy.InAdamsFiltration}\leanok
+    The Adams spectral sequence induces a natural decreasing filtration on $\pi_* X$, called the \emph{Adams filtration}. An element $\alpha \in \pi_n X$ has \emph{Adams filtration} $\ge s$ if it lies in $F^s \pi_n X$.
+\end{axiom}
+
+\begin{definition}\label{prereq:def:adams-filtration-maps}
+    \uses{prereq:ax:adams-filtration,prereq:def:mod2-homology,prereq:def:finite-spectra}
+    \lean{KIPBase.StableHomotopy.AF}\leanok
+    The Adams filtration extends to maps between spectra. For $X \in \calS^{fin}$ and $Y$ of finite type, a map $f \in [X, Y]$ has \emph{Adams filtration} $\AF(f) \ge k$ if $f$ factors as a composition
+    $$X \xrightarrow{f_1} X_1 \xrightarrow{f_2} X_2 \xrightarrow{f_3} \cdots \xrightarrow{f_{k-1}} X_{k-1} \xrightarrow{f_k} Y$$
+    where each $f_i$ induces the zero map on mod~2 homology: $(f_i)_* = 0: H_*(X_{i-1}; \bF_2) \to H_*(X_i; \bF_2)$. The \emph{Adams filtration} $\AF(f)$ is the largest such $k$.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:adams-filtration-characterization}
+    \uses{prereq:def:adams-filtration-maps}
+    \lean{KIPBase.StableHomotopy.adamsFiltration_functorial}\leanok
+    A map $f: X \to Y$ with $\AF(f) = k$ maps $F^s \pi_* X$ into $F^{s+k} \pi_* Y$ for all $s$.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:af-vanishing}
+    \uses{prereq:def:adams-filtration-maps,prereq:def:ess,prereq:ax:f-ext-characterization}
+    \notready
+    If $\mathrm{AF}(f) = k$, then $d_i^f = 0$ for $i < k$ in the $f$-extension spectral sequence.
+\end{axiom}
+\begin{proof}\leanok By Proposition~\ref{prereq:ax:f-ext-characterization}, $d_i^f(x) = y$ requires $[x] \in \{x\}$ with $f_A[x] \in \{y\}$, which forces $\mathrm{Fil}(f_A[x]) \ge s + i$. But $\mathrm{AF}(f) = k$ means $f_A$ raises filtration by at least $k$, so $\mathrm{Fil}(f_A[x]) \ge s + k > s + i$ for $i < k$, hence $y = 0$.\end{proof}
+
+\begin{definition}\label{prereq:def:adams-filtration-infinity}
+    \uses{prereq:def:adams-filtration-maps}
+    A map $f \in [X, Y]$ has \emph{Adams filtration $\infty$} if $\AF(f) \ge n$ for all $n$.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:odd-order-af-infinity}
+    \uses{prereq:def:adams-filtration-infinity}
+    \lean{KIPBase.StableHomotopy.af_odd_order_infinite}\leanok
+    If $f$ has odd order in $[X,Y]$, then $f$ has Adams filtration $\infty$.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:not-odd-order-af-finite}
+    \uses{prereq:def:adams-filtration-infinity}
+    \lean{KIPBase.StableHomotopy.af_not_odd_order_finite}\leanok
+    If $f$ does not have odd order, then $f$ does not have Adams filtration $\infty$.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:adams-weak-convergence}
+    \uses{prereq:ax:adams-ss,prereq:def:convergence,prereq:def:finite-spectra,prereq:def:finite-type}
+    \lean{KIPBase.StableHomotopy.adamsConvergence_bigraded}\leanok
+    For $X \in \calS^{fin}$ and $Y$ of finite type, the Adams spectral sequence $Adams(X,Y)$ weakly converges to $[X, Y]$: there is a natural isomorphism between the graded pieces of the Adams filtration on $[X, Y]$ and the $E_\infty$-page of $Adams(X,Y)$.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:adams-separated}
+    \uses{prereq:ax:adams-weak-convergence,prereq:ax:odd-order-af-infinity}
+    \lean{KIPBase.StableHomotopy.adams_separated}\leanok
+    The quotient $[X, Y] / \{\text{odd-order elements}\}$ carries an induced Adams filtration that is separated (Hausdorff).
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:adams-boundedness}
+    \uses{prereq:ax:adams-separated,prereq:def:finite-type}
+    \lean{KIPBase.StableHomotopy.adams_boundedness}\leanok
+    Suppose $X$ is of finite type. Then:
+    \begin{enumerate}
+        \item If additionally $H_i(X; \bQ) = 0$ for some $i$, then the Adams filtration on $\pi_i(X) / \{\text{odd-order elements}\}$ is bounded.
+        \item All subquotients of the Adams filtration on $\pi_i(X) / \{\text{odd-order elements}\}$ are finite groups.
+    \end{enumerate}
+\end{axiom}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{$\HF$-Synthetic Spectra}\label{sec:prereq-synthetic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Synthetic Spectra}\label{sec:prereq-syn-basic}
+
+\begin{definition}\label{prereq:def:synthetic-category}
+    \uses{prereq:def:stable-homotopy-category,prereq:def:functorial-cofiber}
+    \lean{KIPBase.Synthetic.SyntheticCategory}\leanok
+    The category $h\mathrm{Syn}$ of \emph{$\HF$-synthetic spectra} is a closed symmetric monoidal triangulated category with functorial cofiber (it arises as the homotopy category of a stable model category $\mathrm{Syn}_{\HF}$). We denote its tensor product by $\otimes$ and its unit object by $\mathbf{1}$.
+\end{definition}
+
+\begin{definition}\label{prereq:def:bigraded-suspension}
+    \uses{prereq:def:synthetic-category}
+    \lean{KIPBase.Synthetic.SyntheticCategory.biShift}\leanok
+    The category $h\mathrm{Syn}$ admits a \emph{bigraded suspension} $\Sigma^{m,n}$ for each $(m,n) \in \mathbb{Z}^2$, which is an autoequivalence of $h\mathrm{Syn}$ satisfying
+    $$\Sigma^{m_1,n_1}\Sigma^{m_2,n_2} \cong \Sigma^{m_1+m_2, n_1+n_2}.$$
+    The functor $\Sigma^{1,0}$ is identified with the triangulated suspension functor.
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:bishift-tensor-comm}
+    \uses{prereq:def:bigraded-suspension,prereq:def:synthetic-category}
+    The bigraded suspension commutes with the tensor product: for all $(m,n) \in \bZ^2$ and objects $X, Y$ of $h\mathrm{Syn}$,
+    $$\Sigma^{m,n}(X \otimes Y) \cong \Sigma^{m,n}X \otimes Y.$$
+\end{axiom}
+
+\begin{definition}\label{prereq:def:lambda}
+    \uses{prereq:def:bigraded-suspension}
+    \lean{KIPBase.Synthetic.SyntheticCategory.lam}\leanok
+    There exists a natural transformation
+    $$\lambda: \Sigma^{0,-1} \to \mathrm{Id}$$
+    in $h\mathrm{Syn}$. For a synthetic spectrum $X$, $\lambda_X$ denotes the component $\Sigma^{0,-1}X \to X$.
+\end{definition}
+
+\begin{definition}\label{prereq:def:lambda-power}
+    \uses{prereq:def:lambda,prereq:def:bigraded-suspension}
+    \lean{KIPBase.Synthetic.lambdaPow}\leanok
+    For $n \ge 0$, define $\lambda^n_X: \Sigma^{0,-n}X \to X$ by induction:
+    \begin{enumerate}
+        \item $\lambda^0_X = \mathrm{id}_X: X \to X$.
+        \item $\lambda^{n+1}_X = \lambda_X \circ \Sigma^{0,-1}(\lambda^n_X): \Sigma^{0,-n-1}X \to \Sigma^{0,-1}X \to X$, using the composition isomorphism $\Sigma^{0,-n-1} \cong \Sigma^{0,-1}\Sigma^{0,-n}$.
+    \end{enumerate}
+    We define $X/\lambda^n$ as the cofiber of $\lambda^n_X$. In particular, $X/\lambda^0 = 0$ and $X/\lambda^1 = X/\lambda$. The cofiber construction gives a distinguished triangle
+    $$\Sigma^{0,-n}X \xrightarrow{\lambda^n_X} X \to X/\lambda^n \to \Sigma^{1,-n}X.$$
+\end{definition}
+
+\begin{axiom}\label{prereq:ax:zlambda-enrichment}
+    \uses{prereq:def:lambda,prereq:def:synthetic-category}
+    \lean{KIPBase.Synthetic.zlambda_enrichment}\leanok
+    The homotopy category $h\mathrm{Syn}$ is enriched over $\bZ[\lambda]$-modules.
+\end{axiom}
+\begin{proof}
+    The argument proceeds in three steps:
+    \begin{enumerate}
+        \item Since $h\mathrm{Syn}$ is preadditive, it is enriched over $\bZ$-modules.
+        \item The natural transformation $\lambda$ induces an action on hom-sets: for $f: X \to Y$, define $\lambda \cdot f = \lambda_Y \circ \Sigma^{0,-1}(f)$. By naturality of $\lambda$, this agrees with $f \circ \lambda_X$ (up to the identification $\Sigma^{0,-1}X \to X$), and is compatible with composition.
+        \item The polynomial ring $\bZ[\lambda]$ is the free $\bZ$-algebra on one generator. By its universal property, the $\bZ$-linear action of $\lambda$ on each $\Hom(X,Y)$ extends uniquely to a $\bZ[\lambda]$-module structure.
+    \end{enumerate}
+\end{proof}
+
+\subsubsection{Synthetic Spheres}\label{sec:prereq-syn-spheres}
+
+\begin{definition}\label{prereq:def:bigraded-spheres}
+    \uses{prereq:def:bigraded-suspension,prereq:def:synthetic-category}
+    \lean{KIPBase.Synthetic.Smn}\leanok
+    The \emph{synthetic sphere} $S^{0,0}$ is defined as the monoidal unit $\mathbf{1}$ of $h\mathrm{Syn}$. The \emph{bigraded spheres} are
+    $$S^{m,n} = \Sigma^{m,n} S^{0,0} = \Sigma^{m,n}\mathbf{1}.$$
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:bishift-tensor-sphere}
+    \uses{prereq:def:bigraded-spheres,prereq:ax:bishift-tensor-comm}
+    \lean{KIPBase.Synthetic.biShift_eq_tensor_Smn}\leanok
+    For any synthetic spectrum $X$,
+    $$\Sigma^{m,n}X \cong S^{m,n} \otimes X.$$
+\end{proposition}
+\begin{proof}
+    By Axiom~\ref{prereq:ax:bishift-tensor-comm} and the unit isomorphism $\mathbf{1} \otimes X \cong X$:
+    $\Sigma^{m,n}X \cong \Sigma^{m,n}(\mathbf{1} \otimes X) \cong \Sigma^{m,n}\mathbf{1} \otimes X = S^{m,n} \otimes X$.
+\end{proof}
+
+\begin{definition}\label{prereq:def:synthetic-homotopy-groups}
+    \uses{prereq:def:bigraded-spheres}
+    \lean{KIPBase.Synthetic.BiHom}\leanok
+    The \emph{synthetic homotopy groups} of a synthetic spectrum $X$ are
+    $$\pi_{m,n}(X) = [S^{m,n}, X].$$
+    These form a bigraded abelian group with a natural $\mathbb{Z}[\lambda]$-module structure (Proposition~\ref{prereq:ax:zlambda-enrichment}).
+\end{definition}
+
+\begin{proposition}\label{prereq:prop:synthetic-homotopy-shift}
+    \uses{prereq:def:synthetic-homotopy-groups,prereq:def:bigraded-suspension}
+    \lean{KIPBase.Synthetic.susp_invariance}\leanok
+    $$\pi_{m,n}(X) \cong \pi_{m+k,n+l}(\Sigma^{k,l}X).$$
+\end{proposition}
+\begin{proof}
+    By the composition axiom $\Sigma^{m,n}\Sigma^{k,l} \cong \Sigma^{m+k,n+l}$, the functor $\Sigma^{k,l}$ is an autoequivalence and induces a bijection $[S^{m,n}, X] \cong [\Sigma^{k,l}S^{m,n}, \Sigma^{k,l}X] \cong [S^{m+k,n+l}, \Sigma^{k,l}X]$.
+\end{proof}
+
+\begin{definition}\label{prereq:def:lambda-action}
+    \uses{prereq:def:synthetic-homotopy-groups,prereq:def:lambda,prereq:ax:zlambda-enrichment}
+    \lean{KIPBase.Synthetic.lambdaAction}\leanok
+    The \emph{$\lambda$-action} on synthetic homotopy groups is the map
+    $$\lambda: \pi_{m,n}(X) \to \pi_{m,n-1}(X)$$
+    defined as follows: given $f: S^{m,n} \to X$, the element $\lambda \cdot f \in \pi_{m,n-1}(X)$ is the composite
+    $$S^{m,n-1} \xrightarrow[\sim]{\mathrm{biShift}} \Sigma^{0,-1}S^{m,n} \xrightarrow{\lambda_{S^{m,n}}} S^{m,n} \xrightarrow{f} X,$$
+    where the first arrow is the biShift composition isomorphism $S^{m,n-1} = \Sigma^{m,n-1}\mathbf{1} \cong \Sigma^{0,-1}\Sigma^{m,n}\mathbf{1} = \Sigma^{0,-1}S^{m,n}$, and $\lambda_{S^{m,n}}: \Sigma^{0,-1}S^{m,n} \to S^{m,n}$ is the component of $\lambda$ at $S^{m,n}$.
+\end{definition}
+
+\subsubsection{Synthetic Adams Spectral Sequence}\label{sec:prereq-syn-adams}
+
+\begin{axiom}\label{prereq:ax:syn-adams-ss}
+    \uses{prereq:def:spectral-sequence,prereq:def:synthetic-category,prereq:def:converging-ss-morphism}
+    \lean{KIPBase.Synthetic.SynAdamsSS}\leanok
+    The \emph{synthetic Adams spectral sequence} is a functor from $h\mathrm{Syn}$ to the category of 3-graded spectral sequences. For a synthetic spectrum $X \in h\mathrm{Syn}$, it produces a spectral sequence $\SynSS_r^{s,t,w}(X)$ with differentials
+    $$d_r: \SynSS_r^{s,t,w} \to \SynSS_r^{s+r, t+r-1, w}.$$
+    For a finite spectrum $X \in \mathcal{S}^{\mathrm{fin}}$, the synthetic Adams spectral sequence for $\nu X$ converges to $\pi_{*,*}(\nu X)$.
+\end{axiom}
+
+\begin{remark}
+    The synthetic Adams spectral sequence is a $\mathbb{Z}[\lambda]$-module spectral sequence, with $\lambda$ in tridegree $(0,0,-1)$.
+\end{remark}
+
+\subsubsection{The $\nu$ Functor}\label{sec:prereq-nu}
+
+\begin{axiom}\label{prereq:ax:nu-functor}
+    \uses{prereq:def:stable-homotopy-category,prereq:def:synthetic-category}
+    \lean{KIPBase.Synthetic.nu}\leanok
+    There exists an additive functor
+    $$\nu: h\mathcal{S} \to h\mathrm{Syn}$$
+    from the homotopy category of spectra to the homotopy category of synthetic spectra.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:nu-susp}
+    \uses{prereq:ax:nu-functor,prereq:def:bigraded-suspension}
+    \lean{KIPBase.Synthetic.nu_susp}\leanok
+    The functor $\nu$ intertwines suspension with bigraded suspension:
+    $$\nu(\Sigma X) \cong \Sigma^{1,1} \nu(X).$$
+    The natural comparison map $\Sigma(\nu X) \to \nu(\Sigma X)$ is induced by $\lambda$.
+\end{axiom}
+
+\begin{theorem}\label{prereq:thm:nu-shift-bishift}
+    \uses{prereq:ax:nu-susp,prereq:def:bigraded-suspension}
+    \lean{KIPBase.Synthetic.nu_shift_biShift}\leanok
+    For all $n \in \bZ$ and spectra $X$,
+    $$\nu(\Sigma^n X) \cong \Sigma^{n,n}\nu(X).$$
+\end{theorem}
+\begin{proof}
+    By induction on $n$. The base case $n = 1$ is Axiom~\ref{prereq:ax:nu-susp}. The inductive step follows from the biShift composition isomorphism $\Sigma^{n,n}\Sigma^{1,1} \cong \Sigma^{n+1,n+1}$.
+\end{proof}
+
+\begin{axiom}\label{prereq:ax:nu-cofiber-ses}
+    \uses{prereq:ax:nu-functor,prereq:def:cofiber-sequence,prereq:def:mod2-homology}
+    \lean{KIPBase.Synthetic.nu_cofiber_ses}\leanok
+    Suppose $X \xrightarrow{f} Y \xrightarrow{g} Z$ is a cofiber sequence of spectra such that
+    $$0 \to {\HF}_*X \xrightarrow{{\HF}_*f} {\HF}_*Y \xrightarrow{{\HF}_*g} {\HF}_*Z \to 0$$
+    is a short exact sequence of $\HF$-homology. Then $\nu X \xrightarrow{\nu f} \nu Y \xrightarrow{\nu g} \nu Z$ is a distinguished triangle in $h\mathrm{Syn}$.
+\end{axiom}
+
+\begin{remark}\label{prereq:rem:nu-cofiber-cohomological}
+    \uses{prereq:ax:nu-cofiber-ses,prereq:ax:universal-coefficient}
+    \lean{KIPBase.Synthetic.nu_cofiber_ses_cohomological}\leanok
+    The cohomological variant also holds: if $X \to Y \to Z$ is a cofiber sequence with
+    $$0 \to H^*(Z; \bF_2) \to H^*(Y; \bF_2) \to H^*(X; \bF_2) \to 0$$
+    short exact in mod~2 cohomology, then $\nu$ sends it to a distinguished triangle. This follows from Axiom~\ref{prereq:ax:nu-cofiber-ses} and the universal coefficient theorem (Axiom~\ref{prereq:ax:universal-coefficient}).
+\end{remark}
+
+\subsubsection{Synthetic Rigidity}\label{sec:prereq-syn-rigidity}
+
+\begin{axiom}\label{prereq:ax:rigid}
+    \uses{prereq:def:lambda,prereq:ax:syn-adams-ss}
+    \lean{KIPBase.Synthetic.rigidity_degeneration}\leanok
+    Let $X \in \mathcal{S}^{\mathrm{fin}}$ be a finite spectrum. The synthetic Adams spectral sequence for $\nu X$ has $E_2$-page
+    $$\SynSS_2^{*,*,*}(\nu X) \cong E_2^{*,*}(X) \otimes \bF_2[\lambda],$$
+    where an element in $E_2^{s,t}(X)$ has tridegree $(s,t,t)$ and $\lambda$ has tridegree $(0,0,-1)$. Given a classical Adams differential $d_r^{\mathrm{cl}}(x) = y$, the corresponding synthetic differential is $d_r(x) = \lambda^{r-1}y$, which is $\lambda$-linear, and all synthetic Adams differentials arise in this way.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:lambda-bockstein}
+    \uses{prereq:def:lambda,prereq:ax:rigid}
+    \lean{KIPBase.Synthetic.lambda_bockstein_iso}\leanok
+    Let $X \in \mathcal{S}^{\mathrm{fin}}$ be a finite spectrum. The synthetic Adams spectral sequence for $\nu X$ is isomorphic to the $\lambda$-Bockstein spectral sequence:
+    \begin{enumerate}
+        \item $E_2^{s,t}(X) \cong \pi_{t-s,t}(\nu X / \lambda)$.
+        \item If there is a classical Adams differential $d_r x = y$ for $x \in E_2^{s,t}(X) \cong \pi_{t-s,t}(\nu X / \lambda)$, then $x$ admits a lift to $\pi_{t-s,t}(\nu X / \lambda^{r-1})$ whose image under the Bockstein $\nu X / \lambda^{r-1} \to \Sigma^{1,-r+1} \nu X / \lambda$ equals $d_r(x)$.
+    \end{enumerate}
+\end{axiom}
+
+\begin{proposition}\label{prereq:prop:syn-einfty-nuX}
+    \uses{prereq:ax:rigid}
+    \lean{KIPBase.Synthetic.einfty_nuX}\leanok
+    Let $X \in \mathcal{S}^{\mathrm{fin}}$ be a finite spectrum. The $E_\infty$-page of the synthetic Adams spectral sequence for $\nu X$ is
+    $$E_\infty^{s,t,w}(\nu X) \cong \begin{cases}
+        Z_\infty^{s,t}(X) / B_{1+t-w}^{s,t}(X) & \text{if } t \ge w, \\
+        0 & \text{otherwise}.
+    \end{cases}$$
+\end{proposition}
+\begin{proof}\leanok Follows from the rigidity degeneration axiom by unwinding the associated graded structure.\end{proof}
+
+\begin{axiom}\label{prereq:ax:syn-einfty-mod-lambda}
+    \uses{prereq:ax:rigid,prereq:def:lambda}
+    \lean{KIPBase.Synthetic.einfty_nuX_mod_lambda}\leanok
+    Let $X \in \mathcal{S}^{\mathrm{fin}}$ be a finite spectrum. For $r \ge 2$, the $E_\infty$-page of the synthetic Adams spectral sequence for $\nu X / \lambda^r$ is
+    $$E_\infty^{s,t,w}(\nu X / \lambda^r) \cong \begin{cases}
+        Z_{r-t+w}^{s,t}(X) / B_{1+t-w}^{s,t}(X) & \text{if } 0 \le t - w < r, \\
+        0 & \text{otherwise}.
+    \end{cases}$$
+\end{axiom}
+
+\subsubsection{Synthetic Lift}\label{sec:prereq-syn-lift}
+
+\begin{axiom}\label{prereq:ax:synthetic-lift}
+    \uses{prereq:ax:nu-cofiber-ses}
+    \lean{KIPBase.Synthetic.synthetic_lift}\leanok
+    Let $X, Y \in \mathcal{S}^{\mathrm{fin}}$ be finite spectra. If a map $f: X \to Y$ has Adams filtration $\AF(f) = k$, then there exists a factorization
+    $$\begin{CD}
+    @. \Sigma^{0,-k}\nu Y \\
+    @. @VV{\lambda^k}V \\
+    \nu X @>{\nu f}>> \nu Y
+    \end{CD}$$
+    with a dashed lift $\Sigma^{0,-k}\tilde{f}: \nu X \dashrightarrow \Sigma^{0,-k}\nu Y$ such that $\lambda^k \circ \Sigma^{0,-k}\tilde{f} = \nu f$,
+    where $\tilde{f}: \Sigma^{0,k}\nu X \to \nu Y$ is called a \emph{synthetic lift} of $f$.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:lambda-g-equals-f}
+    \uses{prereq:ax:nu-cofiber-ses,prereq:ax:synthetic-lift,prereq:def:lambda,prereq:def:finite-spectra}
+    Let $X, Y \in \mathcal{S}^{\mathrm{fin}}$ be finite spectra and let $f: X \to Y$ be a map that induces the zero map on $\HF$-homology: $H_*(f; \bF_2) = 0$. Let
+    $$W \xrightarrow{i} X \xrightarrow{f} Y \xrightarrow{h} \Sigma W$$
+    be a functorial distinguished triangle (so $W = \Sigma^{-1}C(f)$ is the desuspended cofiber). By the $\nu$-functor applied to this triangle, there exists a distinguished triangle of synthetic spectra
+    $$\nu(\Sigma^{-1}Y) \xrightarrow{g} \nu W \xrightarrow{\nu i} \nu X,$$
+    where $g$ denotes the boundary map. Then:
+    $$\lambda g = \nu f,$$
+    i.e., the boundary map $g$ composed with $\lambda$ equals the synthetic image of $f$.
+\end{axiom}
+
+\begin{axiom}\label{prereq:ax:syn-distinguished-triangle}
+    \uses{prereq:ax:nu-cofiber-ses,prereq:ax:synthetic-lift,prereq:ax:lambda-g-equals-f}
+    \lean{KIPBase.Synthetic.syn_distinguished_triangle}\leanok
+    Let $X, Y, Z \in \mathcal{S}^{\mathrm{fin}}$ be finite spectra. Suppose that $X \xrightarrow{f} Y \xrightarrow{g} Z \xrightarrow{h} \Sigma X$ is a distinguished triangle of spectra with $\AF(h) > 0$, and consequently a short exact sequence on $\HF$-homology
+    $$0 \to H_*X \xrightarrow{H_*f} H_*Y \xrightarrow{H_*g} H_*Z \to 0.$$
+    Then there exists a distinguished triangle of synthetic spectra
+    $$\nu X \xrightarrow{\nu f} \nu Y \xrightarrow{\nu g} \nu Z \xrightarrow{\Sigma^{0,-1}\hat{h}} \Sigma^{0,-1}\nu \Sigma X = \Sigma^{1,0}\nu X$$
+    such that $\nu h = \lambda \hat{h}$. The last relation $\nu h = \lambda \hat{h}$ follows from Axiom~\ref{prereq:ax:lambda-g-equals-f}.
+\end{axiom}
+
+\begin{notation}\label{prereq:not:fhat}
+    \uses{prereq:ax:syn-distinguished-triangle,prereq:ax:lambda-g-equals-f}
+    \lean{KIPBase.Synthetic.eHat}\leanok
+    For a map $f: X \to Y$ which is part of a distinguished triangle $X \xrightarrow{f} Y \xrightarrow{g} Cf \to \Sigma X$, define
+    $$e(f) = \begin{cases}
+        0 & \text{if } \AF(f) = 0, \\
+        1 & \text{if } \AF(f) > 0.
+    \end{cases}$$
+    When $\AF(f) = 0$, we also denote $\nu f$ by $\hat{f}$. In both cases, we have $\hat{f}: \Sigma^{0,e(f)}\nu X \to \nu Y$ and $\nu f = \lambda^{e(f)}\hat{f}$. Furthermore, $C\hat{f} \simeq \Sigma^{0,-e(g)}\nu Cf$ (by Axiom~\ref{prereq:ax:lambda-g-equals-f}).
+\end{notation}
+
+\begin{axiom}\label{prereq:ax:fhat-triangle}
+    \uses{prereq:ax:syn-distinguished-triangle,prereq:not:fhat,prereq:ax:lambda-g-equals-f}
+    \lean{KIPBase.Synthetic.fhat_triangle}\leanok
+    Let $X, Y, Z \in \mathcal{S}^{\mathrm{fin}}$ be finite spectra. Suppose that $X \xrightarrow{f} Y \xrightarrow{g} Z \xrightarrow{h} \Sigma X$ is a distinguished triangle with $e(f) + e(g) + e(h) = 1$. Then there is a distinguished triangle of synthetic spectra
+    $$\nu X \xrightarrow{\hat{f}} \Sigma^{0,-e(f)}\nu Y \xrightarrow{\hat{g}} \Sigma^{0,-e(f)-e(g)}\nu Z \xrightarrow{\hat{h}} \Sigma^{0,-1}\nu \Sigma X.$$
+    The construction uses Axiom~\ref{prereq:ax:lambda-g-equals-f} to establish the $\lambda$-relations between the classical and synthetic connecting maps.
+\end{axiom}

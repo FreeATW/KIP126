@@ -1,0 +1,629 @@
+{
+  "KIPBase.lean": {
+    "namedDeclarations": 0,
+    "inherited": []
+  },
+  "KIPBase/Basic.lean": {
+    "namedDeclarations": 0,
+    "inherited": []
+  },
+  "KIPBase/SpectralSequence/Basic.lean": {
+    "namedDeclarations": 45,
+    "inherited": []
+  },
+  "KIPBase/SpectralSequence/BoundedExtension.lean": {
+    "namedDeclarations": 28,
+    "inherited": [
+      {
+        "kind": "sorry",
+        "declaration": "BoundedExtensionSS.essDiff",
+        "line": 466
+      },
+      {
+        "kind": "sorry",
+        "declaration": "BoundedExtensionSS.essBoundary",
+        "line": 477
+      }
+    ]
+  },
+  "KIPBase/SpectralSequence/Commutativity.lean": {
+    "namedDeclarations": 26,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity",
+        "line": 140
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_iso",
+        "line": 171
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_noCrossing",
+        "line": 203
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_noCrossing_iso",
+        "line": 228
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_triangle",
+        "line": 262
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_triangle_iso",
+        "line": 289
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_composition",
+        "line": 326
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_composition_iso",
+        "line": 351
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_induces_map",
+        "line": 380
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essInducedPageMap_comm",
+        "line": 396
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_null",
+        "line": 416
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_preserves_boundaries",
+        "line": 435
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_naturality",
+        "line": 449
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_eInfty_compat",
+        "line": 461
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_filtration_compat",
+        "line": 473
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essTriangle_from_square",
+        "line": 489
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essComposition_from_square",
+        "line": 511
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_boundary_transfer",
+        "line": 537
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_page_functorial",
+        "line": 552
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_detection_compat",
+        "line": 569
+      },
+      {
+        "kind": "axiom",
+        "declaration": "essCommutativity_page_transition",
+        "line": 584
+      }
+    ]
+  },
+  "KIPBase/SpectralSequence/Completion.lean": {
+    "namedDeclarations": 23,
+    "inherited": []
+  },
+  "KIPBase/SpectralSequence/Convergence.lean": {
+    "namedDeclarations": 40,
+    "inherited": []
+  },
+  "KIPBase/SpectralSequence/Crossing.lean": {
+    "namedDeclarations": 12,
+    "inherited": []
+  },
+  "KIPBase/SpectralSequence/FilteredComplex.lean": {
+    "namedDeclarations": 39,
+    "inherited": [
+      {
+        "kind": "sorry",
+        "declaration": "FilteredComplex.isLift_sub_factors",
+        "line": 2652
+      },
+      {
+        "kind": "sorry",
+        "declaration": "FilteredComplex.differentialRelation_of_lift",
+        "line": 2670
+      },
+      {
+        "kind": "sorry",
+        "declaration": "FilteredComplex.lift_of_differentialRelation",
+        "line": 2688
+      },
+      {
+        "kind": "sorry",
+        "declaration": "FilteredComplex.differentialRelation_crossed_of_two",
+        "line": 2709
+      },
+      {
+        "kind": "sorry",
+        "declaration": "FilteredComplex.lift_rel_of_not_crossed",
+        "line": 2733
+      }
+    ]
+  },
+  "KIPBase/SpectralSequence/Truncation.lean": {
+    "namedDeclarations": 11,
+    "inherited": []
+  },
+  "KIPBase/SpectralSequence/UnboundedExtension.lean": {
+    "namedDeclarations": 21,
+    "inherited": [
+      {
+        "kind": "sorry",
+        "declaration": "truncatedUC_cycleSubobject_one_preserved",
+        "line": 364
+      },
+      {
+        "kind": "sorry",
+        "declaration": "truncatedUC_boundarySubobject_zero_preserved",
+        "line": 515
+      },
+      {
+        "kind": "sorry",
+        "declaration": "truncatedESS_pageStabilization",
+        "line": 604
+      },
+      {
+        "kind": "sorry",
+        "declaration": "UnboundedExtensionSS",
+        "line": 612
+      },
+      {
+        "kind": "sorry",
+        "declaration": "UnboundedExtensionSS.pageIso",
+        "line": 621
+      },
+      {
+        "kind": "axiom",
+        "declaration": "UnboundedExtensionSS.weakConvergence",
+        "line": 625
+      }
+    ]
+  },
+  "KIPBase/StableHomotopy/Adams.lean": {
+    "namedDeclarations": 38,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "AdamsSS",
+        "line": 56
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsSS_r₀",
+        "line": 61
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsSS_diffDeg",
+        "line": 65
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsSS_map",
+        "line": 70
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsSS_map_id",
+        "line": 75
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsSS_map_comp",
+        "line": 80
+      },
+      {
+        "kind": "axiom",
+        "declaration": "AdamsEInfty",
+        "line": 94
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsEInfty_ss",
+        "line": 99
+      },
+      {
+        "kind": "axiom",
+        "declaration": "InAdamsFiltration",
+        "line": 117
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsFiltration_mono",
+        "line": 128
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsFiltration_zero",
+        "line": 134
+      },
+      {
+        "kind": "axiom",
+        "declaration": "finite_spectra_char",
+        "line": 157
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsConvergence",
+        "line": 165
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsFiltration_exists",
+        "line": 194
+      },
+      {
+        "kind": "axiom",
+        "declaration": "af_ge_one_iff_zero_on_homology",
+        "line": 209
+      },
+      {
+        "kind": "axiom",
+        "declaration": "af_id",
+        "line": 215
+      },
+      {
+        "kind": "axiom",
+        "declaration": "af_comp",
+        "line": 220
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adams_2torsion",
+        "line": 235
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsFiltration_functorial",
+        "line": 248
+      },
+      {
+        "kind": "axiom",
+        "declaration": "af_detection",
+        "line": 257
+      },
+      {
+        "kind": "axiom",
+        "declaration": "sphere_connected",
+        "line": 275
+      },
+      {
+        "kind": "axiom",
+        "declaration": "connected_homology_vanishing",
+        "line": 279
+      },
+      {
+        "kind": "axiom",
+        "declaration": "mod2Homology_shift_iso",
+        "line": 295
+      },
+      {
+        "kind": "axiom",
+        "declaration": "mod2Homology_cofiber_bound",
+        "line": 302
+      },
+      {
+        "kind": "axiom",
+        "declaration": "af_odd_order_infinite",
+        "line": 351
+      },
+      {
+        "kind": "axiom",
+        "declaration": "af_not_odd_order_finite",
+        "line": 356
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adamsConvergence_bigraded",
+        "line": 362
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adams_separated",
+        "line": 370
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adams_subquotient_finite",
+        "line": 376
+      },
+      {
+        "kind": "axiom",
+        "declaration": "adams_boundedness",
+        "line": 382
+      }
+    ]
+  },
+  "KIPBase/StableHomotopy/Basic.lean": {
+    "namedDeclarations": 30,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "sh_closedSymmetricTT",
+        "line": 52
+      },
+      {
+        "kind": "axiom",
+        "declaration": "sh_tensor_functorial_cofiber",
+        "line": 57
+      },
+      {
+        "kind": "axiom",
+        "declaration": "sphereTwistSign",
+        "line": 145
+      }
+    ]
+  },
+  "KIPBase/StableHomotopy/Cohomology.lean": {
+    "namedDeclarations": 20,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "EilenbergMacLane",
+        "line": 36
+      },
+      {
+        "kind": "axiom",
+        "declaration": "HF2_pi0",
+        "line": 41
+      },
+      {
+        "kind": "axiom",
+        "declaration": "HF2_pin_zero",
+        "line": 47
+      },
+      {
+        "kind": "axiom",
+        "declaration": "SteenrodAlgebra",
+        "line": 62
+      },
+      {
+        "kind": "axiom",
+        "declaration": "instRingSteenrodAlgebra_ax",
+        "line": 67
+      },
+      {
+        "kind": "axiom",
+        "declaration": "Mod2CohomologyTotal.steenrodModuleAction",
+        "line": 120
+      },
+      {
+        "kind": "axiom",
+        "declaration": "universal_coefficient",
+        "line": 194
+      }
+    ]
+  },
+  "KIPBase/StableHomotopy/TensorTriangulatedCategory.lean": {
+    "namedDeclarations": 3,
+    "inherited": []
+  },
+  "KIPBase/Synthetic/Adams.lean": {
+    "namedDeclarations": 8,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "SynAdamsSS",
+        "line": 41
+      },
+      {
+        "kind": "axiom",
+        "declaration": "synAdamsSS_diffDeg",
+        "line": 52
+      },
+      {
+        "kind": "axiom",
+        "declaration": "synAdamsSS_r0",
+        "line": 62
+      },
+      {
+        "kind": "axiom",
+        "declaration": "synAdamsFiltration",
+        "line": 76
+      },
+      {
+        "kind": "axiom",
+        "declaration": "synAdamsFiltration_mono",
+        "line": 85
+      },
+      {
+        "kind": "axiom",
+        "declaration": "synAdamsConvergence",
+        "line": 105
+      },
+      {
+        "kind": "axiom",
+        "declaration": "synAdamsSS_functorial",
+        "line": 123
+      },
+      {
+        "kind": "axiom",
+        "declaration": "synAdamsSS_zlambda_module",
+        "line": 137
+      }
+    ]
+  },
+  "KIPBase/Synthetic/Basic.lean": {
+    "namedDeclarations": 11,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "syn_functorial_cofiber",
+        "line": 86
+      },
+      {
+        "kind": "axiom",
+        "declaration": "zlambda_enrichment",
+        "line": 156
+      }
+    ]
+  },
+  "KIPBase/Synthetic/Lift.lean": {
+    "namedDeclarations": 8,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "synthetic_lift",
+        "line": 34
+      },
+      {
+        "kind": "axiom",
+        "declaration": "fHat_spec",
+        "line": 59
+      },
+      {
+        "kind": "axiom",
+        "declaration": "syn_distinguished_triangle",
+        "line": 71
+      },
+      {
+        "kind": "axiom",
+        "declaration": "fhat_triangle",
+        "line": 84
+      },
+      {
+        "kind": "axiom",
+        "declaration": "cofiber_fhat",
+        "line": 95
+      },
+      {
+        "kind": "axiom",
+        "declaration": "af_eq_lambda_bockstein",
+        "line": 114
+      }
+    ]
+  },
+  "KIPBase/Synthetic/Nu.lean": {
+    "namedDeclarations": 8,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "nu",
+        "line": 35
+      },
+      {
+        "kind": "axiom",
+        "declaration": "nu_additive",
+        "line": 38
+      },
+      {
+        "kind": "axiom",
+        "declaration": "nu_zero",
+        "line": 41
+      },
+      {
+        "kind": "axiom",
+        "declaration": "nu_susp",
+        "line": 48
+      },
+      {
+        "kind": "axiom",
+        "declaration": "nu_cofiber_ses",
+        "line": 100
+      },
+      {
+        "kind": "axiom",
+        "declaration": "cohom_exact_implies_homol_exact",
+        "line": 115
+      }
+    ]
+  },
+  "KIPBase/Synthetic/Rigidity.lean": {
+    "namedDeclarations": 10,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "SynAdamsEInfty",
+        "line": 29
+      },
+      {
+        "kind": "axiom",
+        "declaration": "synAdamsEInfty_ss",
+        "line": 39
+      },
+      {
+        "kind": "axiom",
+        "declaration": "rigidity_degeneration",
+        "line": 55
+      },
+      {
+        "kind": "axiom",
+        "declaration": "rigidity_neg_weight_vanishing",
+        "line": 62
+      },
+      {
+        "kind": "axiom",
+        "declaration": "rigidity_above_diag_vanishing",
+        "line": 68
+      },
+      {
+        "kind": "axiom",
+        "declaration": "lambda_bockstein_iso",
+        "line": 82
+      },
+      {
+        "kind": "axiom",
+        "declaration": "einfty_nuX_weight_map",
+        "line": 115
+      },
+      {
+        "kind": "axiom",
+        "declaration": "einfty_nuX_weight_map_epi",
+        "line": 122
+      },
+      {
+        "kind": "axiom",
+        "declaration": "einfty_nuX_mod_lambda",
+        "line": 130
+      }
+    ]
+  },
+  "KIPBase/Synthetic/Sphere.lean": {
+    "namedDeclarations": 8,
+    "inherited": [
+      {
+        "kind": "axiom",
+        "declaration": "biShift_fullyFaithful",
+        "line": 58
+      }
+    ]
+  }
+}

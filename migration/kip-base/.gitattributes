@@ -1,0 +1,5 @@
+# Byte-identical historical documents and unified-diff context retain upstream
+# whitespace. The migration checker verifies their content; active Lean code
+# and newly authored documentation keep the normal whitespace checks.
+original/** -whitespace
+port.patch -whitespace

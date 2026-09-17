@@ -1,0 +1,2 @@
+# Full working-tree backup includes untracked agent logs and local connection settings.
+/local/

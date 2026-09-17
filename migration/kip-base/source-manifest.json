@@ -1,0 +1,444 @@
+{
+  "source_commit": "bff9a8d1f96a7e450bca3b850020687560449e6d",
+  "source_status": " M KIPBase/SpectralSequence/Crossing.lean\n M KIPBase/SpectralSequence/FilteredComplex.lean\n",
+  "files": [
+    {
+      "source": ".claude/settings.json",
+      "destination": "migration/kip-base/original/.claude/settings.json",
+      "sha256": "d984a32b301b0b4f2db5ed0b2137a668fc7af820c09a37365581a75f5476d751",
+      "bytes": 61
+    },
+    {
+      "source": ".claude/tools/archon-informal-agent.py",
+      "destination": "migration/kip-base/original/.claude/tools/archon-informal-agent.py",
+      "sha256": "a1ce0ac2e147a89149e840efd6951000c0b48b1ef75cd37003178fc5701c4a45",
+      "bytes": 12911
+    },
+    {
+      "source": ".github/workflows/create-release.yml",
+      "destination": "migration/kip-base/original/.github/workflows/create-release.yml",
+      "sha256": "491f1c02bb31774c3f711155a4cc24da5923dc8ba7016e9aaff13969e2ea49ca",
+      "bytes": 427
+    },
+    {
+      "source": ".github/workflows/lean_action_ci.yml",
+      "destination": "migration/kip-base/original/.github/workflows/lean_action_ci.yml",
+      "sha256": "3b0d49449c2e6d4ee04ce6e57c23dde1a836314b502351f1f6203477e2aafe8f",
+      "bytes": 487
+    },
+    {
+      "source": ".github/workflows/update.yml",
+      "destination": "migration/kip-base/original/.github/workflows/update.yml",
+      "sha256": "608304be502130030682762aa4a9bbec3e127d6b1eb2acf054818b84b6c81a4f",
+      "bytes": 1950
+    },
+    {
+      "source": ".gitignore",
+      "destination": "migration/kip-base/original/.gitignore",
+      "sha256": "75d89a8e120974410913ac66a768c448f545657c894048c068a95aa63364b0c0",
+      "bytes": 292
+    },
+    {
+      "source": "KIPBase.lean",
+      "destination": "KIPBase.lean",
+      "sha256": "52f902e32b93412a1de8fb69f1b930a252682615b6e8c4f654283373add5dd4d",
+      "bytes": 21
+    },
+    {
+      "source": "KIPBase/Basic.lean",
+      "destination": "KIPBase/Basic.lean",
+      "sha256": "4005540326f406f94c51e6d5cdc35d3ae1d2b588f0bc0db7b0eb1c582521f760",
+      "bytes": 759
+    },
+    {
+      "source": "KIPBase/SpectralSequence/Basic.lean",
+      "destination": "KIPBase/SpectralSequence/Basic.lean",
+      "sha256": "bc3a14bde9c98f44119bd6fa36b9d37a0b4ec8c12ed54581fdf36baa67635629",
+      "bytes": 49270
+    },
+    {
+      "source": "KIPBase/SpectralSequence/BoundedExtension.lean",
+      "destination": "KIPBase/SpectralSequence/BoundedExtension.lean",
+      "sha256": "c15965d06d0cd10e818458a83ca0123e2056701d358ab529909bd4e4d7f81606",
+      "bytes": 24370
+    },
+    {
+      "source": "KIPBase/SpectralSequence/Commutativity.lean",
+      "destination": "KIPBase/SpectralSequence/Commutativity.lean",
+      "sha256": "16e8976d2ff65261f2937028a019d6034913f66078bb5819cb6960e1416f688b",
+      "bytes": 30443
+    },
+    {
+      "source": "KIPBase/SpectralSequence/Completion.lean",
+      "destination": "KIPBase/SpectralSequence/Completion.lean",
+      "sha256": "0fe0eda873ceb715a1641398c1f71bee177e50f8b53bfc49deafd479884d4785",
+      "bytes": 19292
+    },
+    {
+      "source": "KIPBase/SpectralSequence/Convergence.lean",
+      "destination": "KIPBase/SpectralSequence/Convergence.lean",
+      "sha256": "d8d0677215ca82463440c9e2b57370a09e6331d33fcd09c33afa35d069194d17",
+      "bytes": 41275
+    },
+    {
+      "source": "KIPBase/SpectralSequence/Crossing.lean",
+      "destination": "KIPBase/SpectralSequence/Crossing.lean",
+      "sha256": "745d722dcff39511879d5ccd94d87f28640246b271d34874e810238ff13a09bb",
+      "bytes": 9251
+    },
+    {
+      "source": "KIPBase/SpectralSequence/FilteredComplex.lean",
+      "destination": "KIPBase/SpectralSequence/FilteredComplex.lean",
+      "sha256": "65de0d40d40e4a4b74dabe0e3d2603d1e4974a19b09cbe85ceca9f8c756004d7",
+      "bytes": 213356
+    },
+    {
+      "source": "KIPBase/SpectralSequence/Truncation.lean",
+      "destination": "KIPBase/SpectralSequence/Truncation.lean",
+      "sha256": "61c23e3ec89feefab9992056673fbc798886949d3bba15f81bceb3078a2b47a4",
+      "bytes": 9804
+    },
+    {
+      "source": "KIPBase/SpectralSequence/UnboundedExtension.lean",
+      "destination": "KIPBase/SpectralSequence/UnboundedExtension.lean",
+      "sha256": "fead4c76ab6ae10ca3b8d9819c96ee72e9d668c75b4130bbffd480b0b7ac1a61",
+      "bytes": 33851
+    },
+    {
+      "source": "KIPBase/StableHomotopy/Adams.lean",
+      "destination": "KIPBase/StableHomotopy/Adams.lean",
+      "sha256": "e751d204c430c8e584c4ca5aaad3c3b68c87fb6c54e4dcf1de5f31afdfb7bdb0",
+      "bytes": 18028
+    },
+    {
+      "source": "KIPBase/StableHomotopy/Basic.lean",
+      "destination": "KIPBase/StableHomotopy/Basic.lean",
+      "sha256": "2f401d4920e0656fd77880cd273444fd4c63d4184bb820c2a5d4f57ebce0cb2e",
+      "bytes": 22682
+    },
+    {
+      "source": "KIPBase/StableHomotopy/Cohomology.lean",
+      "destination": "KIPBase/StableHomotopy/Cohomology.lean",
+      "sha256": "0e1ae8e6c1ef0a8944c8e87729fa6a59c88ec0a1a24f1ce371b2d14470ae2079",
+      "bytes": 8699
+    },
+    {
+      "source": "KIPBase/StableHomotopy/TensorTriangulatedCategory.lean",
+      "destination": "KIPBase/StableHomotopy/TensorTriangulatedCategory.lean",
+      "sha256": "745461d3cb671c868141feb8a5f1282bd991a684efb03f6b7bf3a3d3506e7b50",
+      "bytes": 5350
+    },
+    {
+      "source": "KIPBase/Synthetic/Adams.lean",
+      "destination": "KIPBase/Synthetic/Adams.lean",
+      "sha256": "d77bce7f2fe195cbe5774a01a69eadd8c49f2c1153088de6f09c3b2ff9e41ba1",
+      "bytes": 7053
+    },
+    {
+      "source": "KIPBase/Synthetic/Basic.lean",
+      "destination": "KIPBase/Synthetic/Basic.lean",
+      "sha256": "77dd7c2e9ec350123c0f960009b4be744798147bec80ec996bef29ca9d760dac",
+      "bytes": 7878
+    },
+    {
+      "source": "KIPBase/Synthetic/Lift.lean",
+      "destination": "KIPBase/Synthetic/Lift.lean",
+      "sha256": "ef471f031d0f7ec1a7a61664139dd22f707f35c3a719f5dd255030b9a1237349",
+      "bytes": 5876
+    },
+    {
+      "source": "KIPBase/Synthetic/Nu.lean",
+      "destination": "KIPBase/Synthetic/Nu.lean",
+      "sha256": "58c3fe1c54c62377c19ccbfe2d90ba4c58b9889b4175b1d14535c6dfc89e70bf",
+      "bytes": 6631
+    },
+    {
+      "source": "KIPBase/Synthetic/Rigidity.lean",
+      "destination": "KIPBase/Synthetic/Rigidity.lean",
+      "sha256": "9eebc165d768d17486d623eef10bf034fb541787a830d94247e8d5df91a30f82",
+      "bytes": 6038
+    },
+    {
+      "source": "KIPBase/Synthetic/Sphere.lean",
+      "destination": "KIPBase/Synthetic/Sphere.lean",
+      "sha256": "2d531f064234c80ad73d2dd6f06c226a0209fee3449553d2ad6d27565e16f721",
+      "bytes": 3886
+    },
+    {
+      "source": "README.md",
+      "destination": "migration/kip-base/original/README.md",
+      "sha256": "31608dfd4058e9abf2ffbb2734adc9bcf389b03be5ca6c82df5025e4670c7228",
+      "bytes": 484
+    },
+    {
+      "source": "blueprint/README.md",
+      "destination": "migration/kip-base/original/blueprint/README.md",
+      "sha256": "52878b5ce2337d110167f9de476e302a11db5067fc77e785f359fcd6ac020e79",
+      "bytes": 1976
+    },
+    {
+      "source": "blueprint/build.sh",
+      "destination": "migration/kip-base/original/blueprint/build.sh",
+      "sha256": "00b9a1ab20c4ec26b5a85a0e31f180b6e3cb2c1c82ec9b41106b483ea89fad7b",
+      "bytes": 2015
+    },
+    {
+      "source": "blueprint/src/algtop.sty",
+      "destination": "migration/kip-base/original/blueprint/src/algtop.sty",
+      "sha256": "af579fad0c3dded988c10cde425832f81c94cb4b1105d28f9139cf1c72a5fd60",
+      "bytes": 6350
+    },
+    {
+      "source": "blueprint/src/blueprint.sty",
+      "destination": "migration/kip-base/original/blueprint/src/blueprint.sty",
+      "sha256": "5a7741a78a338b034be8076ced1b4964fb92beccd533de65f158d42124a409b6",
+      "bytes": 65
+    },
+    {
+      "source": "blueprint/src/chapters/prerequisites.tex",
+      "destination": "migration/kip-base/original/blueprint/src/chapters/prerequisites.tex",
+      "sha256": "b444c0b7ac1687e0e828df50e7f274b40e5f25a3612934fd2420bb080bd9904a",
+      "bytes": 79998
+    },
+    {
+      "source": "blueprint/src/content.tex",
+      "destination": "migration/kip-base/original/blueprint/src/content.tex",
+      "sha256": "73b59d46786f657e1ae697651c915b6cea81c765c90b12346ba9a5512dce2d88",
+      "bytes": 172
+    },
+    {
+      "source": "blueprint/src/extra_styles.css",
+      "destination": "migration/kip-base/original/blueprint/src/extra_styles.css",
+      "sha256": "01f6bf9d23a170c360b5969661ba96a09af3b43cec31ed06b35441235c92eb90",
+      "bytes": 483
+    },
+    {
+      "source": "blueprint/src/latexmkrc",
+      "destination": "migration/kip-base/original/blueprint/src/latexmkrc",
+      "sha256": "1471f9ca62d893594661ec4424c4ec0d2f88828d3da2d2057de0b7a31dd813b6",
+      "bytes": 182
+    },
+    {
+      "source": "blueprint/src/leanpkg.tex",
+      "destination": "migration/kip-base/original/blueprint/src/leanpkg.tex",
+      "sha256": "f11d37a3dfcd8a36017a3275ef526662b8170bb068ccb8eb3200123fcf927680",
+      "bytes": 310
+    },
+    {
+      "source": "blueprint/src/macros/common.tex",
+      "destination": "migration/kip-base/original/blueprint/src/macros/common.tex",
+      "sha256": "dbdeed301216af8e22311d2808fb6d212166a8809ad038293ac00d82b3194f55",
+      "bytes": 1662
+    },
+    {
+      "source": "blueprint/src/macros/print.tex",
+      "destination": "migration/kip-base/original/blueprint/src/macros/print.tex",
+      "sha256": "2ca7df11b18bc6ef4b833589804fdcd44082bce8f893a18abd9e86ab8d65ccb7",
+      "bytes": 653
+    },
+    {
+      "source": "blueprint/src/macros/web.tex",
+      "destination": "migration/kip-base/original/blueprint/src/macros/web.tex",
+      "sha256": "e3022720d1e64f5ce43694db6c373916800e25e128998cd5bbbe136eccbd8cbc",
+      "bytes": 648
+    },
+    {
+      "source": "blueprint/src/main.bib",
+      "destination": "migration/kip-base/original/blueprint/src/main.bib",
+      "sha256": "b762d7bdfd654376553bdf57e8e888351f47d905bf8a5aa52d611c64973c3f16",
+      "bytes": 741
+    },
+    {
+      "source": "blueprint/src/plastex.cfg",
+      "destination": "migration/kip-base/original/blueprint/src/plastex.cfg",
+      "sha256": "1f7b2ce9adf5b5214760576bd7042fea00aae8ac0857fd8335e410faeb9ca19b",
+      "bytes": 302
+    },
+    {
+      "source": "blueprint/src/print.tex",
+      "destination": "migration/kip-base/original/blueprint/src/print.tex",
+      "sha256": "d6717599633f42d206685ca36ca8def9fd967f835fc415e009763a5870afb886",
+      "bytes": 158
+    },
+    {
+      "source": "blueprint/src/web.tex",
+      "destination": "migration/kip-base/original/blueprint/src/web.tex",
+      "sha256": "b4310bad2d06df9e4330eaa606e676a43e698a29062bc67e27a88495cc92a7f6",
+      "bytes": 155
+    },
+    {
+      "source": "informal/adams.tex",
+      "destination": "migration/kip-base/original/informal/adams.tex",
+      "sha256": "05ebbaadfe317dd0228ea41a5f05a3da21949bf4f2897421448decd13c7ca4bd",
+      "bytes": 4102
+    },
+    {
+      "source": "informal/adams_extended.md",
+      "destination": "migration/kip-base/original/informal/adams_extended.md",
+      "sha256": "7718868e2c6f4b0f0dc0d6671f21f1f71bc8c1bdcb200a19ffc005c2047947fd",
+      "bytes": 7572
+    },
+    {
+      "source": "informal/adams_review.md",
+      "destination": "migration/kip-base/original/informal/adams_review.md",
+      "sha256": "f67783be1112c9c8bb916c6383256ef8d39709e525822af8c51c2fd4e655301f",
+      "bytes": 4171
+    },
+    {
+      "source": "informal/commutativity_ss.md",
+      "destination": "migration/kip-base/original/informal/commutativity_ss.md",
+      "sha256": "4b67198fdd9546b714dba15f331d7a46b6e85470b7cc626dd137b9adb6db36ad",
+      "bytes": 3541
+    },
+    {
+      "source": "informal/ess_commutativity.md",
+      "destination": "migration/kip-base/original/informal/ess_commutativity.md",
+      "sha256": "2cfd36a7e5adadf7c4d78d80aef5f4a8d47e1fdf7773b9beaceac0506d6fa8d5",
+      "bytes": 4273
+    },
+    {
+      "source": "informal/extension_ss.md",
+      "destination": "migration/kip-base/original/informal/extension_ss.md",
+      "sha256": "7190f13c0ccf017d5af705f61c010483a1cf481f94a0405314fc6c8f615db102",
+      "bytes": 4569
+    },
+    {
+      "source": "informal/functorial_cofiber.md",
+      "destination": "migration/kip-base/original/informal/functorial_cofiber.md",
+      "sha256": "e706196eabc922471571da9649148a5a89caf3b08afd6fa1f610654c0170e6a3",
+      "bytes": 3498
+    },
+    {
+      "source": "informal/lambdaAction.md",
+      "destination": "migration/kip-base/original/informal/lambdaAction.md",
+      "sha256": "7746ee4bf68206e29e892b2e704db86d257c2fda80b801b7054ae3240c606564",
+      "bytes": 3474
+    },
+    {
+      "source": "informal/lambdaPow.md",
+      "destination": "migration/kip-base/original/informal/lambdaPow.md",
+      "sha256": "b21e34b93d49e14beb6e9b0be94860d894b2c5551fdc73424789a262ca97aefe",
+      "bytes": 6902
+    },
+    {
+      "source": "informal/nu_review.md",
+      "destination": "migration/kip-base/original/informal/nu_review.md",
+      "sha256": "0ad3d2bec6338d1a68cf839391a0f0996d938312363226bd36efaf95523bef57",
+      "bytes": 1330
+    },
+    {
+      "source": "informal/pageIso.md",
+      "destination": "migration/kip-base/original/informal/pageIso.md",
+      "sha256": "5e89d5c9071ef827d47606dd1fa8ac7aaaee2598919d0fee976e4a85d18e47bb",
+      "bytes": 3404
+    },
+    {
+      "source": "informal/spectral_sequences.md",
+      "destination": "migration/kip-base/original/informal/spectral_sequences.md",
+      "sha256": "0376dc074a6456179cfb2873f8f88cabcfd42ad7ea298b4ba8020ce3af154a67",
+      "bytes": 4353
+    },
+    {
+      "source": "informal/sphere_refactor.md",
+      "destination": "migration/kip-base/original/informal/sphere_refactor.md",
+      "sha256": "ab2f8838569774525c7d50dbf0304fde385e784c4424192bfa8c0e604cffc846",
+      "bytes": 10552
+    },
+    {
+      "source": "informal/stable_homotopy.md",
+      "destination": "migration/kip-base/original/informal/stable_homotopy.md",
+      "sha256": "b06f7c803db17c246411cba6e001d5675691b65a3e5857443028179e1f00361a",
+      "bytes": 3081
+    },
+    {
+      "source": "informal/synthetic_spectra.md",
+      "destination": "migration/kip-base/original/informal/synthetic_spectra.md",
+      "sha256": "4b78af7e24bcca28aca8753bb84618890483b5e25d40ae60da1e4828df94b096",
+      "bytes": 3670
+    },
+    {
+      "source": "informal/zlambda_enrichment.md",
+      "destination": "migration/kip-base/original/informal/zlambda_enrichment.md",
+      "sha256": "196786c1220bb474e4f880150513818bf6554f296409442af54e0e8796d5c64f",
+      "bytes": 4184
+    },
+    {
+      "source": "informal/zlambda_review.md",
+      "destination": "migration/kip-base/original/informal/zlambda_review.md",
+      "sha256": "9eb650b9b9319ea6bfa012009d0592b84f4f1db5470d184d166f53706ef7c145",
+      "bytes": 1282
+    },
+    {
+      "source": "lake-manifest.json",
+      "destination": "migration/kip-base/original/lake-manifest.json",
+      "sha256": "1f5d49fc4f5a7f865eb0fd7f6ed9d92e585993e50c23bc2fdf5a39496deb6b91",
+      "bytes": 3118
+    },
+    {
+      "source": "lakefile.toml",
+      "destination": "migration/kip-base/original/lakefile.toml",
+      "sha256": "aab4fe172b35f07aace0e9f463b5d6425bf716dea153a6bbb78732f6d7093a2b",
+      "bytes": 350
+    },
+    {
+      "source": "lean-toolchain",
+      "destination": "migration/kip-base/original/lean-toolchain",
+      "sha256": "db7bb24b756d745bbde83fe92718b51bd3625dae3701ba0f598d0eedcd3f3028",
+      "bytes": 25
+    },
+    {
+      "source": "references/.latexmkrc",
+      "destination": "migration/kip-base/original/references/.latexmkrc",
+      "sha256": "dc5f696379da7e71230dd58208689ae11e4207d20a925e9e7826d6970d792353",
+      "bytes": 80
+    },
+    {
+      "source": "references/raw_paper/2412.10879/README.md",
+      "destination": "migration/kip-base/original/references/raw_paper/2412.10879/README.md",
+      "sha256": "e68dccd1b4d06424ab5f387a5664e72ef7490b8377d8455a1fa09aa790cb070f",
+      "bytes": 612
+    },
+    {
+      "source": "references/raw_paper/2412.10879/tex/112.tex",
+      "destination": "migration/kip-base/original/references/raw_paper/2412.10879/tex/112.tex",
+      "sha256": "5eb83ef105ce9dbbda87a9f57726bb5c078308fd3718840ea29ee8100cbefabb",
+      "bytes": 102754
+    },
+    {
+      "source": "references/raw_paper/2412.10879/tex/algtop.sty",
+      "destination": "migration/kip-base/original/references/raw_paper/2412.10879/tex/algtop.sty",
+      "sha256": "32e70036acc2c3734814aa02c7927b58ba54f18e7d102219832bfd4137a511bc",
+      "bytes": 6099
+    },
+    {
+      "source": "references/raw_paper/2412.10879/tex/main.bib",
+      "destination": "migration/kip-base/original/references/raw_paper/2412.10879/tex/main.bib",
+      "sha256": "ef28d62f0343a70c6176387d25fd19c50cc053197d522170632aa9aa24f1cd1d",
+      "bytes": 29372
+    },
+    {
+      "source": "references/raw_paper/2412.10879/tex/main.pdf",
+      "destination": "migration/kip-base/original/references/raw_paper/2412.10879/tex/main.pdf",
+      "sha256": "2bbc78c09eb91afd5687f6c71d9f464e97397646f78abd54e4b2dce48e1f6672",
+      "bytes": 766777
+    },
+    {
+      "source": "references/raw_paper/2412.10879/tex/main.tex",
+      "destination": "migration/kip-base/original/references/raw_paper/2412.10879/tex/main.tex",
+      "sha256": "1125462bcae4a4ec56e3bfcaad15df4febf98757dfb83462b155af162c99c9e0",
+      "bytes": 210618
+    },
+    {
+      "source": "references/template.pdf",
+      "destination": "migration/kip-base/original/references/template.pdf",
+      "sha256": "68127b637c4b2554b8496216c3edab4969a45278603860b44d6851f93dff7e59",
+      "bytes": 72078
+    },
+    {
+      "source": "references/template.tex",
+      "destination": "migration/kip-base/original/references/template.tex",
+      "sha256": "5b895d63bd2efdc0ec27d3b543f5dff8a6e55391d42e8c262ac8e17ae40cbbd3",
+      "bytes": 7515
+    }
+  ]
+}
