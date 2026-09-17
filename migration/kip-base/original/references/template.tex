@@ -1,0 +1,280 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[UTF8, fontset=none]{ctex}
+\setCJKmainfont{Droid Sans Fallback}
+\setCJKsansfont{Droid Sans Fallback}
+\setCJKmonofont{Droid Sans Fallback}
+\usepackage{amsfonts,amsmath,amsthm,amssymb}
+\usepackage{sfmath}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{left=0cm,right=0cm,top=0cm,bottom=0.1cm, footskip=0cm, includefoot=true}
+%\usepackage[contents = \thepage, color=yellow, angle=0, scale = 20]{background}
+\pagestyle{empty}
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\fancyhead{}
+%\fancyfoot{}
+%\cfoot{}
+%\lfoot{{\small \color{red} \slshape \thepage 页}}
+%\fancyfoot[R]{\thepage}
+
+\usepackage[all]{xy}
+\usepackage{color}
+
+\renewenvironment{proof}{{\noindent\it\textbf{Proof}}\quad\it}{\hfill$\square$}
+
+%\theoremstyle{definition}
+
+\newtheorem{thm}[equation]{Theorem}
+\newtheorem{cor}[equation]{Corollary}
+\newtheorem{lem}[equation]{Lemma}
+\newtheorem{prop}[equation]{Proposition}
+\newtheorem{defn}[equation]{Definition}
+\newtheorem{rem}[equation]{Remark}
+
+\title{last Kervaire}
+\author{}
+
+\setcounter{secnumdepth}{6}
+
+\begin{document}
+
+\sffamily
+\maketitle
+\thispagestyle{empty}
+
+\abstract{}
+\tableofcontents
+
+\large
+
+\begin{sloppy}
+\clubpenalty=-100
+\widowpenalty=-100
+
+\section{谱序列}
+\subsection{谱序列}
+\paragraph{}
+给定abel范畴C，定义C上的具有n分次的谱序列
+
+\begin{rem}
+    本项目考虑的filtration都是decreasing
+\end{rem}
+
+\subsection{谱序列的收敛性}
+
+\paragraph{}A为一个n-1分次的对象，给定A上的一个filtration，则graded pieces构成一个n分次的对象
+
+\paragraph{}称谱序列E收敛到A，如果存在同构，$E_\infty$到A的graded pieces，之间分次可以相差一个线性变换
+
+\paragraph{}converging 谱序列的范畴：
+给定一个$E$到A分次的变换规则，定义相应的谱序列的范畴，态射为一个E之间的同态加上A之间的同态，保持相应的结构
+
+\begin{rem}
+    该收敛性为弱意义下的收敛性，本项目不考虑强收敛性等问题
+\end{rem}
+
+\paragraph{}A的原始的n-1分次对应的E的分次，我们称之为stem
+
+\paragraph{}A中的filtration对应的E的分次，我们称之为E的filtration次数
+
+\paragraph{}
+A中元素$x$具有filtration至少r，考虑$x$在r分次的graded piece中的像，其在E中对应的元素$y$, 我们称y可以detect x
+
+\paragraph{} x被0 detect当且仅当x的filtration至少$r+1$
+
+\paragraph{}
+$x,x'$被同一个$y$所detect，当且仅当$x-x'$被更高filtration的东西detect
+
+\subsection{filtration 诱导的谱序列}
+\paragraph{}
+给定具有filtration的链复形$X$, 我们可以得到相应的谱序列
+
+\paragraph{}
+该谱序列收敛到链复形的同调
+
+\paragraph{}
+该谱序列具有函子性
+
+\subsection{微分的交叉}
+\paragraph{}
+给定$E$中的两个微分
+$$d:x\xrightarrow{}y$$
+$$d':z\xrightarrow{}w$$
+我们称$d$被$d'$交叉，如果
+\begin{enumerate}
+\item $d'$为非平凡的微分
+    \item x与z的stem相同，z的filtration严格高于x
+    \item y与w的stem相同，w的filtration不高于y
+\end{enumerate}
+
+\paragraph{}
+2.7给出了更精细的crossing条件
+
+\subsection{extension谱序列}
+
+\paragraph{}
+给定一个converging谱序列的同态
+$f:(E_1,A_1)\xrightarrow{}(E_2,A_2)$, 则A上的filtration诱导了extension谱序列
+
+
+\paragraph{} extension微分$d:x\xrightarrow{}y$不被其他微分交叉，当且仅当，对任意被x所detect的$x_0$, $f(x_0)$被y所detect
+
+\paragraph{}
+2.10是更精确的版本
+
+\subsection{extension微分和谱序列中微分的交换性}
+
+即2.12及其推论
+
+
+\section{稳定同伦论}
+\subsection{稳定同伦范畴}\label{3}
+
+本节不依赖其他章节
+
+\paragraph{}
+稳定同伦范畴$\mathcal{S}$为一个三角范畴
+
+\begin{rem}
+    $\mathcal{S}$是指谱形(spectra)的同伦范畴。在形式化中我们直接公理化其三角范畴结构，而不经过模型范畴的构造。
+\end{rem}
+
+\paragraph{}
+存在球面谱 $\mathbb{S}\in \mathcal{S}$
+
+\paragraph{}
+对整数n，
+$S^n$为作用n次suspension函子在$\mathbb{S}$上
+
+\paragraph{}
+$\pi_nX$为$S^n$到 X 的映射同伦类
+
+\paragraph{}
+$\pi_*X$为单分次的abel群
+
+\subsection{上同调}
+
+\paragraph{}
+$HF_2$为Eilenberg-MacLane对象
+
+\paragraph{}
+$\pi_0(HF_2)=F_2$， 其他的同伦群为0
+
+\paragraph{}
+mod 2系数同调定义为
+$$H^*(X) = [\Sigma^*X,HF_2]$$
+
+\subsection{Adams谱序列}
+
+\paragraph{}Adams谱序列是$\mathcal{S}$到双分次的converging
+谱序列范畴的函子
+
+\paragraph{}
+$\pi_*X$上有自然的Adams filtration
+
+\paragraph{}
+Adams谱序列收敛到$\pi_*X$, 即Adams filtration的graded piece与Adams 谱序列的$E_\infty$项中相应的群之间存在自然同构
+
+\paragraph{}mod 2的Adams谱序列的$E_2$项中元素都是2阶的 
+
+\paragraph{}Adams filtration可以推广到一般的两个谱形之间的映射
+
+\paragraph{}Adams filtration的刻画：
+$f:X\xrightarrow{}Y$具有Adams filtration至少r，如果f能分解为r个映射的复合，且其中每个映射诱导mod 2同调的0映射
+
+\section{synthetic}
+\subsection{synthetic谱形}
+考虑$HF_2$-synthetic 谱
+\paragraph{}Syn 为预三角范畴
+
+\paragraph{} hSyn
+为其同伦范畴
+
+\paragraph{}$\Sigma^{m,n}$为一个hSyn上的自等价
+
+\paragraph{}存在自然等价：
+$$\Sigma^{m_1,n_1}\Sigma^{m_2,n_2}\cong\Sigma^{m_1+m_2,n_1+n_2}$$
+
+
+\paragraph{}$\Sigma^{1,0}$为稳定同伦范畴中的suspension函子
+
+
+\paragraph{}存在自然变换
+$$\lambda: \Sigma^{0,-1}\xrightarrow{} Id$$
+
+\paragraph{}定义$X/\lambda^n$为 $\lambda^n|_X$的cofiber
+
+\paragraph{} hSyn可以enriched over $\mathbb{Z}[\lambda]$-模, $Hom(X,Y)$为双分次的abel群$[\Sigma^{*,*}X,Y]$
+
+\paragraph{} $\lambda$的分次是$(0,-1)$
+
+\subsection{Synthetic球}
+\paragraph{}存在球对象
+$S^{0,0}\in Syn$
+
+\paragraph{}
+$S^{m,n} = \Sigma^{m,n}S^{0,0}$
+
+\paragraph{}synthetic同伦群为bigraded abel群
+$$\pi_{m,n}(X) = [S^{m,n},X]$$
+
+\paragraph{}
+$\pi_{m,n}(X) = \pi_{m+k,n+l}(\Sigma^{k,l}X)$
+
+\paragraph{}$\pi_{*,*}$具有自然的$\mathbb{Z}[\lambda]$-模结构
+
+\subsection{Adams谱序列}
+
+\paragraph{}Adams谱序列是$\mathcal{S}$到3-分次的converging谱序列范畴的函子，分次规则见3.6
+
+\paragraph{}
+$\pi_*X$上有自然的Adams filtration
+
+\paragraph{}
+Adams谱序列收敛到$\pi_{*,*}X$
+
+\paragraph{}synthetic Adams谱序列是一个$\mathbb{Z}[\lambda]$-模范畴中的谱序列
+
+\subsection{$\nu$函子}
+\paragraph{} 存在函子
+$$\nu: h\mathcal{S}\xrightarrow{} hSyn$$
+
+\paragraph{}$\nu$保distinguished triangla的条件：3.1
+
+\paragraph{} $\nu$与$\Sigma$不交换，
+$$\nu(\Sigma X) \cong \Sigma^{1,1}\nu X$$
+
+\paragraph{}
+自然的比较映射
+$\Sigma(\nu X) \xrightarrow{} \nu(\Sigma X)$为$\lambda$
+
+\subsection{Synthetic rigidity}
+\paragraph{}
+$\nu X$的Adams $E_2$项：即3.6
+
+\paragraph{} Adams 与$\lambda$-bockstein:即3.8
+\begin{rem}
+    3.8(2)中的映射为cofiber
+    $$\Sigma^{0,r}\nu X\xrightarrow{\lambda^r} \nu X \xrightarrow{} \nu X/\lambda^r$$
+    中的边缘映射
+\end{rem}
+
+\paragraph{}$\nu X$的Synthetic Adams $E_\infty$项与$X$的Adams的关系：即3.12
+
+\subsection{Synthetic lift}
+
+\paragraph{}$\nu$作用在Adams filtration k的映射上得到的东西可以除$\lambda^k$, 即Adams filtration等价于$\lambda$-bockstein filtration, 即3.16
+
+\paragraph{} Adams filtration 1 的映射作用$\nu$之后的canonical 除$\lambda$：即3.17
+
+\paragraph{} $\nu$作用在distinguished triangle上的notation： 3.19，3.20
+
+
+\begin{thebibliography}{99}
+
+
+\end{thebibliography}
+
+\end{sloppy}
+\end{document}

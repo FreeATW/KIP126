@@ -1,0 +1,239 @@
+--- KIP-base-4.28/KIPBase/SpectralSequence/Basic.lean
++++ KIP126-4.32.2/KIPBase/SpectralSequence/Basic.lean
+@@ -10,7 +10,10 @@
+   分量的微分组装在一起。页对象 `Page r k` 由 `SSData` 派生，
+   不单独存储。
+ -/
+-import Mathlib
++import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
++import Mathlib.CategoryTheory.Abelian.Subobject
++import Mathlib.CategoryTheory.Abelian.Pseudoelements
++import Mathlib.Tactic.Abel
+ 
+ namespace KIPBase.SpectralSequence
+ 
+--- KIP-base-4.28/KIPBase/SpectralSequence/BoundedExtension.lean
++++ KIP126-4.32.2/KIPBase/SpectralSequence/BoundedExtension.lean
+@@ -380,7 +380,7 @@
+   rw [(cm.filtration_compat s t).choose_spec]
+   -- Remains: (FC.d_preserves_fil s 1).choose ≫ (F₂.F s t).arrow = (F₁.F s t).arrow ≫ cm.aMap t
+   -- This follows from (FC.d_preserves_fil s 1).choose_spec after unfolding twoTermFil/twoTermDiff.
+-  convert (FC.d_preserves_fil s 1).choose_spec using 1
++  convert (FC.d_preserves_fil s 1).choose_spec using 1 <;> try rfl
+   change (F₁.F s t).arrow ≫ cm.aMap t =
+     (twoTermFil (fun s => F₁.F s t) (fun s => F₂.F s t) s 1).arrow ≫
+       twoTermDiff (A₁ t) (A₂ t) (cm.aMap t) 1
+--- KIP-base-4.28/KIPBase/SpectralSequence/Commutativity.lean
++++ KIP126-4.32.2/KIPBase/SpectralSequence/Commutativity.lean
+@@ -9,7 +9,7 @@
+   sequences, and axiomatizes Theorem 2.12 (commutativity), its
+   corollaries (2.15–2.19), and the induced map on ESS pages.
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.SpectralSequence.Basic
+ import KIPBase.SpectralSequence.Convergence
+ import KIPBase.SpectralSequence.Crossing
+--- KIP-base-4.28/KIPBase/SpectralSequence/Completion.lean
++++ KIP126-4.32.2/KIPBase/SpectralSequence/Completion.lean
+@@ -344,8 +344,7 @@
+     -- hw : limit.π(op N₀) ≫ completionFunctor.map _ = limit.π(op n)
+     -- Goal: limit.π(op N₀) ≫ truncationTransition _ k = limit.π(op n)
+     -- completionFunctor.map = truncationTransition by definition
+-    convert hw.symm using 1
+-    exact hw.symm
++    exact hw
+   -- Step 2: completionProj'(lo+↑n) = completionProj'(lo+↑n+1) ≫ tr(lo+↑n ≤ lo+↑n+1)
+   -- by completionProj'_factor
+   -- Step 3: completionProj'(lo+↑n+1) = cFil.truncationProj(lo+↑n) ≫ ψ(lo+↑n)
+--- KIP-base-4.28/KIPBase/SpectralSequence/Convergence.lean
++++ KIP126-4.32.2/KIPBase/SpectralSequence/Convergence.lean
+@@ -9,7 +9,7 @@
+   All filtrations are decreasing. Convergence is in the weak sense
+   (no strong convergence considerations).
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.SpectralSequence.Basic
+ 
+ namespace KIPBase.SpectralSequence
+--- KIP-base-4.28/KIPBase/SpectralSequence/Crossing.lean
++++ KIP126-4.32.2/KIPBase/SpectralSequence/Crossing.lean
+@@ -8,7 +8,7 @@
+   Defines the crossing predicate for spectral sequence differentials.
+   All declarations are definitions — no theorems expected.
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.SpectralSequence.Basic
+ import KIPBase.SpectralSequence.Convergence
+ 
+--- KIP-base-4.28/KIPBase/SpectralSequence/FilteredComplex.lean
++++ KIP126-4.32.2/KIPBase/SpectralSequence/FilteredComplex.lean
+@@ -9,7 +9,7 @@
+   weak convergence to the homology. All filtrations are decreasing.
+   The spectral sequence starts at page E_0.
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.SpectralSequence.Basic
+ import KIPBase.SpectralSequence.Convergence
+ import KIPBase.SpectralSequence.Crossing
+@@ -539,7 +539,6 @@
+       have h1 := kernelSubobject_arrow_comp ((FC.fil s k).arrow ≫ FC.d k ≫
+           cokernel.π ((FC.fil (s + ↑N) (k - 1)).arrow))
+       -- Reassociate h1
+-      simp only [] at h1
+       -- h1 now: ker.arrow ≫ fil.arrow ≫ d ≫ cokernel.π = 0
+       rw [← cancel_mono (cokernel.π ((FC.fil (s + ↑N) (k - 1)).arrow))]
+       simp only [Category.assoc, zero_comp]
+@@ -1460,7 +1459,7 @@
+   -- Strategy: show it's equal to β ≫ ml ≫ πV' = 0, then prove the latter.
+   -- Use `convert` to match against β ≫ ml ≫ πV' = 0.
+   suffices h_main : β ≫ ml ≫ πV' = 0 by
+-    convert h_main using 2
++    convert h_main using 2 <;> try rfl
+     -- Goal: P.factorThru(ml_expr, w) ≫ P.arrow ≫ πV' = ml ≫ πV'
+     rw [show (_ : Subobject.underlying.obj _ ⟶ _) ≫ _ ≫ πV' = (_ ≫ _) ≫ πV'
+       from (Category.assoc _ _ _).symm, Subobject.factorThru_arrow]
+--- KIP-base-4.28/KIPBase/SpectralSequence/UnboundedExtension.lean
++++ KIP126-4.32.2/KIPBase/SpectralSequence/UnboundedExtension.lean
+@@ -160,14 +160,14 @@
+       (Z := (truncatedUnderlyingComplex cm s₀ t).A (0 - 1))
+       (cokernel.π (((truncatedUnderlyingComplex cm s₀ t).fil (s + 1) 0).ofLE
+         ((truncatedUnderlyingComplex cm s₀ t).fil s 0) (FilteredComplex.fil_anti _ s 0)))
+-      <;> rw [h_d_zero, comp_zero]
++      <;> first | rfl | rw [h_d_zero, comp_zero]
+   | coe n =>
+     dsimp only []
+     convert imageSubobject_eq_top_of_zero_comp_epi
+       (Z := cokernel ((truncatedUnderlyingComplex cm s₀ t).fil (s + ↑n) (0 - 1)).arrow)
+       (cokernel.π (((truncatedUnderlyingComplex cm s₀ t).fil (s + 1) 0).ofLE
+         ((truncatedUnderlyingComplex cm s₀ t).fil s 0) (FilteredComplex.fil_anti _ s 0)))
+-      <;> simp [h_d_zero, comp_zero, zero_comp]
++      <;> first | rfl | simp [h_d_zero, comp_zero, zero_comp]
+ 
+ set_option maxHeartbeats 800000 in
+ private theorem truncatedUC_boundarySubobject_one_eq_bot
+@@ -187,6 +187,7 @@
+       ((truncatedUnderlyingComplex cm s₀ t).fil s 1)
+       (cokernel.π (((truncatedUnderlyingComplex cm s₀ t).fil (s + 1) 1).ofLE
+         ((truncatedUnderlyingComplex cm s₀ t).fil s 1) (FilteredComplex.fil_anti _ s 1)))
++      <;> first | rfl | simpa using h_I
+   | coe n =>
+     dsimp only []
+     have h_I : imageSubobject (((truncatedUnderlyingComplex cm s₀ t).fil (s - ↑n + 1) 2).arrow ≫
+@@ -197,6 +198,7 @@
+       ((truncatedUnderlyingComplex cm s₀ t).fil s 1)
+       (cokernel.π (((truncatedUnderlyingComplex cm s₀ t).fil (s + 1) 1).ofLE
+         ((truncatedUnderlyingComplex cm s₀ t).fil s 1) (FilteredComplex.fil_anti _ s 1)))
++      <;> first | rfl | simpa using h_I
+ 
+ /-- Given a commutative square on kernels and a compatible cokernel-projection square,
+     imageSubobjectMap provides a lift for the composition `kernelSubobject.arrow ≫ πV`. -/
+--- KIP-base-4.28/KIPBase/StableHomotopy/Adams.lean
++++ KIP126-4.32.2/KIPBase/StableHomotopy/Adams.lean
+@@ -1,4 +1,4 @@
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.StableHomotopy.Cohomology
+ import KIPBase.SpectralSequence.Basic
+ import KIPBase.SpectralSequence.Convergence
+--- KIP-base-4.28/KIPBase/StableHomotopy/Basic.lean
++++ KIP126-4.32.2/KIPBase/StableHomotopy/Basic.lean
+@@ -7,7 +7,7 @@
+   Round 3 refactor: LES axioms replaced by theorems derived from
+   Mathlib's triangulated category library (coyoneda_exact₂/₃).
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.StableHomotopy.TensorTriangulatedCategory
+ open CategoryTheory MonoidalCategory Pretriangulated
+ 
+--- KIP-base-4.28/KIPBase/StableHomotopy/Cohomology.lean
++++ KIP126-4.32.2/KIPBase/StableHomotopy/Cohomology.lean
+@@ -1,4 +1,4 @@
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.StableHomotopy.Basic
+ 
+ /-!
+--- KIP-base-4.28/KIPBase/StableHomotopy/TensorTriangulatedCategory.lean
++++ KIP126-4.32.2/KIPBase/StableHomotopy/TensorTriangulatedCategory.lean
+@@ -5,7 +5,9 @@
+   Blueprint: prerequisites.tex, Definition prereq:def:closed-symmetric-tensor-triangulated
+   Reference: Hovey–Palmieri–Strickland, Definition A.2.1
+ -/
+-import Mathlib
++import Mathlib.CategoryTheory.Triangulated.Functor
++import Mathlib.CategoryTheory.Monoidal.Closed.Basic
++import Mathlib.CategoryTheory.Monoidal.Braided.Basic
+ 
+ namespace KIPBase.StableHomotopy
+ 
+--- KIP-base-4.28/KIPBase/Synthetic/Adams.lean
++++ KIP126-4.32.2/KIPBase/Synthetic/Adams.lean
+@@ -10,7 +10,7 @@
+   - `synthetic-extensions.tex` §4 (applications to extension spectral sequences)
+   - KIP Appendix A, Corollary A.9, A.11 (convergence of synthetic Adams SS)
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.Synthetic.Sphere
+ import KIPBase.SpectralSequence.Convergence
+ 
+--- KIP-base-4.28/KIPBase/Synthetic/Basic.lean
++++ KIP126-4.32.2/KIPBase/Synthetic/Basic.lean
+@@ -18,7 +18,7 @@
+     [Pretriangulated Syn]
+   Affected: Syn/Nu.lean, Syn/Sphere.lean, Syn/Adams.lean, Syn/Rigidity.lean, Syn/Lift.lean
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.StableHomotopy.TensorTriangulatedCategory
+ 
+ namespace KIPBase.Synthetic
+--- KIP-base-4.28/KIPBase/Synthetic/Lift.lean
++++ KIP126-4.32.2/KIPBase/Synthetic/Lift.lean
+@@ -5,7 +5,7 @@
+   canonical division by λ for Adams filtration 1 maps (§3.17),
+   ν applied to distinguished triangles: notation §3.19, §3.20
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.Synthetic.Rigidity
+ import KIPBase.StableHomotopy.Adams
+ 
+--- KIP-base-4.28/KIPBase/Synthetic/Nu.lean
++++ KIP126-4.32.2/KIPBase/Synthetic/Nu.lean
+@@ -3,7 +3,7 @@
+   §3.4 ν functor — ν: hS → hSyn, preservation of distinguished triangles
+   (condition 3.1), ν(ΣX) ≅ Σ^{1,1}νX
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.Synthetic.Basic
+ import KIPBase.StableHomotopy.Basic
+ import KIPBase.StableHomotopy.Cohomology
+--- KIP-base-4.28/KIPBase/Synthetic/Rigidity.lean
++++ KIP126-4.32.2/KIPBase/Synthetic/Rigidity.lean
+@@ -4,7 +4,7 @@
+   Adams vs λ-Bockstein (§3.8, cofiber sequence Σ^{0,r}νX →[λʳ] νX → νX/λʳ),
+   E∞ comparison between synthetic and classical Adams (§3.12)
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.Synthetic.Adams
+ import KIPBase.Synthetic.Nu
+ import KIPBase.StableHomotopy.Adams
+--- KIP-base-4.28/KIPBase/Synthetic/Sphere.lean
++++ KIP126-4.32.2/KIPBase/Synthetic/Sphere.lean
+@@ -4,7 +4,7 @@
+   bigraded homotopy groups π_{m,n}(X) = [S^{m,n}, X],
+   suspension invariance, Z[λ]-module structure on π_{*,*}
+ -/
+-import Mathlib
++import KIPBase.Mathlib
+ import KIPBase.Synthetic.Basic
+ 
+ namespace KIPBase.Synthetic

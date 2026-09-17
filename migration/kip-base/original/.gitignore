@@ -1,0 +1,23 @@
+/.lake
+
+# Archon state directory
+.archon/
+
+# Local tool configuration and generated blueprint output
+/.mcp.json
+/blueprint/print/
+/blueprint/web/
+/blueprint/lean_decls
+/blueprint/status.yaml
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.paux
+*.synctex.gz
+*.toc

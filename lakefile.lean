@@ -20,8 +20,28 @@ lean_lib KIP126 where
   globs := #[.andSubmodules `KIP126]
 
 /-!
+Historical KIP-base, ported to the pinned toolchain. Its inherited assumptions
+are inventoried under migration/kip-base and must not enter KIP126's import graph.
+-/
+@[default_target]
+lean_lib KIPBase where
+  globs := #[.andSubmodules `KIPBase]
+  leanOptions := #[
+    ⟨`pp.unicode.fun, true⟩,
+    ⟨`relaxedAutoImplicit, false⟩,
+    ⟨`weak.linter.mathlibStandardSet, true⟩,
+    -- Preserve the elaboration behavior used by the historical categorical proofs.
+    -- These options affect elaboration only; the kernel and axiom audit are unchanged.
+    ⟨`backward.defeqAttrib.useBackward, true⟩,
+    ⟨`backward.isDefEq.respectTransparency, false⟩,
+    ⟨`maxSynthPendingDepth, .ofNat 3⟩]
+
+/-!
 The trusted compiled-environment audit. Keep this target and its implementation
 outside the worker-editable source overlay used by CI.
 -/
 lean_exe axioms where
   root := `scripts.Axioms
+
+lean_exe kipbaseAudit where
+  root := `scripts.KIPBaseAudit

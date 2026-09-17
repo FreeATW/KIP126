@@ -69,6 +69,10 @@ partial def reachesDisallowedAxiom (constantName : Name) : AxiomCacheM Bool := d
 def audit : CoreM (Nat × Array String) := do
   let env ← getEnv
   let moduleNames := env.allImportedModuleNames
+  -- The historical migration has explicitly retained assumptions. Even a clean
+  -- declaration must be ported into the canonical model before KIP126 imports it.
+  if moduleNames.any (fun n => n == `KIPBase || (`KIPBase).isPrefixOf n) then
+    return (0, #["KIP126 imports the isolated KIPBase historical component"])
   let candidates : Array Name := env.constants.fold (init := #[]) fun declarations declarationName _ =>
     match env.getModuleIdxFor? declarationName with
     | some index =>
@@ -92,6 +96,10 @@ def main : IO UInt32 := do
     IO.eprintln s!"axioms: found no Lean modules under {auditedDirectory}: the audit is miswired."
     return 1
   let (audited, messages) ← withImportedEnv modules audit
+  if audited == 0 && !messages.isEmpty then
+    for message in messages do
+      IO.eprintln message
+    return 1
   if audited == 0 then
     IO.eprintln s!"axioms: audited 0 declarations in {auditedRoot}: the audit is miswired."
     return 1

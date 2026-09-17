@@ -2,6 +2,11 @@
 
 ## Dependencies
 
+**Fixed Lean toolchain: `leanprover/lean4:v4.32.2`.** Both the canonical
+`KIP126` library and the migrated `KIPBase` component use this toolchain with
+mathlib **`v4.32.2`**. The authoritative pin is [`lean-toolchain`](lean-toolchain);
+run Lake commands from this repository so Elan selects that exact version.
+
 KIP126 is developed with the following projects and tools:
 
 - [Lean](https://leanprover.github.io/) `4.32.2`, selected by
@@ -24,6 +29,11 @@ generated declaration list in the Blueprint artifact when it is needed later.
 
 Lean 4.32.2 project and source-grounded Blueprint for the KIP126
 formalization.
+
+The complete historical KIP-base library is retained as the separately compiled
+`KIPBase` component on the same Lean/mathlib 4.32.2 pins. Its original assumptions
+are isolated from `KIP126` and do not count as completed paper proofs. See the
+[migration inventory, paper mapping, and validation commands](migration/kip-base/README.md).
 
 ## Project documents and workflow
 

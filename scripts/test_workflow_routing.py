@@ -175,6 +175,16 @@ class WorkflowRoutingTests(unittest.TestCase):
             lean_key = run("bash", str(key_script), ".", lean_revision)
             self.assertNotEqual(docs_key, lean_key)
 
+            (repo / "KIPBase").mkdir()
+            (repo / "KIPBase.lean").write_text("import KIPBase.Basic\n")
+            (repo / "KIPBase" / "Basic.lean").write_text("def historical := 28\n")
+            legacy_revision = commit("historical library")
+            legacy_key = run("bash", str(key_script), ".", legacy_revision)
+            self.assertNotEqual(lean_key, legacy_key)
+            (repo / "KIPBase" / "Basic.lean").write_text("def historical := 32\n")
+            changed_legacy = commit("port historical proof")
+            self.assertNotEqual(legacy_key, run("bash", str(key_script), ".", changed_legacy))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -15,13 +15,15 @@ done
 # build definition, or toolchain change gets a distinct immutable cache key.
 entries=$(
   git -C "$repo" ls-tree -r --full-tree "$revision" -- \
-    KIP126.lean KIP126 lakefile.lean lake-manifest.json lean-toolchain |
+    KIP126.lean KIP126 KIPBase.lean KIPBase lakefile.lean lake-manifest.json lean-toolchain |
     awk -F '\t' '
       $2 == "KIP126.lean" ||
+      $2 == "KIPBase.lean" ||
       $2 == "lakefile.lean" ||
       $2 == "lake-manifest.json" ||
       $2 == "lean-toolchain" ||
-      $2 ~ /^KIP126\/.*\.lean$/
+      $2 ~ /^KIP126\/.*\.lean$/ ||
+      $2 ~ /^KIPBase\/.*\.lean$/
     '
 )
 
