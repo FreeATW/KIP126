@@ -15,6 +15,11 @@ require checkdecls from git
   "https://github.com/PatrickMassot/checkdecls.git" @
     "3d425859e73fcfbef85b9638c2a91708ef4a22d4"
 
+/-- Independent statement definitions requested under `chanllege/`. -/
+lean_lib Challenge where
+  roots := #[`chanllege]
+  globs := #[.submodules `chanllege]
+
 @[default_target]
 lean_lib KIP126 where
   globs := #[.andSubmodules `KIP126]
