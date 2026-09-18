@@ -27,6 +27,28 @@ If a worker task does not select exactly one mode, or requires a path outside th
 selected boundary, stop before editing and request that the task be split or
 clarified.
 
+## Mandatory GitHub synchronization at task start
+
+Before investigating, planning, editing, or validating any task, synchronize the
+agent's own checkout with the canonical GitHub repository. The remote default
+branch, `origin/main`, is the source of truth; a previously fetched local
+`origin/main` ref is not sufficient.
+
+1. Run `git fetch --prune origin`, then inspect `git status` and compare `HEAD`
+   and local `main` with `origin/main` (for example with `git rev-list
+   --left-right --count ...`).
+2. If local `main` is behind and has no local-only commits, fast-forward it with
+   `git pull --ff-only origin main` before beginning new code. A feature branch
+   must likewise be rebased or merged onto the current `origin/main` before new
+   implementation starts, when that is safe and within the task's authorization.
+3. If the checkout is dirty, ahead, diverged, cannot fast-forward, or the fetch
+   fails, do not reset, overwrite, or silently work from a stale base. Preserve
+   the existing work and report the condition or request the needed direction.
+
+This procedure applies only to the agent's task checkout. The persistent
+daemon-owned checkout described below remains read-only to agents and must never
+be synchronized or otherwise modified by them.
+
 ## Readiness and trust boundary
 
 Use the `Project documents and workflow` section of `README.md` as the single map
