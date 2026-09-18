@@ -56,12 +56,16 @@ document:
   natural-language formalization sketch.  The Blueprint follows the paper's
   definitions and the roadmap's order, and refines each step into nodes whose
   mathematical statement, dependencies, sources, and intended Lean object can
-  be checked together.  In the usual layout, one chapter corresponds to one
-  Lean file; temporary shared facades are allowed during migration, but the
-  final implementation should expose chapter-level Lean entry points.
+  be checked together.  A chapter indexes several small Lean modules under
+  `KIP126/Def/`, `KIP126/External/`, and `KIP126/Challenge/`;
+  `KIP126/Def.lean` and `KIP126/Challenge.lean` are package entry points.
 - [`KIP126.lean`](KIP126.lean) and the modules under [`KIP126/`](KIP126/) are
   authoritative for interfaces and proofs that are actually implemented, as
-  well as their import graph.
+  well as their import graph.  `Def/` owns mathematical data and properties,
+  `External/` owns provenance-bearing inputs, `Challenge/` owns internal proof
+  targets, and `Checks/` owns compilation regressions.  The
+  [layout migration map](docs/DEF_CHALLENGE_LAYOUT_STATUS.md) records moved
+  source modules and remaining open milestones.
 - [`reference/source-inventory.json`](reference/source-inventory.json), the
   per-source status records under [`reference/`](reference/), and the Lean
   claim ledger own the catalogue and provenance of external inputs. They record

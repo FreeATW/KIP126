@@ -57,16 +57,18 @@ convention 不一致、定理强度不对齐，或把数学内容藏入公理/ty
 ### 模块划分口径
 
 Blueprint 使用平铺 chapter：`content.tex` 中没有 `\part` 或嵌套目录，只用注释标出
-“数学定义 → 外部输入 → 内部证明”三层。Lean 文件列出各章当前最接近的公共入口；
-同一现有入口暂时承载两个新章时，后续实现任务再按 chapter 边界拆 facade。
+“数学定义 → 外部输入 → 内部证明”三层。每章对应一组按数学概念划分的 Lean 模块，
+而不是单个源文件；`KIP126/Def.lean`、`KIP126/External.lean` 和
+`KIP126/Challenge.lean` 是这些模块的包入口。旧路径与新路径的逐项对应及开放节点
+见 [`DEF_CHALLENGE_LAYOUT_STATUS.md`](DEF_CHALLENGE_LAYOUT_STATUS.md)。
 章级 Blueprint 节点数量与完成度不在本文件汇总，以对应章节子 Wiki 的当前记录为准。
 
 - `content.tex` 只保留按依赖顺序的平铺 `\input` 清单与三层注释；没有 LaTeX
   `\part`。`blueprint/print` 和 `blueprint/web` 是生成物，不手工编辑；
   `blueprint/lean_decls` 也是被忽略的生成物，声明检查前由 `leanblueprint web`
   重新生成，不手工编辑或提交。
-- 章节不按代码行数均分，而按数学定义、外部黑盒和内部消费者的边界拆分。同一现有
-  Lean facade 暂时覆盖两个 chapter 不表示两章已经合并；实现层仍需最终形成一章一入口。
+- 章节不按代码行数均分，而按数学定义、外部黑盒和内部消费者的边界拆分。每个
+  公开声明只有一个权威实现；包入口只汇总 import，不复制声明。
 
 ### 依赖顺序
 
