@@ -137,6 +137,19 @@ class ProjectionTests(unittest.TestCase):
         self.assertEqual(decision["phase"], "awaiting-author")
         self.assertEqual(decision["reason"], "scope:failure")
 
+    def test_warning_only_build_requires_human_merge(self) -> None:
+        value = facts(review=self.green())
+        value["statuses"] = [
+            status("scope", "success"),
+            status("build", "success"),
+            status("bump-guard", "success"),
+            status("warnings", "failure"),
+        ]
+        decision = projection.reduce_facts(value, CONFIG)
+        self.assertFalse(decision["merge_allowed"])
+        self.assertEqual(decision["phase"], "awaiting-author")
+        self.assertEqual(decision["reason"], "warnings:failure")
+
     def test_absent_stale_blocked_and_running_scoreboards_have_distinct_phases(self) -> None:
         rubrics = CONFIG["review_rubrics"]["lean"]
         cases = [

@@ -1,6 +1,6 @@
 {
   "schema": "kip126-pr-status/v2",
-  "mechanical_contexts": ["scope", "build", "bump-guard"],
+  "mechanical_contexts": ["scope", "build", "bump-guard", "warnings"],
   "mechanical_trusted_creators": ["github-actions[bot]"],
   "scoreboard_trusted_associations": ["OWNER", "MEMBER", "COLLABORATOR"],
   "review_rubrics_sha": "011964c0480219e97ffd55f58ce6d1425ff58335",

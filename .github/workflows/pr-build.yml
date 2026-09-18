@@ -790,6 +790,12 @@ jobs:
           # here). Keeping the landrun `bash -c` payload a fixed, comment-free one-liner
           # is deliberate: a comment's apostrophe once closed this single-quoted string
           # early and reddened every PR build (#694). All prose now lives in the script.
+          # The marker comes from the trusted sandbox script only after an
+          # ordinary build, the axiom audit, and project gates have all passed.
+          # Capture it outside landrun, where untrusted Lean code cannot alter
+          # the result file; a forged marker can only fail closed into review.
+          set -o pipefail
+          build_log=$(mktemp "$RUNNER_TEMP/kip126-sandbox-build.XXXXXX")
           landrun --rox /usr --rox /etc \
             --rw /dev/null --rox /dev/zero --rox /dev/urandom --rox /dev/random \
             --rox "$HOME/.elan" --rox "$WATCHDOG_TOOLCHAIN" \
@@ -797,7 +803,10 @@ jobs:
             --env PATH --env HOME --env CI \
             --env LAKE_NO_CACHE --env LAKE_ARTIFACT_CACHE --env LAKE_RESTORE_ARTIFACTS --env LAKE_CACHE_DIR \
             --env WATCHDOG_TOOLCHAIN --env EULER_LEAN_TIMEOUT_SECONDS \
-            -- bash -euxo pipefail -c 'cd base && exec bash scripts/sandbox-build.sh'
+            -- bash -euxo pipefail -c 'cd base && exec bash scripts/sandbox-build.sh' 2>&1 | tee "$build_log"
+          if grep -qx 'KIP126_WARNING_ONLY_BUILD=1' "$build_log"; then
+            echo "BUILD_WARNINGS=1" >> "$GITHUB_ENV"
+          fi
 
       # This separate namespace never feeds the trusted-main cache. It only supplies compiled
       # material to the Blueprint declaration check for a later head with the same attested inputs.
@@ -814,7 +823,7 @@ jobs:
         if: always()
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
-          # Posting the three statuses is deliberately NOT all-or-nothing. These are three
+          # Posting the four statuses is deliberately NOT all-or-nothing. These are four
           # sequential API calls under `set -e`: a single transient error on an early one used to
           # abort the step and leave the commit with a partial set. A MISSING required status is
           # worse than a red one. `build` never appears, so GitHub holds the PR at BLOCKED
@@ -884,6 +893,21 @@ jobs:
             state=failure; desc="sandboxed build, audit, or simp-NF lint failed"
           fi
           post_status build "$state" "$desc"
+
+          # warnings: a strict `lake build --iofail` may find warnings even
+          # though an ordinary Lean build, the axiom audit, and all project
+          # gates pass.  Such a PR satisfies GitHub's required `build` check
+          # but is deliberately rejected by the automatic merge gate.  This
+          # context is not a repository-required check, so a human reviewer
+          # can still place the PR in the merge queue after review.
+          if [ "$state" != success ]; then
+            warn_state=failure; warn_desc="warning policy unavailable because the build failed"
+          elif [ "${{ env.BUILD_WARNINGS }}" = "1" ]; then
+            warn_state=failure; warn_desc="Lean build completed with warnings — human review + merge required"
+          else
+            warn_state=success; warn_desc="Lean build completed without warnings"
+          fi
+          post_status warnings "$warn_state" "$warn_desc"
 
           # scope: the merge-policy verdict, posted as its OWN status so a policy issue never hides the
           # build result (the bug this split fixes — an out-of-scope PR used to post its "human review"
