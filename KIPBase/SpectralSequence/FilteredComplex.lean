@@ -960,7 +960,6 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
         = (kernel.ι p ≫ to_Z_n_t) ≫ pageπ' := (Category.assoc _ _ _).symm
       _ = (γ ≫ Subobject.ofLE B_n_t Z_n_t hB_le_Z) ≫ pageπ' := by
         rw [← h_factor_B]
-        rfl
       _ = γ ≫ (Subobject.ofLE B_n_t Z_n_t hB_le_Z ≫ pageπ') := Category.assoc _ _ _
       _ = γ ≫ 0 := by rw [h_cok]
       _ = 0 := comp_zero
@@ -1050,7 +1049,7 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
       simp only [Category.assoc, Subobject.ofLE_arrow]
       -- Now both sides should reduce to oI_s ≫ πV
       rw [Category.assoc, hσ_p_spec]
-      exact hq_arrow
+      simpa only [hq_def, Category.assoc] using hq_arrow
     -- === Step 5: σ_s ≫ lift_n = 0 (key: d² = 0) ===
     have hσ_lift_zero : σ_s ≫ lift_n = 0 := by
       apply (inferInstance : Mono (FC.fil (s + ↑n) (k - 1)).arrow).right_cancellation
@@ -1566,7 +1565,9 @@ theorem pageDifferential_Z_succ_ge (FC : FilteredComplex C)
     exact Subobject.ofLE_comp_ofLE (FC.fil (s + ↑(n + 1)) (k - 1))
       (FC.fil (s + ↑n + 1) (k - 1)) (FC.fil (s + ↑n) (k - 1))
       h_le_ι_source (FC.fil_anti (s + ↑n) (k - 1))
-  rw [h_factored, Category.assoc, cokernel.condition, comp_zero]
+  rw [h_factored, Category.assoc]
+  dsimp [πV', FilteredComplex.filToAssocGraded]
+  rw [cokernel.condition, comp_zero]
 
 open CategoryTheory.Abelian in
 /-- `imageSubobject (e ≫ f) = imageSubobject f` when `e` is epi (in an abelian category). -/
