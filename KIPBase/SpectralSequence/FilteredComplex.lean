@@ -144,6 +144,17 @@ theorem FilteredComplex.assocGradedDiff_compat (FC : FilteredComplex C)
   show cokernel.π _ ≫ cokernel.desc _ _ _ = _
   rw [cokernel.π_desc]
 
+/-- `assocGradedDiff` 的双次数搬运版本：若 `k₁ = k₂`，则可用 `eqToHom`
+    把 `assocGradedDiff s k₁` 转成 `assocGradedDiff s k₂`。
+    用于把「次数 `k` 处的诱导微分」与「目标次数相差一个定义性等式的
+    诱导微分」互推，避免在大型 `≫` 链里做定义展开。 -/
+theorem FilteredComplex.assocGradedDiff_cast (FC : FilteredComplex C)
+    (s : ℤ) {k₁ k₂ : ℤ} (hk : k₁ = k₂) :
+    FC.assocGradedDiff s k₁ =
+      eqToHom (by rw [hk]) ≫ FC.assocGradedDiff s k₂ ≫ eqToHom (by rw [hk]) := by
+  subst hk
+  simp
+
 /-- The induced differential on the associated graded squares to zero:
     `assocGradedDiff ≫ assocGradedDiff = 0`. -/
 theorem FilteredComplex.assocGradedDiff_sq (FC : FilteredComplex C)
