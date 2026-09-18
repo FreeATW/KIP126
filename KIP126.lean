@@ -1,18 +1,7 @@
 import KIP126.BlueprintRoots
-import KIP126.Classical
-import KIP126.Comparison
-import KIP126.Core
+import KIP126.Def
 import KIP126.External
-import KIP126.Kervaire
-import KIP126.Synthetic
+import KIP126.Challenge
 
-/-!
-# KIP126
-
-The package entry point imports the architectural scaffold.  The modules are
-intentionally definition-free until their corresponding roadmap stages begin.
--/
-
-namespace KIP126
-
-end KIP126
+/-! Canonical library entry: mathematical definitions, explicit external inputs,
+and proved internal challenges. Regression modules live under `KIP126.Checks`. -/

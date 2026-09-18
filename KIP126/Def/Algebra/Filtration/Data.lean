@@ -1,4 +1,4 @@
-import KIP126.Core.Algebra.Graded
+import KIP126.Def.Algebra.Graded.Data
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 
 /-!

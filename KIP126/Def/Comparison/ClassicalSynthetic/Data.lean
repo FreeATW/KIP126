@@ -1,5 +1,5 @@
-import KIP126.Classical.Adams.Basic
-import KIP126.Synthetic.SpectralSequence.Basic
+import KIP126.Def.ClassicalAdams.SphereSequence.Data
+import KIP126.Def.Synthetic.AdamsSequence.Data
 import Mathlib.Algebra.Category.ModuleCat.Abelian
 import Mathlib.Algebra.Field.ZMod
 
