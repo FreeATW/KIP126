@@ -54,3 +54,11 @@ The Appendix schema and its 401 nonempty rows, the full external literature
 interfaces, and the near-126 coherence packages also remain unimplemented.
 The existing eta rows are one small, located computation slice; they do not
 stand in for the Appendix catalogue.
+
+Two existing type dependencies still prevent the strict target import layering:
+`Def/ClassicalESS/Eta/Data` imports `External.Claims` because the current
+`EtaESSInput` stores a catalogued evidence field and names the concrete eta
+row set; `Def/SpectralSequence/Convergence/Data` imports the earlier
+completion proofs to construct a completion witness. Removing these edges
+requires a reviewed change to those dependent interfaces. The present move
+preserves their statements and does not claim the target layering is finished.
