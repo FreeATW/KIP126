@@ -15,11 +15,11 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Core/SpectralSequence/FilteredRepresentatives` | `Def/SpectralSequence/Representatives/Proofs` |
 | `Core/SpectralSequence/HomologicalImage` | `Def/SpectralSequence/HomologicalImage/Data` |
 | `Core/SpectralSequence/SpectralObjectAdapter` | `Def/SpectralSequence/SpectralObject/Data` |
-| `Core/SpectralSequence/Convergence` | `Def/SpectralSequence/EndpointExtension/Data`, `Convergence/Data` |
+| `Core/SpectralSequence/Convergence` | `Def/SpectralSequence/EndpointExtension/Data`, `Convergence/{Data,Predicates,Proofs}` |
 | `Core/SpectralSequence/Extension` | `Def/SpectralSequence/Extension/Data` |
 | `Classical/Adams/Basic` | `Def/StableHomotopy/Context/Data`, `Def/ClassicalAdams/{Page/Data,Convergence/{Data,Predicates,Proofs,StrongData},SphereSequence/Data,H4D2/{Data,Predicates}}`, `External/Literature/Adams/OneLine` |
 | `Classical/SpectralSequence/Basic` | `Def/ClassicalAdams/PageSlice/Data` |
-| `Classical/ExtensionSS/Basic` | `Def/ClassicalESS/Eta/{Data,Predicates,Proofs}` |
+| `Classical/ExtensionSS/Basic` | `Def/ClassicalESS/Eta/{Data,ExternalInput,Predicates,Proofs}` |
 | `Classical/ExtensionSS/EtaData` | `External/Computation/EtaRows/Data` |
 | `Synthetic/SpectralSequence/Basic` | `Def/Synthetic/AdamsSequence/Data` |
 | `Comparison/ClassicalSynthetic/Basic` | `Def/Comparison/ClassicalSynthetic/{Data,Proofs}`, `Challenge/Tools/Comparison/{Statement,Proof}` |
@@ -50,15 +50,25 @@ Blueprint targets. A generic `Prop`, arbitrary witness, or external input
 asserting the endpoint would change the mathematical task, so no placeholder
 statement or proof is installed for them.
 
-The Appendix schema and its 401 nonempty rows, the full external literature
+The remaining Appendix row schema and its 401 nonempty rows, the full external literature
 interfaces, and the near-126 coherence packages also remain unimplemented.
 The existing eta rows are one small, located computation slice; they do not
 stand in for the Appendix catalogue.
 
-Two existing type dependencies still prevent the strict target import layering:
-`Def/ClassicalESS/Eta/Data` imports `External.Claims` because the current
-`EtaESSInput` stores a catalogued evidence field and names the concrete eta
-row set; `Def/SpectralSequence/Convergence/Data` imports the earlier
-completion proofs to construct a completion witness. Removing these edges
-requires a reviewed change to those dependent interfaces. The present move
-preserves their statements and does not claim the target layering is finished.
+`Def/Computation/AppendixTable/Data` now gives the twelve paper tables stable
+identities, printed table numbers, TeX labels and source line ranges, PDF
+pages, spectra, stems, and filtration bands. This is table metadata only;
+the row schema, all 401 nonempty rows, and their evidence remain open.
+
+The convergence witness structures now live in `Data`, their detection
+relation in `Predicates`, and the derived completion and detection results in
+`Proofs`. The provenance-bearing `EtaESSInput` and concrete eta ESS now live
+in `ExternalInput`; the eta `Data` file imports only the provenance data type,
+not the claim ledger. Public names and statements were preserved.
+
+Two construction files still import earlier filtration proofs:
+`Def/Algebra/Completion/Data` needs the filtration inclusion law to construct
+quotient transitions, and `Def/SpectralSequence/FilteredComplex/Data` uses
+associated-graded and filtered-morphism results to construct standard
+categorical objects. Those constructor-support imports are not yet split into
+smaller, earlier data modules.
