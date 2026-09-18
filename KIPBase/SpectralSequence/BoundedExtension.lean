@@ -661,15 +661,45 @@ noncomputable def selfComplex
       (fun (s : ℤ) (k' : ω') => X.F.fcId s k') t hb hb⟩
 
 /-- 收敛谱序列之间的态射诱导的**两复形过滤复形态射**：
-    次数 `1` 处取 `𝟙`，次数 `0` 处取 `cm.aMap t`，其余次数取 `0`；
+    次数 `1` 与次数 `0` 处均取 `cm.aMap t`，其余次数取 `0`；
     微分交换由两项复形微分的定义（其余次数微分为 `0`）逐情况验证；
     保过滤性在次数 `1` 由 `F₁.fcId`、次数 `0` 由 `cm.filtration_compat` 给出。
-    证明后续补全（sorry）。 -/
+    这里不能在次数 `1` 取恒等：源和目标分别是 `X.A t` 与 `Y.A t`。 -/
 noncomputable def toFCMorphism
     {X Y : ConvergingSS C ω ω'} (cm : X ⟶ Y)
     (hbX : X.F.IsBounded) (hbY : Y.F.IsBounded) (t : ω') :
     selfComplex X hbX t ⟶ selfComplex Y hbY t := by
-  sorry
+  let component : ∀ k : ℤ,
+      (selfComplex X hbX t).FC.A k ⟶ (selfComplex Y hbY t).FC.A k := fun k =>
+    if h₁ : k = 1 then
+      eqToHom (by simp [selfComplex, underlyingComplex, twoTermObj, h₁]) ≫
+        cm.aMap t ≫
+          eqToHom (by simp [selfComplex, underlyingComplex, twoTermObj, h₁])
+    else if h₀ : k = 0 then
+      eqToHom (by simp [selfComplex, underlyingComplex, twoTermObj, h₀]) ≫
+        cm.aMap t ≫
+          eqToHom (by simp [selfComplex, underlyingComplex, twoTermObj, h₀])
+    else 0
+  refine
+    { f := component
+      comm_d := ?_
+      filt_compat := ?_ }
+  · intro k
+    by_cases h₁ : k = 1
+    · subst k
+      simp [component, selfComplex, underlyingComplex, twoTermDiff, twoTermObj]
+    · simp [component, selfComplex, underlyingComplex, twoTermDiff, h₁]
+  · intro s k
+    by_cases h₁ : k = 1
+    · subst k
+      simpa [component, selfComplex, underlyingComplex, twoTermFil, twoTermObj] using
+        cm.filtration_compat s t
+    · by_cases h₀ : k = 0
+      · subst k
+        simpa [component, selfComplex, underlyingComplex, twoTermFil, twoTermObj] using
+          cm.filtration_compat s t
+      · refine ⟨0, ?_⟩
+        simp [component, selfComplex, underlyingComplex, twoTermFil, twoTermObj, h₁, h₀]
 
 /-- **convSS ⥤ 有界过滤复形函子**：收敛谱序列 `X` 在每个茎次数 `t` 处
     送至其自身的两项复形 `A(t) ⟶[𝟙] A(t)`；
