@@ -1,6 +1,6 @@
 import KIP126.Def.ClassicalAdams.SphereSequence.Data
 import KIP126.Def.SpectralSequence.PageLevel.Data
-import KIP126.External.Claims
+import KIP126.External.Provenance
 import Mathlib.Algebra.Homology.SpectralSequence.Basic
 
 /-!
@@ -162,34 +162,6 @@ noncomputable def etaPage {stable : StableHomotopyContext}
   d := pageData.d n
   shape := pageData.shape n
   d_comp_d' := by intro i j k hij hjk; exact pageData.d_comp_d n i j k
-
-structure EtaESSInput {stable : StableHomotopyContext}
-    {X Y : stable.Spectrum}
-    (source : ClassicalAdamsSS stable X)
-    (target : ClassicalAdamsSS stable Y) where
-  adapter : ClassicalEtaESSAdapter source target
-  differentials : Set EtaDifferential
-  detected : Set EtaDifferential
-  detected_eq_differentials : detected = differentials
-  ledgerEvidence : KIP126.External.CataloguedExternalEvidence
-    (KIP126.Classical.Regression.etaEss differentials)
-  pageData : EtaESSPageData adapter differentials
-  pageIso : ∀ (n : ℤ) (b : Index),
-    (etaPage pageData n).homology b ≅ (etaPage pageData (n + 1)).X b
-
-/-- The abutment is displayed componentwise as kernel plus cokernel. -/
-noncomputable def abutment {stable : StableHomotopyContext} {X Y : stable.Spectrum}
-    {source : ClassicalAdamsSS stable X} {target : ClassicalAdamsSS stable Y}
-    (D : EtaESSInput source target) : GradedObject Index Coeff :=
-  fun b => kernel (D.adapter.etaMap b) ⊞ cokernel (D.adapter.etaMap b)
-
-/-- The concrete classical eta-ESS returned by this module. -/
-noncomputable def etaESS {stable : StableHomotopyContext} {X Y : stable.Spectrum}
-    {source : ClassicalAdamsSS stable X} {target : ClassicalAdamsSS stable Y}
-    (D : EtaESSInput source target) :
-    SpectralSequence Coeff etaESSShape 0 where
-  page n _ := etaPage D.pageData n
-  iso n _ b _ _ := D.pageIso n b
 
 abbrev ClassicalEtaESS := SpectralSequence Coeff etaESSShape 0
 

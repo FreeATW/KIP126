@@ -1,4 +1,4 @@
-import KIP126.Def.ClassicalESS.Eta.Data
+import KIP126.Def.ClassicalESS.Eta.ExternalInput
 
 namespace KIP126.Classical.ExtensionSS
 

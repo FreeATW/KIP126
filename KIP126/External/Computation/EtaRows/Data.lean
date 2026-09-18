@@ -1,4 +1,5 @@
 import KIP126.Def.ClassicalESS.Eta.Data
+import KIP126.External.Claims
 
 /-!
 # Typed data for the classical eta extension spectral sequence

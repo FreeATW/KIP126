@@ -7,8 +7,9 @@ import KIP126.Def.ClassicalAdams.Convergence.Proofs
 import KIP126.Def.ClassicalAdams.SphereSequence.Data
 import KIP126.Def.ClassicalAdams.H4D2.Predicates
 import KIP126.Def.ClassicalESS.Eta.Proofs
+import KIP126.Def.Computation.AppendixTable.Data
 import KIP126.Def.Comparison.ClassicalSynthetic.Proofs
-import KIP126.Def.SpectralSequence.Convergence.Data
+import KIP126.Def.SpectralSequence.Convergence.Proofs
 import KIP126.Def.SpectralSequence.Extension.Data
 import KIP126.Def.SpectralSequence.EndpointExtension.Data
 import KIP126.Def.SpectralSequence.FilteredComplex.Data
