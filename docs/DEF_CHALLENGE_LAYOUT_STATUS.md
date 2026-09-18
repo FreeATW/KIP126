@@ -58,7 +58,8 @@ stand in for the Appendix catalogue.
 `Def/Computation/AppendixTable/Data` now gives the twelve paper tables stable
 identities, printed table numbers, TeX labels and source line ranges, PDF
 pages, spectra, stems, and filtration bands. This is table metadata only;
-the row schema, all 401 nonempty rows, and their evidence remain open.
+the row schema, all 401 nonempty rows, and their evidence remain open. Only
+the Blueprint definition `def:appendix-table-id` has advanced to `\leanok`.
 
 The convergence witness structures now live in `Data`, their detection
 relation in `Predicates`, and the derived completion and detection results in

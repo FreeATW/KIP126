@@ -1,4 +1,5 @@
 import Mathlib.Data.Nat.Basic
+import Mathlib.Data.Fintype.Card
 
 /-!
 # The twelve tables in the Kervaire computation catalogue
@@ -142,12 +143,23 @@ def all : List AppendixTableId :=
   [.cnu126, .s122, .s123, .s124High, .s124Low, .s125High,
    .s125Low, .s126High, .s126Low, .s127High, .s127Middle, .s127Low]
 
+instance : Fintype AppendixTableId where
+  elems := {.cnu126, .s122, .s123, .s124High, .s124Low, .s125High,
+    .s125Low, .s126High, .s126Low, .s127High, .s127Middle, .s127Low}
+  complete id := by cases id <;> simp
+
 theorem all_complete (id : AppendixTableId) : id ∈ all := by
   cases id <;> decide
 
 theorem all_nodup : all.Nodup := by decide
 
 theorem all_length : all.length = 12 := by decide
+
+theorem card : Fintype.card AppendixTableId = 12 := by decide
+
+theorem paperNumbers_nodup : (all.map paperNumber).Nodup := by decide
+
+theorem texLabels_nodup : (all.map texLabel).Nodup := by decide
 
 theorem sourceRange_valid (id : AppendixTableId) :
     id.sourceStart ≤ id.sourceEnd := by

@@ -20,7 +20,16 @@ This chapter defines the types used to state machine and appendix results.  It c
 % SOURCE: aimpaper/main.tex:2738-3290, all twelve tables.
 \begin{definition}[Appendix table identifier]
   \label{def:appendix-table-id}
-  \notready
+  \leanok
+  \lean{KIP126.Computation.AppendixTableId}
+  \lean{KIP126.Computation.AppendixTableId.paperNumber}
+  \lean{KIP126.Computation.AppendixTableId.texLabel}
+  \lean{KIP126.Computation.AppendixTableId.sourceStart}
+  \lean{KIP126.Computation.AppendixTableId.sourceEnd}
+  \lean{KIP126.Computation.AppendixTableId.pdfPage}
+  \lean{KIP126.Computation.AppendixTableId.spectrum}
+  \lean{KIP126.Computation.AppendixTableId.stem}
+  \lean{KIP126.Computation.AppendixTableId.filtrationRange}
   The table identifier is a twelve-element finite type containing
   $C\nu126$, $S122$, $S123$, the two $S124$ bands, the two $S125$ bands, the
   two $S126$ bands, and the three $S127$ bands.  It records the paper table
