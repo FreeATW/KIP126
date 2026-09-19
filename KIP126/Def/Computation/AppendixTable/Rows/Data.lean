@@ -45,14 +45,21 @@ inductive ClassTerm
 
 namespace ClassTerm
 
+mutual
+  def validBool : ClassTerm → Bool
+    | .atom (.named name) => decide (name ≠ "")
+    | .atom (.generator ..) => true
+    | .power value _ => validBool value
+    | .product values => validListBool values
+    | .sum values => validListBool values
+    | .cell _ value => validBool value
+  def validListBool : List ClassTerm → Bool
+    | [] => false
+    | value :: values => validBool value && (values.isEmpty || validListBool values)
+end
+
 /-- A term contains at least one atom with a nonempty catalogue name. -/
-def Valid : ClassTerm → Prop
-  | .atom (.named name) => name ≠ ""
-  | .atom (.generator ..) => True
-  | .power value _ => value.Valid
-  | .product values => values ≠ [] ∧ ∀ value ∈ values, value.Valid
-  | .sum values => values ≠ [] ∧ ∀ value ∈ values, value.Valid
-  | .cell _ value => value.Valid
+def Valid (term : ClassTerm) : Prop := term.validBool = true
 
 end ClassTerm
 
@@ -180,6 +187,7 @@ def validBool (row : AppendixRow) : Bool :=
     decide (row.source.metadata.stem = row.stem) &&
     decide (row.source.metadata.filtration = row.filtration) &&
     decide (row.source.metadata.internalDegree = row.stem + row.filtration) &&
+    row.source.term.validBool &&
     match row.relation with
     | none => true
     | some relation => relation.validBool
