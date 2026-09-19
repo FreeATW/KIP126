@@ -29,6 +29,12 @@ def cataloguedBJM_BXCriterion (proof : BJM_BXCriterion C) :
     ref_eq := rfl
     class_supported := by trivial }
 
+@[simp] theorem cataloguedBJM_BXCriterion_source
+    (proof : BJM_BXCriterion C) :
+    (cataloguedBJM_BXCriterion C proof).value.ref.source =
+      SourceId.burklundXu := by
+  rfl
+
 /-- The Xu/IWX order and choice-comparison result attached to its composite
 claim row. -/
 def cataloguedTheta5OrderData (proof : Theta5OrderData C) :
@@ -40,6 +46,12 @@ def cataloguedTheta5OrderData (proof : Theta5OrderData C) :
     ref_eq := rfl
     class_supported := by trivial }
 
+@[simp] theorem cataloguedTheta5OrderData_source
+    (proof : Theta5OrderData C) :
+    (cataloguedTheta5OrderData C proof).value.ref.source =
+      SourceId.aimPaper := by
+  rfl
+
 /-- The total differential identity attached to the located Burklund--Xu
 construction. -/
 def cataloguedTotalDifferentialIdentity (proof : TotalDifferentialIdentity C) :
@@ -50,6 +62,12 @@ def cataloguedTotalDifferentialIdentity (proof : TotalDifferentialIdentity C) :
         ref := (externalClaimLedger.lookup .totalDifferentialIdentity).ref }
     ref_eq := rfl
     class_supported := by trivial }
+
+@[simp] theorem cataloguedTotalDifferentialIdentity_source
+    (proof : TotalDifferentialIdentity C) :
+    (cataloguedTotalDifferentialIdentity C proof).value.ref.source =
+      SourceId.burklundXu := by
+  rfl
 
 /-- The finite evidence wrapper for the order/torsion computation.  The
 artifact and its digest remain fields of `CataloguedExternalEvidence`; this
@@ -101,6 +119,12 @@ def cataloguedBrowderCriterion
     ref_eq := rfl
     class_supported := by trivial }
 
+@[simp] theorem cataloguedBrowderCriterion_source
+    (proof : BrowderCriterionStatement dimension kervaireOne permanent) :
+    (cataloguedBrowderCriterion dimension kervaireOne permanent proof).value.ref.source =
+      SourceId.browder := by
+  rfl
+
 /-- HHR's nonexistence statement with its own canonical source row. -/
 def cataloguedHHRNonexistence
     (proof : HHRNonexistenceStatement dimension kervaireOne) :
@@ -111,6 +135,12 @@ def cataloguedHHRNonexistence
         ref := (externalClaimLedger.lookup .hhrNonexistence).ref }
     ref_eq := rfl
     class_supported := by trivial }
+
+@[simp] theorem cataloguedHHRNonexistence_source
+    (proof : HHRNonexistenceStatement dimension kervaireOne) :
+    (cataloguedHHRNonexistence dimension kervaireOne proof).value.ref.source =
+      SourceId.hhr := by
+  rfl
 
 end PublishedGeometry
 
@@ -132,6 +162,12 @@ def cataloguedBJMInduction
         ref := (externalClaimLedger.lookup .bjmInduction).ref }
     ref_eq := rfl
     class_supported := by trivial }
+
+@[simp] theorem cataloguedBJMInduction_source
+    (proof : BJMInductionStatement detected isOrderTwo squareZero) :
+    (cataloguedBJMInduction detected isOrderTwo squareZero proof).value.ref.source =
+      SourceId.bjmInduction := by
+  rfl
 
 end BJMInduction
 
