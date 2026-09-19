@@ -14,4 +14,13 @@ example (FC : FilteredComplex C) (s k : ℤ) (n : ℕ) :
     FC.pageDifferential s k n ≫ FC.pageDifferential (s + ↑n) (k - 1) n = 0 :=
   FC.pageDifferential_comp s k n
 
+example (FC : FilteredComplex C) (s k : ℤ) (n : ℕ) :
+    imageSubobject (
+        Subobject.ofLE (FC.cycleSubobject s k ↑(n + 1))
+          (FC.cycleSubobject s k ↑n)
+          (FC.cycleSubobject_antitone s k (by exact_mod_cast Nat.le_succ n)) ≫
+        FC.pageπ s k ↑n) ≤
+      kernelSubobject (FC.pageDifferential s k n) :=
+  FC.pageDifferential_Z_succ_ge s k n
+
 end KIP126.Core.SpectralSequence.FilteredComplex
