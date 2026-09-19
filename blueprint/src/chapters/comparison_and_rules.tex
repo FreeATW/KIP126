@@ -876,6 +876,10 @@ This chapter begins the internal-proof layer.  It consumes the explicit literatu
 \begin{theorem}[Generalized Leibniz rule]
   \label{thm:generalized-leibniz}
   \uses{prop:delta-ess-formula-infinite,thm:delta-classical-equivalence,prop:classical-crossing-iff-delta-crossing,def:page-extension,prop:page-crossing-iff-synthetic-crossing,cor:fess-square-naturality}
+  \lean{KIP126.Challenge.Tools.Thm6_1Leibniz.Operations}
+  \lean{KIP126.Challenge.Tools.Thm6_1Leibniz.Input}
+  \lean{KIP126.Challenge.Tools.Thm6_1Leibniz.conclusion}
+  \lean{KIP126.Challenge.Tools.Thm6_1Leibniz.generalizedLeibniz}
   \notready
   Let $f:X\to Y$, $2\le n\le r$,
   $e(f)\le m\le n-2+e(f)$, and $l\ge e(f)$.  Suppose
@@ -978,6 +982,8 @@ This chapter begins the internal-proof layer.  It consumes the explicit literatu
 \begin{definition}[Generalized Mahowald input package]
   \label{def:mahowald-input-data}
   \uses{prop:normalized-synthetic-triangle,def:page-extension,def:classical-differential-crossing}
+  \lean{KIP126.Challenge.Tools.Thm6_12Mahowald.Operations}
+  \lean{KIP126.Challenge.Tools.Thm6_12Mahowald.Input}
   \notready
   A Mahowald input package consists of a distinguished triangle
   $X\xrightarrow fY\xrightarrow gZ\xrightarrow h\Sigma X$ with
@@ -1127,6 +1133,8 @@ This chapter begins the internal-proof layer.  It consumes the explicit literatu
 \begin{theorem}[Generalized Mahowald trick]
   \label{thm:generalized-mahowald}
   \uses{def:mahowald-input-data,prop:normalized-synthetic-triangle,def:lambda-rho-delta-triangle,lem:mahowald-synchronized-representatives,lem:mahowald-compatible-quotient-lift,lem:mahowald-quotient-lift-survival,lem:mahowald-lambda-division}
+  \lean{KIP126.Challenge.Tools.Thm6_12Mahowald.conclusion}
+  \lean{KIP126.Challenge.Tools.Thm6_12Mahowald.generalizedMahowald}
   \notready
   Let
   $X\xrightarrow fY\xrightarrow gZ\xrightarrow h\Sigma X$ be distinguished
@@ -1373,6 +1381,8 @@ This chapter begins the internal-proof layer.  It consumes the explicit literatu
 % inverse-limit obstruction hypothesis is a project correction for r=infinity.
 \begin{corollary}[Page-extension stretching]
   \label{cor:page-extension-stretch}
+  \lean{KIP126.Challenge.Tools.PagePropagation.Input}
+  \lean{KIP126.Challenge.Tools.PagePropagation.statement}
   \uses{prop:page-extension-loss-certificate,lem:page-extension-first-obstruction,def:synthetic-ess-solution-tower,lem:synthetic-ess-coherent-tower-limit}
   \notready
   Let $r'\le r\le\infty$, suppose

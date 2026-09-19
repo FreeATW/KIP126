@@ -96,11 +96,11 @@ Blueprint 使用平铺 chapter：`content.tex` 中没有 `\part` 或嵌套目录
 
 ### 当前执行前沿
 
-当前优先级是补完 Spectral-sequence machinery 并建立 Stable-homotopy objects 的
-最小接口；随后完成 Classical Adams/ESS 和 Synthetic 定义，使
-external-results statements 获得真实类型，再推进 comparison、数据、near-126 与
-几何端点。主 Wiki 负责更新章级完成状态和下一步；本文件只在阶段、模块边界、依赖
-顺序变化时更新。
+当前执行前沿已推进到稳定同伦/合成同伦输入包、附录 401 行 typed catalogue、BJM/BX
+选择传输接口以及 Theorem 6.1/6.12/7.3 的精确开放命题。下一步按依赖图补齐
+page-extension、near-126 coherence 和几何端点的真实证明，同时为每个外部输入补上
+具体实例与 evidence；这些开放目标继续保持 `notready`。主 Wiki 负责更新章级完成状态和
+下一步；本文件只在阶段、模块边界、依赖顺序变化时更新。
 
 ## 第三阶段：最终完整审计
 

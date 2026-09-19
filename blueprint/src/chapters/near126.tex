@@ -167,6 +167,8 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2221-2241, Lemma lem:equistate4.
 \begin{lemma}[Existential and universal forms of $C_4$]
   \label{lem:near126-equiv-c4}
+  \lean{KIP126.Challenge.Near126.Conditions.Input}
+  \lean{KIP126.Challenge.Near126.Conditions.statement}
   \uses{def:near126-computation-input,def:near126-conditions,evidence:theta5-order-torsion}
   \notready
   For a near-$126$ computation input $D$, condition $C_4$ is equivalent to the
@@ -183,6 +185,7 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2244-2258, Lemma lem:equistate5.
 \begin{lemma}[Existential and universal forms of $C_5$]
   \label{lem:near126-equiv-c5}
+  \lean{KIP126.Challenge.Near126.Conditions.statement}
   \uses{def:near126-computation-input,def:near126-conditions,evidence:near126-indeterminacy}
   \notready
   For a near-$126$ computation input $D$, condition $C_5$ is equivalent to the
@@ -200,6 +203,10 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2181-2204 and 2300-2354, Proposition prop:possibleh62.
 \begin{proposition}[Only possible differential on $h_6^2$]
   \label{prop:possible-h62}
+  \lean{KIP126.Challenge.Near126.CandidateReduction.Input}
+  \lean{KIP126.Challenge.Near126.CandidateReduction.statement}
+  \lean{KIP126.Challenge.Near126.OnlyD12.Input}
+  \lean{KIP126.Challenge.Near126.OnlyD12.statement}
   \uses{def:near126-computation-input,def:near126-conditions,thm:bjm-bx-criterion-any-choice,thm:external-total-differential-identity,thm:delta-classical-equivalence,evidence:near126-core,evidence:theta5-square-tmf,lem:near126-equiv-c4,lem:near126-equiv-c5}
   \notready
   For a near-$126$ computation input $D$, exactly one of the following holds:
@@ -470,6 +477,8 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2208-2210 and 2698-2778, Proposition prop:state5false.
 \begin{proposition}[$C_3$ excludes $C_5$]
   \label{prop:near126-c3-not-c5}
+  \lean{KIP126.Challenge.Near126.ExcludeEta.statement}
+  \lean{KIP126.Challenge.Near126.C3NotC5.statement}
   \uses{def:near126-computation-input,def:near126-conditions,lem:near126-equiv-c5,cor:near126-two-extension,lem:near126-nu-extension,evidence:near126-core,evidence:stem122-product-exhaustion,prop:synthetic-hopf-cofiber-equivalence,thm:external-synthetic-rigidity,evidence:cnu126-short-incoming-exclusion,def:external-evidence}
   \notready
   For a near-$126$ computation input $D$, if $C_3$ holds, then $C_5$ is false.
@@ -493,6 +502,8 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:128-130 and 2106-2214, Theorems thm:h62 and thm:126survives.
 \begin{theorem}[$h_6^2$ is a permanent cycle]
   \label{thm:h6-square-permanent}
+  \lean{KIP126.Challenge.Final.H6SquarePermanent.Input}
+  \lean{KIP126.Challenge.Final.H6SquarePermanent.statement}
   \uses{def:kervaire-main-input,prop:possible-h62,prop:near126-c3-not-c5}
   \notready
   For every main input $I$, the class $h_6^2$ is a permanent cycle in

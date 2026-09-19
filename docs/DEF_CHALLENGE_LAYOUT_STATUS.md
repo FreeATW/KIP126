@@ -23,6 +23,20 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Classical/ExtensionSS/EtaData` | `External/Computation/EtaRows/Data` |
 | `Synthetic/SpectralSequence/Basic` | `Def/Synthetic/AdamsSequence/Data` |
 | `Comparison/ClassicalSynthetic/Basic` | `Def/Comparison/ClassicalSynthetic/{Data,Proofs}`, `Challenge/Tools/Comparison/{Statement,Proof}` |
+| `Classical/Synthetic Kervaire setup` | `Def/Kervaire/Setup/Data`, `Def/Kervaire/Theta5/{Data,Predicates,Proofs}` |
+| `External BJM/BX, Xu/IWX, Browder, HHR, BJM inputs` | `External/Literature/Kervaire` |
+| `Theorem 6.1 generalized Leibniz` | `Challenge/Tools/Thm6_1Leibniz/Statement` |
+| `Theorem 6.12 generalized Mahowald` | `Challenge/Tools/Thm6_12Mahowald/Statement` |
+| `Page-extension stretching` | `Challenge/Tools/PagePropagation/Statement` |
+| `Theorem 7.3 BJM/BX choice transport` | `Challenge/Near126/Thm7_3BJMBX/Statement`, `Def/Kervaire/Theta5/Proofs` |
+| `Candidate differential reduction` | `Challenge/Near126/CandidateReduction/Statement` |
+| `C₃/C₄/C₅ choice transport` | `Challenge/Near126/Conditions/Statement` |
+| `Final eta-extension exclusion` | `Challenge/Near126/ExcludeEta/Statement` |
+| `Proposition 7.8 dichotomy` | `Challenge/Near126/OnlyD12/Statement` |
+| `Proposition 7.9 incompatibility` | `Challenge/Near126/C3NotC5/Statement` |
+| `Permanent h₆² endpoint` | `Challenge/Final/H6SquarePermanent/Statement` |
+| `Dimension-126 geometry` | `Challenge/Geometry/Thm1_1Dimension126/Statement`, `Challenge/Geometry/Cor1_2Dimensions/Statement` |
+| `Appendix computation catalogue` | `Def/Computation/AppendixTable/{Data,Rows/{Data,Catalogue}}` |
 | `*/Regression`, `*Regression` | corresponding `Checks/` modules |
 
 Import-only facades and empty `Classical/FExtension`, `Classical/PageExtensions`,
@@ -46,20 +60,22 @@ canonical Lean proof: Theorem 6.1 (generalized Leibniz), Theorem 6.12
 126), and Corollary 1.2 (exact dimension list). Their precise Lean statements
 require the paper-specific stable and synthetic homotopy objects, page
 extensions, computation interpretations, and fixed MainInput that are still
-Blueprint targets. A generic `Prop`, arbitrary witness, or external input
-asserting the endpoint would change the mathematical task, so no placeholder
-statement or proof is installed for them.
+Blueprint targets. Each target now has a typed open `Statement.lean`; no
+statement is marked as a proof, and no arbitrary witness or external input
+asserts an endpoint.
 
-The remaining Appendix row schema and its 401 nonempty rows, the full external literature
-interfaces, and the near-126 coherence packages also remain unimplemented.
-The existing eta rows are one small, located computation slice; they do not
-stand in for the Appendix catalogue.
+The appendix row schema and all 401 nonempty rows are now encoded as typed AST
+records with source locators, 124 joined differential relation pairs, 31
+permanent rows, 370 differential rows, and nine explicit zero bands.  The
+catalogue has executable length, key uniqueness, metadata, and zero-band
+regressions.  It remains an input catalogue: the mathematical interpretation
+of each row and its evidence proof are still open.  The existing eta rows are
+kept as a separate located computation slice.
 
-`Def/Computation/AppendixTable/Data` now gives the twelve paper tables stable
+`Def/Computation/AppendixTable/Data` gives the twelve paper tables stable
 identities, printed table numbers, TeX labels and source line ranges, PDF
-pages, spectra, stems, and filtration bands. This is table metadata only;
-the row schema, all 401 nonempty rows, and their evidence remain open. Only
-the Blueprint definition `def:appendix-table-id` has advanced to `\leanok`.
+pages, spectra, stems, and filtration bands. `Rows/Catalogue` contains the
+source-shaped 401-row input and remains `\notready` for theorem completion.
 
 The convergence witness structures now live in `Data`, their detection
 relation in `Predicates`, and the derived completion and detection results in

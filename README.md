@@ -100,11 +100,13 @@ spectral-object adapter; endpoint and convergence data remain explicit
 Blueprint interfaces.  The toolchain and Mathlib dependency are pinned to
 matching `4.32.2` releases.
 
-The Blueprint is substantially ahead of the Lean implementation.  Its entry
+The Blueprint remains ahead of the theorem proofs, while the source catalogue
+interfaces now cover the completed migration slices.  Its entry
 point is [blueprint/src/content.tex](blueprint/src/content.tex), with the
 paper-specific chapters under [blueprint/src/chapters](blueprint/src/chapters).
 It covers the paper's Sections 1--7, all 401 nonempty appendix rows and nine
-zero bands, the stable/spectral-sequence/Steenrod/synthetic background absent
+zero bands (the rows are now typed AST input records with executable catalogue
+regressions), the stable/spectral-sequence/Steenrod/synthetic background absent
 from Mathlib, explicit literature and computation provenance, and the full
 dependency cone from the compiled Core to the conditional Kervaire endpoints.
 All unimplemented nodes are conservatively marked `notready`; the Blueprint
