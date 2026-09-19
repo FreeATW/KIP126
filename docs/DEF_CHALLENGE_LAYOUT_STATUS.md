@@ -12,7 +12,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `SpectralSequence/Truncation` | `Def/Algebra/Truncation/{Data,Proofs}` (image filtration and boundedness on canonical quotient objects; no duplicate quotient tower) |
 | `Core/SpectralSequence/Basic` | `Checks/SpectralSequence/MathlibAPI`; production code imports Mathlib directly |
 | `Core/SpectralSequence/PageLevel` | `Def/SpectralSequence/PageLevel/{Data,Proofs}` |
-| `Core/SpectralSequence/FilteredComplex` | `Def/SpectralSequence/FilteredComplex/Data`, `Challenge/Tools/FilteredComplexRelations/Statement` (canonical Mathlib filtered complex plus the four open lift/relation obligations; no historical `sorry` proofs copied) |
+| `Core/SpectralSequence/FilteredComplex` | `Def/SpectralSequence/FilteredComplex/Data`, `Checks/SpectralSequence/FilteredComplex`, `Challenge/Tools/FilteredComplexRelations/Statement` (canonical filtered complex, homology filtration, cycle/boundary subobjects, and proved `B ≤ Z`; the full ESS/page adapter and four lift/relation obligations remain open) |
 | `Core/SpectralSequence/FilteredRepresentatives` | `Def/SpectralSequence/Representatives/Proofs` |
 | `Core/SpectralSequence/HomologicalImage` | `Def/SpectralSequence/HomologicalImage/Data` |
 | `Core/SpectralSequence/SpectralObjectAdapter` | `Def/SpectralSequence/SpectralObject/Data` |

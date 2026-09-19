@@ -37,6 +37,183 @@ next chain degree. -/
 
 namespace FilteredComplex
 
+/-! ### Homology of the underlying complex
+
+The following construction keeps the chain-degree convention explicit.  A
+homology object at degree `k` is the homology of the short complex
+`X (k + 1) ⟶ X k ⟶ X (k - 1)`. -/
+
+noncomputable def homologyShortComplex (FC : FilteredComplex C) (k : ℤ) :
+    ShortComplex C :=
+  ShortComplex.mk
+    (FC.complex.d (k + 1) k)
+    (FC.complex.d k (k - 1))
+    (FC.complex.d_comp_d (k + 1) k (k - 1))
+
+/-- The homology graded object of the underlying filtered chain complex. -/
+noncomputable def homologyObj (FC : FilteredComplex C) : ℤ → C :=
+  fun k => (FC.homologyShortComplex k).homology
+
+@[simp]
+lemma homologyObj_apply (FC : FilteredComplex C) (k : ℤ) :
+    FC.homologyObj k = (FC.homologyShortComplex k).homology := rfl
+
+/-! ### The induced filtration on homology -/
+
+noncomputable def homologyFiltration (FC : FilteredComplex C) :
+    Algebra.Filtration FC.homologyObj where
+  F s k :=
+    let S := FC.homologyShortComplex k
+    let I := kernelSubobject S.g ⊓ FC.filtration.F s k
+    let hzero : I.arrow ≫ S.g = 0 := by
+      rw [show I.arrow = Subobject.ofLE I (kernelSubobject S.g) inf_le_left ≫
+        (kernelSubobject S.g).arrow from (Subobject.ofLE_arrow inf_le_left).symm]
+      rw [Category.assoc, kernelSubobject_arrow_comp, comp_zero]
+    imageSubobject (S.liftCycles I.arrow hzero ≫ S.homologyπ)
+  decreasing := by
+    intro s k
+    let S := FC.homologyShortComplex k
+    let I₁ := kernelSubobject S.g ⊓ FC.filtration.F (s + 1) k
+    let I₀ := kernelSubobject S.g ⊓ FC.filtration.F s k
+    have hle : I₁ ≤ I₀ := inf_le_inf_left _ (FC.filtration.decreasing s k)
+    have hzero₁ : I₁.arrow ≫ S.g = 0 := by
+      rw [show I₁.arrow = Subobject.ofLE I₁ (kernelSubobject S.g) inf_le_left ≫
+        (kernelSubobject S.g).arrow from (Subobject.ofLE_arrow inf_le_left).symm]
+      rw [Category.assoc, kernelSubobject_arrow_comp, comp_zero]
+    have hzero₀ : I₀.arrow ≫ S.g = 0 := by
+      rw [show I₀.arrow = Subobject.ofLE I₀ (kernelSubobject S.g) inf_le_left ≫
+        (kernelSubobject S.g).arrow from (Subobject.ofLE_arrow inf_le_left).symm]
+      rw [Category.assoc, kernelSubobject_arrow_comp, comp_zero]
+    have hlift : S.liftCycles I₁.arrow hzero₁ =
+        Subobject.ofLE I₁ I₀ hle ≫ S.liftCycles I₀.arrow hzero₀ := by
+      apply (cancel_mono S.iCycles).mp
+      rw [S.liftCycles_i, Category.assoc, S.liftCycles_i]
+      exact (Subobject.ofLE_arrow hle).symm
+    have hlift' : S.liftCycles I₁.arrow hzero₁ ≫ S.homologyπ =
+        Subobject.ofLE I₁ I₀ hle ≫
+          (S.liftCycles I₀.arrow hzero₀ ≫ S.homologyπ) := by
+      rw [← Category.assoc, hlift]
+    change imageSubobject (S.liftCycles I₁.arrow hzero₁ ≫ S.homologyπ) ≤
+      imageSubobject (S.liftCycles I₀.arrow hzero₀ ≫ S.homologyπ)
+    rw [hlift']
+    exact imageSubobject_comp_le _ _
+
+/-! ### Cycles and boundaries in an associated graded piece -/
+
+/-- The differential from degree `k + 1` to degree `k`.  The canonical chain
+complex already indexes its target by `k`, so no degree transport is needed. -/
+noncomputable def dToK (FC : FilteredComplex C) (k : ℤ) :
+    FC.complex.X (k + 1) ⟶ FC.complex.X k :=
+  FC.complex.d (k + 1) k
+
+/-- The `r`-cycle subobject in the associated graded piece. -/
+noncomputable def cycleSubobject (FC : FilteredComplex C)
+    (s k : ℤ) (r : WithTop ℕ) :
+    Subobject (FC.filtration.associatedGraded s k) :=
+  let πV := FC.filtration.toAssociatedGraded s k
+  match r with
+  | ⊤ =>
+    let f := (FC.filtration.F s k).arrow ≫ FC.complex.d k (k - 1)
+    imageSubobject ((kernelSubobject f).arrow ≫ πV)
+  | (n : ℕ) =>
+    let f := (FC.filtration.F s k).arrow ≫ FC.complex.d k (k - 1) ≫
+      cokernel.π ((FC.filtration.F (s + ↑n) (k - 1)).arrow)
+    imageSubobject ((kernelSubobject f).arrow ≫ πV)
+
+/-- The `r`-boundary subobject in the associated graded piece. -/
+noncomputable def boundarySubobject (FC : FilteredComplex C)
+    (s k : ℤ) (r : WithTop ℕ) :
+    Subobject (FC.filtration.associatedGraded s k) :=
+  let πV := FC.filtration.toAssociatedGraded s k
+  match r with
+  | ⊤ =>
+    let imgD := imageSubobject (FC.dToK k)
+    let I := imgD ⊓ FC.filtration.F s k
+    imageSubobject (Subobject.ofLE I (FC.filtration.F s k) inf_le_right ≫ πV)
+  | (n : ℕ) =>
+    let imgD := imageSubobject
+      ((FC.filtration.F (s - ↑n + 1) (k + 1)).arrow ≫ FC.dToK k)
+    let I := imgD ⊓ FC.filtration.F s k
+    imageSubobject (Subobject.ofLE I (FC.filtration.F s k) inf_le_right ≫ πV)
+
+/-- The transported differential squares to zero. -/
+theorem dToK_comp_d (FC : FilteredComplex C) (k : ℤ) :
+    FC.dToK k ≫ FC.complex.d k (k - 1) = 0 := by
+  exact FC.complex.d_comp_d (k + 1) k (k - 1)
+
+set_option maxHeartbeats 800000 in
+/-- Boundaries are cycles in every associated graded piece. -/
+theorem B_le_Z_aux (FC : FilteredComplex C) (s k : ℤ)
+    (r : WithTop ℕ) :
+    FC.boundarySubobject s k r ≤ FC.cycleSubobject s k r := by
+  rcases r with _ | n
+  · simp only [boundarySubobject, cycleSubobject]
+    let ι := Subobject.ofLE (FC.filtration.F (s + 1) k)
+      (FC.filtration.F s k) (FC.filtration.decreasing s k)
+    let πV := cokernel.π ι
+    let imgD := imageSubobject (FC.dToK k)
+    let I := imgD ⊓ FC.filtration.F s k
+    let oI := Subobject.ofLE I (FC.filtration.F s k) inf_le_right
+    let f := (FC.filtration.F s k).arrow ≫ FC.complex.d k (k - 1)
+    have h_zero : oI ≫ f = 0 := by
+      change Subobject.ofLE I (FC.filtration.F s k) inf_le_right ≫
+        (FC.filtration.F s k).arrow ≫ FC.complex.d k (k - 1) = 0
+      rw [← Category.assoc, Subobject.ofLE_arrow]
+      rw [show I.arrow =
+          Subobject.ofLE I imgD inf_le_left ≫ imgD.arrow
+        from (Subobject.ofLE_arrow inf_le_left).symm,
+        Category.assoc]
+      have h : imgD.arrow ≫ FC.complex.d k (k - 1) = 0 := by
+        rw [← cancel_epi (factorThruImageSubobject (FC.dToK k))]
+        rw [comp_zero, ← Category.assoc, imageSubobject_arrow_comp]
+        exact FC.dToK_comp_d k
+      rw [h, comp_zero]
+    have heq : oI ≫ πV = factorThruKernelSubobject f oI h_zero ≫
+        (kernelSubobject f).arrow ≫ πV := by
+      rw [← Category.assoc, factorThruKernelSubobject_comp_arrow]
+    calc imageSubobject (oI ≫ πV)
+        = imageSubobject (factorThruKernelSubobject f oI h_zero ≫
+            (kernelSubobject f).arrow ≫ πV) := by rw [heq]
+      _ ≤ imageSubobject ((kernelSubobject f).arrow ≫ πV) :=
+          imageSubobject_comp_le _ _
+  · simp only [boundarySubobject, cycleSubobject]
+    let ι := Subobject.ofLE (FC.filtration.F (s + 1) k)
+      (FC.filtration.F s k) (FC.filtration.decreasing s k)
+    let πV := cokernel.π ι
+    let imgD := imageSubobject
+      ((FC.filtration.F (s - ↑n + 1) (k + 1)).arrow ≫ FC.dToK k)
+    let I := imgD ⊓ FC.filtration.F s k
+    let oI := Subobject.ofLE I (FC.filtration.F s k) inf_le_right
+    let f := (FC.filtration.F s k).arrow ≫ FC.complex.d k (k - 1) ≫
+      cokernel.π ((FC.filtration.F (s + ↑n) (k - 1)).arrow)
+    have h_zero : oI ≫ f = 0 := by
+      change Subobject.ofLE I (FC.filtration.F s k) inf_le_right ≫
+        ((FC.filtration.F s k).arrow ≫ FC.complex.d k (k - 1) ≫
+          cokernel.π ((FC.filtration.F (s + ↑n) (k - 1)).arrow)) = 0
+      simp only [← Category.assoc]
+      rw [Subobject.ofLE_arrow]
+      rw [show I.arrow =
+          Subobject.ofLE I imgD inf_le_left ≫ imgD.arrow
+        from (Subobject.ofLE_arrow inf_le_left).symm]
+      simp only [Category.assoc]
+      have hd : imgD.arrow ≫ FC.complex.d k (k - 1) = 0 := by
+        rw [← cancel_epi (factorThruImageSubobject
+          ((FC.filtration.F (s - ↑n + 1) (k + 1)).arrow ≫ FC.dToK k))]
+        rw [comp_zero, ← Category.assoc, imageSubobject_arrow_comp,
+          Category.assoc, FC.dToK_comp_d, comp_zero]
+      rw [show imgD.arrow ≫ FC.complex.d k (k - 1) ≫ cokernel.π _ =
+        (imgD.arrow ≫ FC.complex.d k (k - 1)) ≫ cokernel.π _
+        from (Category.assoc _ _ _).symm,
+        hd, zero_comp, comp_zero]
+    have heq : oI ≫ πV = factorThruKernelSubobject f oI h_zero ≫
+        (kernelSubobject f).arrow ≫ πV := by
+      rw [← Category.assoc, factorThruKernelSubobject_comp_arrow]
+    calc imageSubobject (oI ≫ πV)
+        = imageSubobject (factorThruKernelSubobject f oI h_zero ≫
+            (kernelSubobject f).arrow ≫ πV) := by rw [heq]
+      _ ≤ imageSubobject ((kernelSubobject f).arrow ≫ πV) :=
+          imageSubobject_comp_le _ _
+
 /-- A chain map between filtered complexes which preserves every filtration
 level.  The factorisations are kept as explicit data: this is the categorical
 version of a filtered chain map and does not identify a filtered subobject with
