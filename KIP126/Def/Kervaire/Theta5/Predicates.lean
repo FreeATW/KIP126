@@ -27,7 +27,8 @@ theorem in `Proofs.lean` supplies the arbitrary-choice form. -/
 def BJM_BXCriterion : Prop :=
   IsOrderTwo C.sourceChoice ∧
     (∀ r : ℕ, 1 ≤ r →
-      (C.h6Survives r ↔ C.finiteZero r C.sourceExpression)) ∧
+      (C.h6Survives (r + 3) ↔
+        C.finiteZero (r + 1) C.sourceExpression)) ∧
     (C.h6Permanent ↔ C.untruncatedZero C.sourceExpression)
 
 /-- The located total-differential identity for every order-two choice. -/
