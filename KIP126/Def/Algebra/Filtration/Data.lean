@@ -107,6 +107,19 @@ noncomputable def associatedGradedObject [Abelian C] (F : Filtration A) :
     CategoryTheory.GradedObject (ℤ × ι) C :=
   fun si => F.associatedGraded si.1 si.2
 
+/-! ### Index transport for associated graded pieces
+
+The associated graded object is indexed by a product, so equal reindexings
+must be transported explicitly when a construction changes the presentation
+of a bidegree.  This is the canonical replacement for the corresponding
+transport helper in the historical convergence file. -/
+
+/-- Transport an associated-graded piece along an equality of its indices. -/
+noncomputable def transportGraded [Abelian C] (F : Filtration A)
+    {r₁ r₂ : ℤ × ι} (h : r₁ = r₂) :
+    F.associatedGraded r₁.1 r₁.2 ⟶ F.associatedGraded r₂.1 r₂.2 :=
+  eqToHom (by rw [h])
+
 end Filtration
 
 /-- A morphism of filtered graded objects is a graded map whose restriction to

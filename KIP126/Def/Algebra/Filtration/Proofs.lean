@@ -12,6 +12,20 @@ namespace Filtration
 
 variable {ι : Type w} {A : CategoryTheory.GradedObject ι C}
 
+@[simp]
+lemma transportGraded_self [Abelian C] (F : Filtration A)
+    {r : ℤ × ι} (h : r = r) :
+    F.transportGraded h = 𝟙 (F.associatedGraded r.1 r.2) :=
+  rfl
+
+lemma transportGraded_trans [Abelian C] (F : Filtration A)
+    {r₁ r₂ r₃ : ℤ × ι} (h₁₂ : r₁ = r₂) (h₂₃ : r₂ = r₃) :
+    F.transportGraded h₁₂ ≫ F.transportGraded h₂₃ =
+      F.transportGraded (h₁₂.trans h₂₃) := by
+  subst h₁₂
+  subst h₂₃
+  simp only [Filtration.transportGraded_self, Category.id_comp]
+
 /-- A generalized element of one filtration level maps to zero in the
 associated graded exactly when it lifts through the next filtration level. -/
 lemma comp_toAssociatedGraded_eq_zero_iff_lifts [Abelian C]
