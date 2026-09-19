@@ -35,6 +35,21 @@ feat/def-challenge-layout
 - PR #97：<https://github.com/SII-MATH/KIP126/pull/97>；
 - 最近的比较和讨论没有产生额外代码修改。
 
+当前 session 已重新核对的状态（2026-09-19）：
+
+- 工作区干净，HEAD：`1bc877b45962d0b76f538fc77bb8f363934cc5f0`；
+- `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
+  `origin/main` 无落后提交；
+- 已补入 canonical `pageObj` 的零页等价律、嵌套商映射/第三同构辅助构造，
+  以及稳定三角形中项同调群的 exactness；这些改动均未引入 `KIPBase` import；
+- 本地 `scripts/shared-main-cache.sh run lake build KIP126` 通过（1904/1904），
+  `scripts/Axioms.lean` 通过（4677 个 KIP126 声明，仅允许
+  `propext`、`Classical.choice`、`Quot.sound`），Python 迁移回归 28 项通过；
+- 迁移校验器仍因归档文件中既有的
+  `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
+  PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
+  PR 或由人工审核处理。
+
 ## 3. 开始工作前的安全步骤
 
 必须先阅读：
