@@ -37,7 +37,8 @@ feat/def-challenge-layout
 
 当前 session 已重新核对的状态（2026-09-19）：
 
-- 工作区干净，HEAD：`138d56ca9b8988e75704dc97b4aae520a7e9112d`；
+- 工作区干净，HEAD：`b73440e3a726`（代码检查点为前一提交
+  `138d56ca9b8988e75704dc97b4aae520a7e9112d`）；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
   `origin/main` 无落后提交；
 - 已补入 canonical `pageObj` 的零页等价律（含 `pageObj_isZero_iff`）、嵌套商映射/第三同构辅助构造，
