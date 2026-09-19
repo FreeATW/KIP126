@@ -113,12 +113,13 @@ are proved directly for `pageObj`; no historical `SSData` structure is copied.
 It also owns the nested-subobject quotient maps and third-isomorphism helper
 used by the future page-homology comparison.
 
-The canonical filtered-differential proof layer now also proves the easy
-`Z_{n+1} → ker(d_n)` inclusion for the finite-page differential and carries
-generic kernel/image factorization lemmas needed by the opposite inclusion.
-The reverse `Z_succ` inclusion, `B_succ`, and the full Mathlib
-spectral-sequence assembly remain open; this infrastructure does not claim a
-completed `toSpectralSequence` adapter.
+The canonical filtered-differential proof layer now proves both finite-page
+`Z_{n+1} → ker(d_n)` inclusions: the easy direction and the reverse kernel
+inclusion `ker(d_n) ≤ image(Z_{n+1} → Z_n → page)`. The proof also carries
+local transport and kernel/image factorization infrastructure for the canonical
+`cycleSubobject` API. `B_succ` and the full Mathlib spectral-sequence assembly
+remain open; this infrastructure does not claim a completed
+`toSpectralSequence` adapter.
 
 The old `SpectralSequence/Completion` construction is not copied as a second
 completion object: KIP126's quotient tower and its eventual-zero limit witness

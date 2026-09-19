@@ -37,8 +37,8 @@ feat/def-challenge-layout
 
 当前 session 已重新核对的状态（2026-09-19）：
 
-- 工作区干净，HEAD：`2ae4151`（迁移两个通用的
-  `kernelSubobject`/`imageSubobject` 核心引理，作为反向 `Z_succ` 证明的正式支撑层）；
+- 当前工作区包含反向 `Z_{n+1}` 核心证明的未提交改动（生产声明
+  `pageDifferential_Z_succ_le` 及其回归检查）；提交前不要据此报告工作区干净；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
   `origin/main` 无落后提交；
 - 已补入 canonical `pageObj` 的零页等价律（含 `pageObj_isZero_iff`）、嵌套商映射/第三同构辅助构造，
@@ -47,13 +47,14 @@ feat/def-challenge-layout
 - 本地 `scripts/shared-main-cache.sh run lake build KIP126` 通过（1904/1904），
   `scripts/Axioms.lean` 通过（4684 个 KIP126 声明，仅允许
   `propext`、`Classical.choice`、`Quot.sound`），Python 单元测试 92 项通过；
-- 反向 `Z_{n+1}` 包含的临时适配已确认主要阻塞在 canonical `cycleSubobject` 的依赖类型重写，
-  未将未完成证明写入生产文件；反向 `Z_succ`、`B_succ`、完整 Mathlib assembly 和四个关系义务仍开放；
+- 反向 `Z_{n+1}` 包含已接入生产 `FilteredDifferential/Proofs.lean`，并在
+  `Checks/SpectralSequence/FilteredDifferential.lean` 增加回归检查；`B_succ`、完整
+  Mathlib assembly 和四个关系义务仍开放；
 - 迁移校验器仍因归档文件中既有的
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
   PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
   PR 或由人工审核处理。
-- PR #97 当前头为 `57f3f5e`，远端状态为 `BLOCKED`：Blueprint/sandboxed-build 门禁因累计 diff
+- PR #97 当前头仍为此前提交（本次证明尚未提交），远端状态为 `BLOCKED`：Blueprint/sandboxed-build 门禁因累计 diff
   超过 2000 行/文件范围上限和历史 `KIP126/` 新增 `set_option` 保护规则失败；这与本地缓存构建
   和 Axiom 审计的通过结果是两个独立门。
 
