@@ -1224,6 +1224,7 @@ def appendixZeroBands : List AppendixZeroBand := [
 
 def appendixRowsValid : Bool := appendixRows.all AppendixRow.validBool
 theorem appendixRows_valid : appendixRowsValid = true := by native_decide
+theorem appendixRows_length : appendixRows.length = 401 := by native_decide
 theorem appendixRows_keys_nodup : (appendixRows.map AppendixRow.key).Nodup := by native_decide
 def appendixZeroBandsValid : Bool := appendixZeroBands.all AppendixZeroBand.validBool
 theorem appendixZeroBands_valid : appendixZeroBandsValid = true := by native_decide
