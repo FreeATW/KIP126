@@ -14,6 +14,8 @@ import KIP126.Def.SpectralSequence.Convergence.Proofs
 import KIP126.Def.SpectralSequence.Extension.Data
 import KIP126.Def.SpectralSequence.EndpointExtension.Data
 import KIP126.Def.SpectralSequence.FilteredComplex.Data
+import KIP126.Def.SpectralSequence.FilteredPage.Proofs
+import KIP126.Def.SpectralSequence.FilteredDifferential.Proofs
 import KIP126.Def.SpectralSequence.HomologicalImage.Data
 import KIP126.Def.SpectralSequence.PageLevel.Proofs
 import KIP126.Def.PageExtensions.Differential.Proofs
