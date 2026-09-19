@@ -68,8 +68,8 @@ noncomputable def drop (r s k : ℤ) (hr : 0 ≤ r) :
       Subobject.underlying.obj (FC.filtration.F s (k - 1)) :=
   FC.filtration.inclusion (by omega) (k - 1)
 
-/-- A lift is compared with a page element through the page-to-associated-
-graded isomorphism; no second associated-graded definition is introduced. -/
+/-- A lift is compared with a page element by factoring its associated-graded
+image through the canonical cycle subobject and then applying `pageπ`. -/
 def IsLift (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ)
     {T : C}
     (xl : T ⟶ Subobject.underlying.obj (FC.filtration.F s k))
