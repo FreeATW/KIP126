@@ -37,7 +37,7 @@ feat/def-challenge-layout
 
 当前 session 已重新核对的状态（2026-09-19）：
 
-- 工作区干净，HEAD：`7103742`（生产声明 `pageDifferential_Z_succ_le`、其回归检查，及
+- 工作区干净，HEAD：`293ba2a`（生产声明 `pageDifferential_Z_succ_le`、其回归检查，及
   canonical `cycleSubobject` 的局部传输/核像基础引理）；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
   `origin/main` 无落后提交；
@@ -45,7 +45,7 @@ feat/def-challenge-layout
   稳定三角形中项同调群的 exactness，有限页 `Z_succ` 的容易方向，以及两个通用核/上像引理；这些改动均未引入
   `KIPBase` import；
 - 本地 `scripts/shared-main-cache.sh run lake build KIP126` 通过（1904/1904），
-  `scripts/Axioms.lean` 通过（4684 个 KIP126 声明，仅允许
+  `scripts/Axioms.lean` 通过（4695 个 KIP126 声明，仅允许
   `propext`、`Classical.choice`、`Quot.sound`），Python 单元测试 92 项通过；
 - 反向 `Z_{n+1}` 包含已接入生产 `FilteredDifferential/Proofs.lean`，并在
   `Checks/SpectralSequence/FilteredDifferential.lean` 增加回归检查；`B_succ`、完整
@@ -54,7 +54,7 @@ feat/def-challenge-layout
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
   PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
   PR 或由人工审核处理。
-- PR #97 当前头已推进到 `7103742`，远端状态仍待新一轮门禁更新（此前为 `BLOCKED`）：Blueprint/sandboxed-build 门禁因累计 diff
+- PR #97 当前头已推进到 `438913f`（清理提交 `293ba2a` 尚未推送），远端状态仍待新一轮门禁更新（此前为 `BLOCKED`）：Blueprint/sandboxed-build 门禁因累计 diff
   超过 2000 行/文件范围上限和历史 `KIP126/` 新增 `set_option` 保护规则失败；这与本地缓存构建
   和 Axiom 审计的通过结果是两个独立门。
 
