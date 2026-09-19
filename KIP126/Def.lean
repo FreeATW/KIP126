@@ -1,5 +1,6 @@
 import KIP126.Def.Algebra.Coefficients.Data
 import KIP126.Def.Algebra.Completion.Proofs
+import KIP126.Def.Algebra.Truncation.Proofs
 import KIP126.Def.Algebra.Filtration.Proofs
 import KIP126.Def.Algebra.Graded.Data
 import KIP126.Def.ClassicalAdams.PageSlice.Data
@@ -15,7 +16,7 @@ import KIP126.Def.SpectralSequence.EndpointExtension.Data
 import KIP126.Def.SpectralSequence.FilteredComplex.Data
 import KIP126.Def.SpectralSequence.HomologicalImage.Data
 import KIP126.Def.SpectralSequence.PageLevel.Proofs
-import KIP126.Def.PageExtensions.Proofs
+import KIP126.Def.PageExtensions.Differential.Proofs
 import KIP126.Def.SpectralSequence.Representatives.Proofs
 import KIP126.Def.SpectralSequence.SpectralObject.Data
 import KIP126.Def.Synthetic.AdamsSequence.Data

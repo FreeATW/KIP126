@@ -1,10 +1,10 @@
-import KIP126.Def.PageExtensions.Predicates
+import KIP126.Def.PageExtensions.Differential.Predicates
 
 /-! Basic, proof-carrying facts for page differential relations. -/
 
 namespace KIP126.Def.PageExtensions
 
-open CategoryTheory
+open CategoryTheory CategoryTheory.Limits
 
 universe u v w
 
@@ -15,7 +15,7 @@ theorem differentialRelation_iff (E : SpectralSequence C c r₀) (r : ℤ)
     (hr : r₀ ≤ r) (source target : κ) {T : C}
     (x : PageElement c r₀ E r hr source T)
     (y : PageElement c r₀ E r hr target T) :
-    DifferentialRelation c r₀ E r hr source target x y ↔
+    DifferentialRelation E r hr source target x y ↔
       x ≫ PageDifferential c r₀ E r hr source target = y := by
   rfl
 
@@ -24,17 +24,16 @@ theorem essentialDifferentialRelation_isEssential
     (source target : κ) {T : C}
     {x : PageElement c r₀ E r hr source T}
     {y : PageElement c r₀ E r hr target T}
-    (h : EssentialDifferentialRelation c r₀ E r hr source target x y) :
-    IsEssentialAt c r₀ E r hr source target :=
-  h.2
+    (h : EssentialDifferentialRelation E r hr source target x y) :
+    y ≠ 0 := h.2
 
-theorem noCrossing_iff (D : DifferentialDatum E) :
+theorem noCrossing_iff (D : DifferentialDatum (c := c) (r₀ := r₀) E) :
     NoCrossing (C := C) (c := c) (r₀ := r₀) D ↔
       NoCrossingRange (C := C) (c := c) (r₀ := r₀) D
         (D.filtrationDegree D.source + 1) := by
   rfl
 
-theorem not_hasCrossingAt_of_noCrossing (D : DifferentialDatum E)
+theorem not_hasCrossingAt_of_noCrossing (D : DifferentialDatum (c := c) (r₀ := r₀) E)
     (h : NoCrossing (C := C) (c := c) (r₀ := r₀) D) :
     ¬ HasCrossingAt (C := C) (c := c) (r₀ := r₀) D
         (D.filtrationDegree D.source + 1) := by
@@ -44,18 +43,5 @@ theorem not_hasCrossingAt_of_noCrossing (D : DifferentialDatum E)
     htarget, hbound⟩
   exact ⟨a, ha, r', hr', source', target', hsource, hessential,
     htarget ▸ le_rfl, hbound⟩
-
-/-- Package a page differential and its filtration data as a datum. -/
-def DifferentialDatum.ofSpectralSequence (E : SpectralSequence C c r₀)
-    (page : ℤ) (page_ge : r₀ ≤ page) (source target : κ)
-    (filtrationDegree : κ → ℤ)
-    (essential : IsEssentialAt c r₀ E page page_ge source target) :
-    DifferentialDatum E :=
-  { page := page
-    page_ge := page_ge
-    source := source
-    target := target
-    filtrationDegree := filtrationDegree
-    essential := essential }
 
 end KIP126.Def.PageExtensions
