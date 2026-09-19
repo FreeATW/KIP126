@@ -9,7 +9,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Core/Algebra/Graded`, `Coefficients` | `Def/Algebra/Graded/Data`, `Coefficients/Data` |
 | `Core/Algebra/Filtered` | `Def/Algebra/Filtration/{Data,Predicates,Proofs}` |
 | `Core/Algebra/Completion` | `Def/Algebra/Completion/{Data,Proofs}` |
-| `SpectralSequence/Truncation` | `Def/Algebra/Truncation/{Data,Proofs}` (image filtration on canonical quotient objects; no duplicate quotient tower) |
+| `SpectralSequence/Truncation` | `Def/Algebra/Truncation/{Data,Proofs}` (image filtration and boundedness on canonical quotient objects; no duplicate quotient tower) |
 | `Core/SpectralSequence/Basic` | `Checks/SpectralSequence/MathlibAPI`; production code imports Mathlib directly |
 | `Core/SpectralSequence/PageLevel` | `Def/SpectralSequence/PageLevel/{Data,Proofs}` |
 | `Core/SpectralSequence/FilteredComplex` | `Def/SpectralSequence/FilteredComplex/Data` |
@@ -100,3 +100,8 @@ nonzero; the original relation may be zero. This does not prove equivalence
 with the historical ambient representative or complete target-coset model. This is foundation data for the paper's
 page-extension nodes; the finite/infinite synthetic page-extension statements
 and their crossing equivalences remain open in the Blueprint.
+
+The truncation port deliberately covers the quotient image filtration and its
+boundedness laws. The historical convergence-morphism truncation adapter and
+the universal `IsComplete` predicate still belong to the existing completion
+and convergence interfaces; they are not claimed as migrated by this slice.
