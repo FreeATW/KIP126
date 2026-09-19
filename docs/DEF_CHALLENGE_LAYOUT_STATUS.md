@@ -98,6 +98,15 @@ canonical cycle subobject and `pageπ`; it no longer identifies every page with
 the associated graded object. The adapter remains open construction data, and
 the four relation obligations remain unproved.
 
+The old `SpectralSequence/Completion` construction is not copied as a second
+completion object: KIP126's quotient tower and its eventual-zero limit witness
+are the canonical completion interface. The old truncation adapter still
+depends on the retired `ConvergenceMorphism`/`PreSS` architecture. Likewise,
+`SpectralSequence/UnboundedExtension` and `SpectralSequence/Commutativity`
+remain isolated historical evidence because their assembly and convergence
+claims depend on that architecture (and the unbounded file contains open
+placeholders). No KIP126 theorem claims those constructions were migrated.
+
 Two construction files still import earlier filtration proofs:
 `Def/Algebra/Completion/Data` needs the filtration inclusion law to construct
 quotient transitions, and `Def/SpectralSequence/FilteredComplex/Data` uses
