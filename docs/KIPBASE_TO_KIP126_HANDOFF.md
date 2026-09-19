@@ -37,15 +37,15 @@ feat/def-challenge-layout
 
 当前 session 已重新核对的状态（2026-09-19）：
 
-- 工作区干净；本次实现提交：`f2e4454`（生产声明 `pageDifferential_Z_succ_le` 与 `pageDifferential_B_succ`、对应回归检查，及
-  canonical `cycleSubobject` 的局部传输/核像基础引理）；状态记录提交为 `16625c4`；
+- 工作区干净；本次实现提交：`f9df77b`（canonical page lift 的 boundary-factorization 定理、回归检查及状态记录）；此前的
+  `pageDifferential_Z_succ_le`、`pageDifferential_B_succ`、`pageComplex` 和条件谱序列装配提交均已保留；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
   `origin/main` 无落后提交；
 - 已补入 canonical `pageObj` 的零页等价律（含 `pageObj_isZero_iff`）、嵌套商映射/第三同构辅助构造，
   稳定三角形中项同调群的 exactness，有限页 `Z_succ` 的容易方向，以及两个通用核/上像引理；这些改动均未引入
   `KIPBase` import；
-- 本地 `scripts/shared-main-cache.sh run lake build KIP126` 通过（1904/1904），
-  `scripts/Axioms.lean` 通过（4700 个 KIP126 声明，仅允许
+- 本地 `scripts/shared-main-cache.sh run lake build KIP126` 通过（1906/1906），
+  `scripts/Axioms.lean` 通过（4730 个 KIP126 声明，仅允许
   `propext`、`Classical.choice`、`Quot.sound`），Python 单元测试 92 项通过；
 - 反向 `Z_{n+1}` 包含已接入生产 `FilteredDifferential/Proofs.lean`，并在
   `Checks/SpectralSequence/FilteredDifferential.lean` 增加回归检查；有限页 `Z_succ` 两个方向和
@@ -62,9 +62,9 @@ feat/def-challenge-layout
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
   PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
   PR 或由人工审核处理。
-- PR #97 本次代码推送后的远端头为 `16625c4`，远端状态仍待新一轮门禁更新（此前为 `BLOCKED`）：Blueprint/sandboxed-build 门禁因累计 diff
-  超过 2000 行/文件范围上限和历史 `KIP126/` 新增 `set_option` 保护规则失败；这与本地缓存构建
-  和 Axiom 审计的通过结果是两个独立门。
+- PR #97 本次代码推送后的远端头为 `f9df77b`，状态为 `BLOCKED`：Blueprint 门禁报告累计 diff
+  超过 2000 行/文件审查上限；sandboxed-build 门禁报告历史新增 `.lean` 文件超过 1000 行，
+  并将 `scope` 标为需人工审核。这与本地缓存构建和 Axiom 审计的通过结果是两个独立门。
 
 ## 3. 开始工作前的安全步骤
 
