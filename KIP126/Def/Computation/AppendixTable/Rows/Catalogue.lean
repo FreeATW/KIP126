@@ -1223,11 +1223,16 @@ def appendixZeroBands : List AppendixZeroBand := [
 ]
 
 def appendixRowsValid : Bool := appendixRows.all AppendixRow.validBool
-theorem appendixRows_valid : appendixRowsValid = true := by native_decide
-theorem appendixRows_length : appendixRows.length = 401 := by native_decide
-theorem appendixRows_keys_nodup : (appendixRows.map AppendixRow.key).Nodup := by native_decide
+set_option maxRecDepth 100000 in
+theorem appendixRows_valid : appendixRowsValid = true := by decide
+set_option maxRecDepth 100000 in
+theorem appendixRows_length : appendixRows.length = 401 := by decide
+set_option maxRecDepth 100000 in
+theorem appendixRows_keys_nodup : (appendixRows.map AppendixRow.key).Nodup := by decide
 def appendixZeroBandsValid : Bool := appendixZeroBands.all AppendixZeroBand.validBool
-theorem appendixZeroBands_valid : appendixZeroBandsValid = true := by native_decide
-theorem appendixZeroBands_length : appendixZeroBands.length = 9 := by native_decide
+set_option maxRecDepth 100000 in
+theorem appendixZeroBands_valid : appendixZeroBandsValid = true := by decide
+set_option maxRecDepth 100000 in
+theorem appendixZeroBands_length : appendixZeroBands.length = 9 := by decide
 
 end KIP126.Computation
