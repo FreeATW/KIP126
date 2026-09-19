@@ -32,4 +32,16 @@ example (D : BoundedExtension.TwoTermData (C := C))
     IsZero (D.complex.complex.X k) :=
   D.two_term k hk₁ hk₀
 
+example (X₁ X₂ : C) (f : X₁ ⟶ X₂) (k : ℤ) :
+    BoundedExtension.twoTermDiff X₁ X₂ f k ≫
+        BoundedExtension.twoTermDiff X₁ X₂ f (k - 1) = 0 :=
+  BoundedExtension.twoTermDiff_sq X₁ X₂ f k
+
+example (X₁ X₂ : C) (F₁ : ℤ → Subobject X₁) (F₂ : ℤ → Subobject X₂)
+    (s : ℤ) :
+    BoundedExtension.twoTermFil F₁ F₂ s 1 = F₁ s ∧
+      BoundedExtension.twoTermFil F₁ F₂ s 0 = F₂ s := by
+  exact ⟨BoundedExtension.twoTermFil_one F₁ F₂ s,
+    BoundedExtension.twoTermFil_zero F₁ F₂ s⟩
+
 end KIP126.Core.SpectralSequence

@@ -17,7 +17,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Core/SpectralSequence/HomologicalImage` | `Def/SpectralSequence/HomologicalImage/Data` |
 | `Core/SpectralSequence/SpectralObjectAdapter` | `Def/SpectralSequence/SpectralObject/Data` |
 | `Core/SpectralSequence/Convergence` | `Def/SpectralSequence/EndpointExtension/Data`, `Convergence/{Data,Predicates,Proofs}` |
-| `Core/SpectralSequence/Extension` | `Def/SpectralSequence/Extension/Data` |
+| `Core/SpectralSequence/Extension` | `Def/SpectralSequence/Extension/Data` (canonical two-term object, differential, square-zero and filtration helpers; full ESS adapter remains open) |
 | `SpectralSequence/Crossing` | `Def/PageExtensions/Differential/{Data,Predicates,Proofs}` (partial: finite-page relations; representative equivalence still open) |
 | `StableHomotopy/{Basic,TensorTriangulatedCategory}` | `Def/StableHomotopy/Context/{Data,Proofs,MappingProofs}` (category structure, sphere shifts, homotopy-group functor, sphere-smash/mapping-spectrum consequences, distinguished-triangle zero-composition laws, and explicit closed/cofiber witness interfaces; long exact sequence and model-specific witnesses remain open) |
 | `StableHomotopy/Cohomology` | `Def/StableHomotopy/Cohomology/{Data,Proofs}` (explicit HF₂, representable mod-2 cohomology/homology, functorial maps, Steenrod carrier, and universal-coefficient input records; mapping-spectrum action and UCT instances remain supplied data) |
