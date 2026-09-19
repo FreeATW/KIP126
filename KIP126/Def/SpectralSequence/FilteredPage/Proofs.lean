@@ -266,6 +266,14 @@ theorem eq_of_pageObj_isZero (FC : FilteredComplex C) (s k : ℤ)
       (FC.cycleSubobject s k r) (FC.B_le_Z_aux s k r)))
     (by simp [Subobject.ofLE_arrow])
 
+/-- The canonical page is zero exactly when its boundary and cycle subobjects agree. -/
+theorem pageObj_isZero_iff (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ) :
+    IsZero (FC.pageObj s k r) ↔
+      FC.boundarySubobject s k r = FC.cycleSubobject s k r := by
+  constructor
+  · exact eq_of_pageObj_isZero FC s k r
+  · exact pageObj_isZero_of_eq FC s k r
+
 /-! ### Quotient maps for nested subobjects
 
 These constructions are the categorical quotient tools used by the historical

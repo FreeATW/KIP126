@@ -38,6 +38,11 @@ example (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ)
     IsZero (FC.pageObj s k r) :=
   FC.pageObj_isZero_of_eq s k r h
 
+example (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ) :
+    IsZero (FC.pageObj s k r) ↔
+      FC.boundarySubobject s k r = FC.cycleSubobject s k r :=
+  FC.pageObj_isZero_iff s k r
+
 example (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ)
     (h : IsZero (FC.pageObj s k r)) :
     FC.boundarySubobject s k r = FC.cycleSubobject s k r :=
