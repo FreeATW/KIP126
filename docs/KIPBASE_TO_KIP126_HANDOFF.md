@@ -37,10 +37,10 @@ feat/def-challenge-layout
 
 当前 session 已重新核对的状态（2026-09-19）：
 
-- 工作区干净，HEAD：`1bc877b45962d0b76f538fc77bb8f363934cc5f0`；
+- 工作区干净，HEAD：`138d56ca9b8988e75704dc97b4aae520a7e9112d`；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
   `origin/main` 无落后提交；
-- 已补入 canonical `pageObj` 的零页等价律、嵌套商映射/第三同构辅助构造，
+- 已补入 canonical `pageObj` 的零页等价律（含 `pageObj_isZero_iff`）、嵌套商映射/第三同构辅助构造，
   以及稳定三角形中项同调群的 exactness；这些改动均未引入 `KIPBase` import；
 - 本地 `scripts/shared-main-cache.sh run lake build KIP126` 通过（1904/1904），
   `scripts/Axioms.lean` 通过（4677 个 KIP126 声明，仅允许
