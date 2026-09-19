@@ -48,7 +48,7 @@ feat/def-challenge-layout
   `KIPBase` import；
 - 本地 `scripts/shared-main-cache.sh run lake build KIP126` 曾通过（1906/1906）；当前增量的
   `FilteredPage.Complex`、`FilteredPage` 和 `FilteredComplexRelations` 检查均通过，
-  `scripts/Axioms.lean` 通过（4759 个 KIP126 声明，仅允许
+  `scripts/Axioms.lean` 通过（4763 个 KIP126 声明，仅允许
   `propext`、`Classical.choice`、`Quot.sound`），源码清单通过（18 sources, 88 artifacts）；
 - 反向 `Z_{n+1}` 包含已接入生产 `FilteredDifferential/Proofs.lean`，并在
   `Checks/SpectralSequence/FilteredDifferential.lean` 增加回归检查；有限页 `Z_succ` 两个方向和
