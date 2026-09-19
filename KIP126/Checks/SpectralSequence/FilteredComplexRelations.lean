@@ -15,8 +15,12 @@ universe u v
 variable {C : Type u} [Category.{v} C] [Abelian C]
 
 example (FC : FilteredComplex C) (W : PageHomologyWitness FC) :
-    PageView FC :=
+  PageView FC :=
   PageView.ofPageHomologyWitness FC W
+
+example (FC : FilteredComplex C) (W : PageHomologyFactorization FC) :
+  PageView FC :=
+  PageView.ofPageHomologyFactorization FC W
 
 example (FC : FilteredComplex C) (P : PageView FC)
     {r : ℤ} {hr : P.firstPage ≤ r} {s k : ℤ} {T : C}

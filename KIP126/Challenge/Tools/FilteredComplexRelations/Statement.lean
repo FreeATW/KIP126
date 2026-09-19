@@ -61,6 +61,12 @@ noncomputable def PageView.ofPageHomologyWitness
   pageNumber := fun r _ => (r.toNat : WithTop ℕ)
   pageToPage := fun _ _ _ _ => Iso.refl _
 
+/-- Directly obtain the canonical page view from the epi--mono factorizations
+used to compare adjacent page homology. -/
+noncomputable def PageView.ofPageHomologyFactorization
+    (FC : FilteredComplex C) (W : PageHomologyFactorization FC) : PageView FC :=
+  PageView.ofPageHomologyWitness FC (PageHomologyWitness.ofFactorization FC W)
+
 namespace PageView
 
 variable {FC : FilteredComplex C} (P : PageView FC)

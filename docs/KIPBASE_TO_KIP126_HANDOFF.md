@@ -57,8 +57,9 @@ feat/def-challenge-layout
   `PageHomologyFactorization`，把每个页面的同调比较精确化为 Mathlib
   `ofEpiMonoFactorisation` 所需的 epi--mono 分解，并提供
   `PageHomologyWitness.ofFactorization` 的打包构造。具体分解的数学证明仍未完成。
-  `PageView.ofPageHomologyWitness` 已把该装配器接入四个关系命题的 canonical
-  页面入口。相邻页同调同构 witness 本身仍是开放证明义务，没有把它当作无条件的
+  `PageView.ofPageHomologyWitness` 与
+  `PageView.ofPageHomologyFactorization` 已把该装配器接入四个关系命题的
+  canonical 页面入口。相邻页同调同构 witness 本身仍是开放证明义务，没有把它当作无条件的
   `toSpectralSequence` 结论。另已证明 `PageView.isLift_sub_factors_boundary`：同一
   page 元素的两个 lift 之差经 canonical `boundarySubobject` 因子化；这替代了旧
   associated-graded lift 唯一性在 page quotient 语义下不成立的版本。
