@@ -17,6 +17,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Core/SpectralSequence/SpectralObjectAdapter` | `Def/SpectralSequence/SpectralObject/Data` |
 | `Core/SpectralSequence/Convergence` | `Def/SpectralSequence/EndpointExtension/Data`, `Convergence/{Data,Predicates,Proofs}` |
 | `Core/SpectralSequence/Extension` | `Def/SpectralSequence/Extension/Data` |
+| `SpectralSequence/Crossing` | `Def/PageExtensions/{Data,Predicates,Proofs}` (Mathlib page-level relation and crossing interface) |
 | `Classical/Adams/Basic` | `Def/StableHomotopy/Context/Data`, `Def/ClassicalAdams/{Page/Data,Convergence/{Data,Predicates,Proofs,StrongData},SphereSequence/Data,H4D2/{Data,Predicates}}`, `External/Literature/Adams/OneLine` |
 | `Classical/SpectralSequence/Basic` | `Def/ClassicalAdams/PageSlice/Data` |
 | `Classical/ExtensionSS/Basic` | `Def/ClassicalESS/Eta/{Data,ExternalInput,Predicates,Proofs}` |
@@ -89,3 +90,9 @@ quotient transitions, and `Def/SpectralSequence/FilteredComplex/Data` uses
 associated-graded and filtered-morphism results to construct standard
 categorical objects. Those constructor-support imports are not yet split into
 smaller, earlier data modules.
+
+`Def/PageExtensions/{Data,Predicates,Proofs}` now owns the Mathlib page-level
+differential, essentiality, crossing, and no-crossing interfaces ported from
+the historical crossing definitions. This is foundation data for the paper's
+page-extension nodes; the finite/infinite synthetic page-extension statements
+and their crossing equivalences remain open in the Blueprint.
