@@ -38,7 +38,8 @@ def TotalDifferentialIdentity : Prop :=
 /-- The finite torsion/filtration evidence consumed by the near-126 layer.
 The first clause records order two and the second records the filtration bound
 on a difference of choices. -/
-def Theta5OrderTorsionEvidence : Prop := Theta5OrderData C
+def Theta5OrderTorsionEvidence : Prop :=
+  Theta5OrderData C ∧ C.noLambdaTorsion62 ∧ C.noLambdaTorsion125
 
 /-- Browder's geometric criterion, parameterized by one fixed framed context.
 The existential side is the dimension-indexed statement used by the endpoint

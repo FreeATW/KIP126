@@ -49,6 +49,11 @@ structure Theta5ChoiceContext where
   h6Survives : ℕ → Prop
   h6Permanent : Prop
   deltaH6 : Carrier
+  /-- Finite evidence that the two comparison groups have no relevant
+  `lambda`-torsion.  The concrete group interpretation supplies these
+  propositions; the context does not choose a class witnessing either one. -/
+  noLambdaTorsion62 : Prop
+  noLambdaTorsion125 : Prop
 
 namespace Theta5ChoiceContext
 
