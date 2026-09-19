@@ -26,6 +26,15 @@ for zero intersection. -/
 def IsEventuallyZero [Abelian C] (F : Filtration A) : Prop :=
   ∀ i : ι, ∃ s : ℤ, F.F s i = ⊥
 
+/-! A Mittag-Leffler condition for the decreasing filtration.  The images of
+deeper levels inside any fixed level must eventually stabilize. -/
+
+/-- The filtration images `F^(s+n) ↪ F^s` stabilize degreewise. -/
+def IsMittagLeffler [Abelian C] (F : Filtration A) : Prop :=
+  ∀ (i : ι) (s : ℤ), ∃ N : ℕ, ∀ n : ℕ, N ≤ n →
+    imageSubobject (F.inclusion (t := s) (s := s + (n : ℤ)) (by omega) i) =
+      imageSubobject (F.inclusion (t := s) (s := s + (N : ℤ)) (by omega) i)
+
 /-- A filtration is bounded below degreewise if sufficiently low levels are
 the whole object. -/
 structure IsBoundedBelow (F : Filtration A) where

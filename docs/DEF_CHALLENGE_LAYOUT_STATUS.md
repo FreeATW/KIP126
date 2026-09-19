@@ -91,6 +91,11 @@ relation in `Predicates`, and the derived completion and detection results in
 in `ExternalInput`; the eta `Data` file imports only the provenance data type,
 not the claim ledger. Public names and statements were preserved.
 
+The canonical filtration layer also now carries the historical
+degreewise-Mittag-Leffler predicate and the bounded-above/bounded proofs. This
+is a filtration property only; it does not recreate the retired completion
+object or its convergence-morphism adapter.
+
 The filtered-complex relation challenge now makes its page adapter explicit:
 `PageView` supplies a page-number translation and compares each Mathlib page
 with the canonical `pageObj` quotient. Its lift predicate factors through the

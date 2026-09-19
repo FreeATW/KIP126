@@ -12,6 +12,42 @@ namespace Filtration
 
 variable {ι : Type w} {A : CategoryTheory.GradedObject ι C}
 
+private lemma imageSubobject_ofLE_eq_bot_of_eq_bot [Abelian C]
+    {B : C} (X Y : Subobject B) (h : X ≤ Y) (hX : X = ⊥) :
+    imageSubobject (Subobject.ofLE X Y h) = ⊥ := by
+  subst hX
+  have hzero : Subobject.ofLE ⊥ Y h = 0 := by
+    rw [← cancel_mono Y.arrow, Subobject.ofLE_arrow, Subobject.bot_arrow, zero_comp]
+  rw [hzero, imageSubobject_zero]
+
+/-- A bounded-above filtration satisfies the canonical Mittag-Leffler
+condition, because all sufficiently deep images are zero. -/
+lemma IsBoundedAbove.isMittagLeffler [Abelian C]
+    {F : Filtration A} (hF : IsBoundedAbove F) :
+    IsMittagLeffler F := by
+  intro i s
+  refine ⟨(hF.upper i - s).toNat, ?_⟩
+  intro n hn
+  have hN : hF.upper i ≤ s + ((hF.upper i - s).toNat : ℤ) := by omega
+  have hn' : hF.upper i ≤ s + (n : ℤ) := by omega
+  have hs_n : s ≤ s + (n : ℤ) := by omega
+  have hs_N : s ≤ s + ((hF.upper i - s).toNat : ℤ) := by omega
+  change imageSubobject
+      (Subobject.ofLE (F.F (s + (n : ℤ)) i) (F.F s i)
+        (F.le_of_le hs_n i)) =
+    imageSubobject
+      (Subobject.ofLE (F.F (s + ((hF.upper i - s).toNat : ℤ)) i)
+        (F.F s i) (F.le_of_le hs_N i))
+  rw [imageSubobject_ofLE_eq_bot_of_eq_bot _ _ (F.le_of_le hs_n i)
+      (hF.eq_bot_of_le i _ hn'),
+    imageSubobject_ofLE_eq_bot_of_eq_bot _ _ (F.le_of_le hs_N i)
+      (hF.eq_bot_of_le i _ hN)]
+
+lemma IsBounded.isMittagLeffler [Abelian C]
+    {F : Filtration A} (hF : IsBounded F) :
+    IsMittagLeffler F :=
+  hF.toIsBoundedAbove.isMittagLeffler
+
 @[simp]
 lemma transportGraded_self [Abelian C] (F : Filtration A)
     {r : ℤ × ι} (h : r = r) :
