@@ -225,4 +225,45 @@ theorem boundarySubobject_top_least (FC : FilteredComplex C)
         cokernel.π (Subobject.ofLE (FC.filtration.F (s + 1) k) (FC.filtration.F s k) (FC.filtration.decreasing s k)))
   rw [himgD]
 
+/-! ### Basic quotient-page consequences
+
+These are the canonical-page counterparts of the elementary `SSData` laws in
+the historical spectral-sequence API.  They use the existing cycle/boundary
+subobjects and `pageObj`; no second page-data structure is introduced. -/
+
+/-- Every boundary at the bottom page is contained in every cycle subobject. -/
+theorem boundarySubobject_bot_le_cycle (FC : FilteredComplex C) (s k : ℤ)
+    (r : WithTop ℕ) :
+    FC.boundarySubobject s k ⊥ ≤ FC.cycleSubobject s k r := by
+  exact le_trans (boundarySubobject_monotone FC s k bot_le)
+    (FC.B_le_Z_aux s k r)
+
+/-- If the boundary and cycle subobjects coincide, the quotient page vanishes. -/
+theorem pageObj_isZero_of_eq (FC : FilteredComplex C) (s k : ℤ)
+    (r : WithTop ℕ) (h : FC.boundarySubobject s k r = FC.cycleSubobject s k r) :
+    IsZero (FC.pageObj s k r) := by
+  unfold pageObj
+  have hi : IsIso (Subobject.ofLE (FC.boundarySubobject s k r)
+      (FC.cycleSubobject s k r) (FC.B_le_Z_aux s k r)) := by
+    rw [← Subobject.isoOfEq_hom _ _ h]
+    infer_instance
+  exact isZero_cokernel_of_epi _
+
+/-- A zero quotient page forces its boundary and cycle subobjects to coincide. -/
+theorem eq_of_pageObj_isZero (FC : FilteredComplex C) (s k : ℤ)
+    (r : WithTop ℕ) (h : IsZero (FC.pageObj s k r)) :
+    FC.boundarySubobject s k r = FC.cycleSubobject s k r := by
+  unfold pageObj at h
+  have hepi : Epi (Subobject.ofLE (FC.boundarySubobject s k r)
+      (FC.cycleSubobject s k r) (FC.B_le_Z_aux s k r)) := by
+    rwa [Preadditive.epi_iff_isZero_cokernel]
+  haveI : IsIso (Subobject.ofLE (FC.boundarySubobject s k r)
+      (FC.cycleSubobject s k r) (FC.B_le_Z_aux s k r)) :=
+    isIso_of_mono_of_epi _
+  apply le_antisymm (FC.B_le_Z_aux s k r)
+  exact Subobject.le_of_comm
+    (inv (Subobject.ofLE (FC.boundarySubobject s k r)
+      (FC.cycleSubobject s k r) (FC.B_le_Z_aux s k r)))
+    (by simp [Subobject.ofLE_arrow])
+
 end KIP126.Core.SpectralSequence.FilteredComplex

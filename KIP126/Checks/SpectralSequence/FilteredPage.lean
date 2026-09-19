@@ -28,6 +28,20 @@ example (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ) :
     Subobject.underlying.obj (FC.cycleSubobject s k r) ⟶ FC.pageObj s k r :=
   FC.pageπ s k r
 
+example (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ) :
+    FC.boundarySubobject s k ⊥ ≤ FC.cycleSubobject s k r :=
+  FC.boundarySubobject_bot_le_cycle s k r
+
+example (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ)
+    (h : FC.boundarySubobject s k r = FC.cycleSubobject s k r) :
+    IsZero (FC.pageObj s k r) :=
+  FC.pageObj_isZero_of_eq s k r h
+
+example (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ)
+    (h : IsZero (FC.pageObj s k r)) :
+    FC.boundarySubobject s k r = FC.cycleSubobject s k r :=
+  FC.eq_of_pageObj_isZero s k r h
+
 end
 
 end KIP126.Core.SpectralSequence.FilteredComplex

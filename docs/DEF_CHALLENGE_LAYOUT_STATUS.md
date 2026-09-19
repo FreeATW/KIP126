@@ -106,6 +106,11 @@ canonical cycle subobject and `pageπ`; it no longer identifies every page with
 the associated graded object. The adapter remains open construction data, and
 the four relation obligations remain unproved.
 
+The canonical page proof layer also carries the elementary quotient-page laws
+formerly provided by `SSData`: bottom boundaries lie in every cycle object, and
+a page is zero exactly when its boundary and cycle subobjects coincide. These
+are proved directly for `pageObj`; no historical `SSData` structure is copied.
+
 The old `SpectralSequence/Completion` construction is not copied as a second
 completion object: KIP126's quotient tower and its eventual-zero limit witness
 are the canonical completion interface. The old truncation adapter still
