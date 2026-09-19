@@ -125,6 +125,21 @@ noncomputable def PageHomologyWitness.ofFactorization
     PageHomologyWitness FC where
   iso n p := (W.isoHomology n p).symm
 
+/-- Recover the epi--mono factorization from an already supplied adjacent-page
+homology witness.  This makes the two interfaces definitionally compatible:
+the factorization carries no extra mathematical assumption beyond the witness.
+-/
+noncomputable def PageHomologyWitness.toFactorization
+    {FC : FilteredComplex C} (W : PageHomologyWitness FC) :
+    PageHomologyFactorization FC where
+  π n p := (FC.pageComplex n).homologyπ p ≫ (W.iso n p).hom
+  ι n p := (W.iso n p).inv ≫ (FC.pageComplex n).homologyι p
+  fac n p := by
+    simpa only [Category.assoc, Iso.hom_inv_id_assoc] using
+      (FC.pageComplex n).homology_π_ι p |>.symm
+  π_epi n p := epi_comp _ _
+  ι_mono n p := mono_comp _ _
+
 /-- Assemble the canonical finite page complexes into Mathlib's spectral
 sequence once the adjacent-page homology comparisons are supplied. -/
 noncomputable def pageSpectralSequence (FC : FilteredComplex C)

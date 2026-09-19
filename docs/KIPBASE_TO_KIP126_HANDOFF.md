@@ -29,7 +29,7 @@ feat/def-challenge-layout
 交接时已知状态（新 session 必须重新核对）：
 
 - 工作区干净；
-- HEAD：`a83f9632f8d53d9be0c2681d0d3937d69b96c4be`；
+- HEAD：`9267418ceda4be52618002dfdd5e2d485482e821`；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；
 - 本分支已包含 `origin/main`；
 - PR #97：<https://github.com/SII-MATH/KIP126/pull/97>；
@@ -37,17 +37,18 @@ feat/def-challenge-layout
 
 当前 session 已重新核对的状态（2026-09-19）：
 
-- 工作区干净；本次实现提交：`51dbdd9`（canonical page lift 的 boundary-factorization 定理、页面同调
-  epi--mono 分解接口、回归检查及状态记录）；此前的
+- 工作区干净；当前实现提交：`9267418`（canonical page lift 的 boundary-factorization 定理、页面同调
+  epi--mono 分解接口、直接 PageView 入口、回归检查及状态记录）；此前的
   `pageDifferential_Z_succ_le`、`pageDifferential_B_succ`、`pageComplex` 和条件谱序列装配提交均已保留；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
   `origin/main` 无落后提交；
 - 已补入 canonical `pageObj` 的零页等价律（含 `pageObj_isZero_iff`）、嵌套商映射/第三同构辅助构造，
   稳定三角形中项同调群的 exactness，有限页 `Z_succ` 的容易方向，以及两个通用核/上像引理；这些改动均未引入
   `KIPBase` import；
-- 本地 `scripts/shared-main-cache.sh run lake build KIP126` 通过（1906/1906），
-  `scripts/Axioms.lean` 通过（4730 个 KIP126 声明，仅允许
-  `propext`、`Classical.choice`、`Quot.sound`），Python 单元测试 92 项通过；
+- 本地 `scripts/shared-main-cache.sh run lake build KIP126` 曾通过（1906/1906）；当前增量的
+  `FilteredPage.Complex`、`FilteredPage` 和 `FilteredComplexRelations` 检查均通过，
+  `scripts/Axioms.lean` 通过（4759 个 KIP126 声明，仅允许
+  `propext`、`Classical.choice`、`Quot.sound`），源码清单通过（18 sources, 88 artifacts）；
 - 反向 `Z_{n+1}` 包含已接入生产 `FilteredDifferential/Proofs.lean`，并在
   `Checks/SpectralSequence/FilteredDifferential.lean` 增加回归检查；有限页 `Z_succ` 两个方向和
   `B_succ` 均已接入生产证明，完整 Mathlib assembly 和四个关系义务仍开放；
@@ -56,7 +57,8 @@ feat/def-challenge-layout
   `PageHomologyWitness` → Mathlib `SpectralSequence` 条件装配器；同时加入
   `PageHomologyFactorization`，把每个页面的同调比较精确化为 Mathlib
   `ofEpiMonoFactorisation` 所需的 epi--mono 分解，并提供
-  `PageHomologyWitness.ofFactorization` 的打包构造。具体分解的数学证明仍未完成。
+  `PageHomologyWitness.ofFactorization` 的打包构造；已有的
+  `PageHomologyWitness.toFactorization` 也可反向暴露同一分解。具体分解的数学证明仍未完成。
   `PageView.ofPageHomologyWitness` 与
   `PageView.ofPageHomologyFactorization` 已把该装配器接入四个关系命题的
   canonical 页面入口。相邻页同调同构 witness 本身仍是开放证明义务，没有把它当作无条件的
@@ -67,9 +69,10 @@ feat/def-challenge-layout
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
   PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
   PR 或由人工审核处理。
-- PR #97 本次代码推送后的远端头为 `f9df77b`，状态为 `BLOCKED`：Blueprint 门禁报告累计 diff
-  超过 2000 行/文件审查上限；sandboxed-build 门禁报告历史新增 `.lean` 文件超过 1000 行，
-  并将 `scope` 标为需人工审核。这与本地缓存构建和 Axiom 审计的通过结果是两个独立门。
+- PR #97 当前远端头为 `9267418`，状态为 `BLOCKED`：Blueprint 门禁报告相对
+  `origin/main` 的 diff 超过 2000 行/文件审查上限；sandboxed-build 门禁报告分支历史相对
+  `origin/main` 新增 `set_option`，并将 `scope` 标为需人工审核。这与本地缓存构建和 Axiom
+  审计的通过结果是两个独立门。
 
 ## 3. 开始工作前的安全步骤
 

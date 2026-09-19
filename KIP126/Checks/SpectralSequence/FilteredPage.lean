@@ -60,6 +60,10 @@ example (FC : FilteredComplex C) (W : PageHomologyFactorization FC) :
     PageHomologyWitness FC :=
   PageHomologyWitness.ofFactorization FC W
 
+example (FC : FilteredComplex C) (W : PageHomologyWitness FC) :
+    PageHomologyFactorization FC :=
+  W.toFactorization
+
 example (FC : FilteredComplex C) (W : PageHomologyFactorization FC)
     (n : ℕ) (p : ℤ × ℤ) :
     FC.pageObj p.1 p.2 (↑(n + 1) : WithTop ℕ) ≅

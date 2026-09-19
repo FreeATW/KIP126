@@ -105,7 +105,9 @@ with the canonical `pageObj` quotient. A `PageHomologyWitness` supplies a
 canonical `PageView` constructor for the finite-page assembly. The new
 `PageHomologyFactorization` interface records the exact epi--mono
 factorization accepted by Mathlib's homology constructor, and
-`PageHomologyWitness.ofFactorization` packages it into the assembly witness.
+`PageHomologyWitness.ofFactorization` packages it into the assembly witness;
+the inverse `PageHomologyWitness.toFactorization` exposes the same factorization
+from any supplied witness.
 Its lift predicate factors through the canonical cycle subobject and `pageπ`, and it no
 longer identifies every page with the associated graded object. The proved
 `PageView.isLift_sub_factors_boundary` lemma records the resulting uniqueness
