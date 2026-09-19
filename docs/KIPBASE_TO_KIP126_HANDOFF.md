@@ -50,6 +50,10 @@ feat/def-challenge-layout
 - 反向 `Z_{n+1}` 包含已接入生产 `FilteredDifferential/Proofs.lean`，并在
   `Checks/SpectralSequence/FilteredDifferential.lean` 增加回归检查；有限页 `Z_succ` 两个方向和
   `B_succ` 均已接入生产证明，完整 Mathlib assembly 和四个关系义务仍开放；
+- 在本次 session 后，canonical finite quotient page 已有 Mathlib
+  `HomologicalComplex` 适配（`pageComplex`），并新增显式的
+  `PageHomologyWitness` → Mathlib `SpectralSequence` 条件装配器；相邻页同调同构
+  witness 本身仍是开放证明义务，没有把它当作无条件的 `toSpectralSequence` 结论。
 - 迁移校验器仍因归档文件中既有的
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
   PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
