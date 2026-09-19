@@ -78,6 +78,25 @@ noncomputable def twoTermFil {X₁ X₂ : C}
     twoTermFil fil₁ fil₂ s 0 = fil₂ s := by
   simp [twoTermFil]
 
+private lemma twoTermDiff_sq_transport (X₁ X₂ : C) (f : X₁ ⟶ X₂)
+    (a b c : ℤ) (hab : a - 1 = b) (hbc : b - 1 = c) :
+    (twoTermDiff X₁ X₂ f a ≫ eqToHom (congrArg (twoTermObj X₁ X₂) hab)) ≫
+        twoTermDiff X₁ X₂ f b ≫ eqToHom (congrArg (twoTermObj X₁ X₂) hbc) = 0 := by
+  subst b
+  subst c
+  simpa only [eqToHom_refl, Category.comp_id, Category.assoc] using
+    twoTermDiff_sq X₁ X₂ f a
+
+/-- The canonical chain complex carried by a two-term differential. -/
+noncomputable def twoTermComplex (X₁ X₂ : C) (f : X₁ ⟶ X₂) : ChainComplex C ℤ :=
+  ChainComplex.of
+    (twoTermObj X₁ X₂)
+    (fun k => twoTermDiff X₁ X₂ f (k + 1) ≫
+      eqToHom (congrArg (twoTermObj X₁ X₂) (by omega : (k + 1) - 1 = k)))
+    (fun k => by
+      exact twoTermDiff_sq_transport X₁ X₂ f (k + 1 + 1) (k + 1) k
+        (by omega) (by omega))
+
 /-- Data for a bounded two-term extension at one graded stem.
 
 The filtered complex is the canonical computational object.  The `two_term`
