@@ -19,7 +19,12 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Core/SpectralSequence/Convergence` | `Def/SpectralSequence/EndpointExtension/Data`, `Convergence/{Data,Predicates,Proofs}` |
 | `Core/SpectralSequence/Extension` | `Def/SpectralSequence/Extension/Data` |
 | `SpectralSequence/Crossing` | `Def/PageExtensions/Differential/{Data,Predicates,Proofs}` (partial: finite-page relations; representative equivalence still open) |
-| `StableHomotopy/{Basic,TensorTriangulatedCategory}` | `Def/StableHomotopy/Context/{Data,Proofs}` (category structure, sphere shifts, homotopy-group functor, distinguished-triangle zero-composition laws, and explicit closed/cofiber witness interfaces; long exact sequence and model-specific witnesses remain open) |
+| `StableHomotopy/{Basic,TensorTriangulatedCategory}` | `Def/StableHomotopy/Context/{Data,Proofs,MappingProofs}` (category structure, sphere shifts, homotopy-group functor, sphere-smash/mapping-spectrum consequences, distinguished-triangle zero-composition laws, and explicit closed/cofiber witness interfaces; long exact sequence and model-specific witnesses remain open) |
+| `StableHomotopy/Cohomology` | `Def/StableHomotopy/Cohomology/{Data,Proofs}` (explicit HF₂, representable mod-2 cohomology/homology, functorial maps, Steenrod carrier, and universal-coefficient input records; mapping-spectrum action and UCT instances remain supplied data) |
+| `Synthetic/{Basic,Sphere}` | `Def/Synthetic/Context/{Data,Proofs}`, `Def/Synthetic/Sphere/Data` (bigraded suspension, λ-powers, λ-cofiber triangles, synthetic spheres, bigraded homotopy, and suspension/λ-action interfaces; enrichment and model-specific equivalences remain open) |
+| `Synthetic/Nu` | `Def/Synthetic/Context/{Data,Proofs}` (`NuFunctorData` records the functor, additivity, zero, and suspension witnesses, with derived shift compatibility; cofiber preservation and cohomology-to-homology implications remain open) |
+| `Synthetic/Adams` | `Def/Synthetic/AdamsSequence/Data` (Mathlib synthetic page object, λ-page action, grading adapters, and weight-preserving interface; convergence and multiplicative sphere witnesses remain open) |
+| `Synthetic/{Lift,Rigidity}` | `Def/Synthetic/Context/Data`, `Def/Comparison/ClassicalSynthetic/{Data,Proofs}`, and the open Challenge/External interfaces (normalized lifts, λ-Bockstein identification, and rigidity are not claimed as proved) |
 | `Classical/Adams/Basic` | `Def/StableHomotopy/Context/Data`, `Def/ClassicalAdams/{Page/Data,Convergence/{Data,Predicates,Proofs,StrongData},SphereSequence/Data,H4D2/{Data,Predicates}}`, `External/Literature/Adams/OneLine` |
 | `Classical/SpectralSequence/Basic` | `Def/ClassicalAdams/PageSlice/Data` |
 | `Classical/ExtensionSS/Basic` | `Def/ClassicalESS/Eta/{Data,ExternalInput,Predicates,Proofs}` |
@@ -106,3 +111,10 @@ The truncation port deliberately covers the quotient image filtration and its
 boundedness laws. The historical convergence-morphism truncation adapter and
 the universal `IsComplete` predicate still belong to the existing completion
 and convergence interfaces; they are not claimed as migrated by this slice.
+
+The stable/synthetic context port now exposes explicit category, bigraded
+suspension, fully-faithful suspension, λ-power cofiber, synthetic-sphere, and
+ν-functor witness interfaces. It does not assert the historical global
+synthetic cofiber, enrichment, ν-cofiber preservation, λ-Bockstein, rigidity,
+or normalized-lift axioms; those remain explicit model inputs or open internal
+proof obligations.

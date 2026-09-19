@@ -52,8 +52,8 @@ variable {C : Type u} [StableHomotopyCategory.{u, v} C]
 /-- A chosen functorial cofiber construction on a stable category.
 
 This is data supplied by a concrete model.  Keeping it as a class preserves
-the convenient Mathlib notation without introducing an `axiom` that would
-silently choose a cofiber for every map.
+the convenient Mathlib notation without introducing a global postulate that
+would silently choose a cofiber for every map.
 -/
 class HasFunctorialCofiber where
   cofib : {X Y : C} → (X ⟶ Y) → C
@@ -99,6 +99,11 @@ class ClosedSymmetricTensorTriangulated where
 
 attribute [instance] ClosedSymmetricTensorTriangulated.symmetricCategory
 attribute [instance] ClosedSymmetricTensorTriangulated.monoidalClosed
+
+/-- The internal mapping spectrum supplied by a closed monoidal witness. -/
+noncomputable def MappingSpectrum (X Y : C)
+    [ClosedSymmetricTensorTriangulated (C := C)] : C :=
+  (ihom X).obj Y
 
 /-- The sphere spectrum is the monoidal unit. -/
 abbrev SphereSpectrum : C := 𝟙_ C
