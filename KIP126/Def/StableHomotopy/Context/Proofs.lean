@@ -40,6 +40,27 @@ theorem HoCofiberSequence.hf_shift_zero (T : HoCofiberSequence (C := C)) :
     T.h ≫ (shiftFunctor C (1 : ℤ)).map T.f = 0 :=
   comp_distTriang_mor_zero₃₁ _ T.distinguished
 
+/-! ### Exactness transferred from the distinguished triangle
+
+The middle-term exactness statement is independent of the connecting
+homomorphism construction. It is therefore a direct canonical port of the
+corresponding completed KIPBase result. -/
+
+/-- The homotopy-group sequence is exact at the middle object `Y`:
+maps into `Y` killed by `g` are exactly those factoring through `f`. -/
+theorem les_homotopy_exact_f (T : HoCofiberSequence (C := C)) (n : ℤ) :
+    ∀ (y : HomotopyGroup n T.Y),
+      (inducedMap T.g n) y = 0 ↔
+        ∃ (x : HomotopyGroup n T.X), (inducedMap T.f n) x = y := by
+  intro y
+  simp only [inducedMap, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
+  constructor
+  · intro hy
+    obtain ⟨x, hx⟩ := Triangle.coyoneda_exact₂ _ T.distinguished y hy
+    exact ⟨x, hx.symm⟩
+  · rintro ⟨x, rfl⟩
+    simp [Category.assoc, T.fg_zero]
+
 /-- Homotopy groups are functorial in the spectrum variable. -/
 noncomputable def homotopyGroupFunctor (n : ℤ) :
     C ⥤ AddCommGrpCat.{v} where

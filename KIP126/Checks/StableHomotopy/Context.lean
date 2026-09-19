@@ -19,6 +19,12 @@ example (T : HoCofiberSequence (C := C)) : T.f ≫ T.g = 0 :=
 example (T : HoCofiberSequence (C := C)) : T.g ≫ T.h = 0 :=
   T.gh_zero
 
+example (T : HoCofiberSequence (C := C)) (n : ℤ) :
+    ∀ (y : HomotopyGroup n T.Y),
+      (inducedMap T.g n) y = 0 ↔
+        ∃ (x : HomotopyGroup n T.X), (inducedMap T.f n) x = y :=
+  les_homotopy_exact_f T n
+
 variable [HasFunctorialCofiber (C := C)]
 
 example {X Y : C} (f : X ⟶ Y) :
