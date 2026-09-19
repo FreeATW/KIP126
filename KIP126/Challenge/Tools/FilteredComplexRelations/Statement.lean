@@ -1,6 +1,7 @@
 import KIP126.Def.Algebra.Filtration.Proofs
 import KIP126.Def.SpectralSequence.FilteredComplex.Data
 import KIP126.Def.SpectralSequence.FilteredPage.Data
+import KIP126.Def.SpectralSequence.FilteredPage.Complex
 import KIP126.Def.PageExtensions.Differential.Proofs
 
 /-!
@@ -19,6 +20,7 @@ namespace KIP126.Challenge.Tools.FilteredComplexRelations
 open CategoryTheory
 open KIP126.Core.Algebra
 open KIP126.Core.SpectralSequence
+open KIP126.Core.SpectralSequence.FilteredComplex
 open KIP126.Def.PageExtensions
 
 universe u v
@@ -46,6 +48,18 @@ structure PageView (FC : FilteredComplex C) where
   pageToPage : ∀ (r : ℤ) (hr : firstPage ≤ r) (s k : ℤ),
     (sequence.page r hr).X (s, k) ≅
       FC.pageObj s k (pageNumber r hr)
+
+/-- The canonical page view obtained once the adjacent-page homology
+comparisons have been supplied.  Its page comparison is definitional because
+`pageComplex` is built directly from `pageObj`; the homology witness is used
+only by the Mathlib spectral-sequence assembly. -/
+noncomputable def PageView.ofPageHomologyWitness
+    (FC : FilteredComplex C) (W : PageHomologyWitness FC) : PageView FC where
+  shape := fun r : ℤ => pageShape r.toNat
+  firstPage := 0
+  sequence := FC.pageSpectralSequence W
+  pageNumber := fun r _ => (r.toNat : WithTop ℕ)
+  pageToPage := fun _ _ _ _ => Iso.refl _
 
 namespace PageView
 
