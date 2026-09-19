@@ -118,3 +118,11 @@ suspension, fully-faithful suspension, λ-power cofiber, synthetic-sphere, and
 synthetic cofiber, enrichment, ν-cofiber preservation, λ-Bockstein, rigidity,
 or normalized-lift axioms; those remain explicit model inputs or open internal
 proof obligations.
+
+The preservation checker for the isolated historical component is currently
+blocked by source drift on `origin/main`: the immutable
+`migration/kip-base/source-4.28.tar.gz` snapshot predates later `KIPBase`
+changes in the bounded-extension and commutativity files, so
+`scripts/kipbase-migration.py` stops at its trust-debt comparison.  The archive
+and ledger are left unchanged; refreshing that archival baseline is a separate
+repository-maintenance decision.
