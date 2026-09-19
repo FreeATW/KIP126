@@ -29,7 +29,8 @@ feat/def-challenge-layout
 交接时已知状态（新 session 必须重新核对）：
 
 - 工作区干净；
-- HEAD：`9267418ceda4be52618002dfdd5e2d485482e821`；
+- 最近核验的代码头：`1810679890a57537e1d3b5b1ac30e74faa64e287`；纯文档提交后以
+  `git rev-parse HEAD` 为准；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；
 - 本分支已包含 `origin/main`；
 - PR #97：<https://github.com/SII-MATH/KIP126/pull/97>；
@@ -69,7 +70,7 @@ feat/def-challenge-layout
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
   PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
   PR 或由人工审核处理。
-- PR #97 当前远端头为 `9267418`，状态为 `BLOCKED`：Blueprint 门禁报告相对
+- PR #97 当前远端头为 `1810679`，状态为 `BLOCKED`：Blueprint 门禁报告相对
   `origin/main` 的 diff 超过 2000 行/文件审查上限；sandboxed-build 门禁报告分支历史相对
   `origin/main` 新增 `set_option`，并将 `scope` 标为需人工审核。这与本地缓存构建和 Axiom
   审计的通过结果是两个独立门。
