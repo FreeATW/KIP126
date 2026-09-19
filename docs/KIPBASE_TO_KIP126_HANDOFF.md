@@ -37,14 +37,13 @@ feat/def-challenge-layout
 
 当前 session 已重新核对的状态（2026-09-19）：
 
-- 工作区干净，HEAD：`b73440e3a726`（代码检查点为前一提交
-  `138d56ca9b8988e75704dc97b4aae520a7e9112d`）；
+- 工作区干净，HEAD：`ae1960484772075e4f0d63cd1b57a6e72ad5c994`；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
   `origin/main` 无落后提交；
 - 已补入 canonical `pageObj` 的零页等价律（含 `pageObj_isZero_iff`）、嵌套商映射/第三同构辅助构造，
   以及稳定三角形中项同调群的 exactness；这些改动均未引入 `KIPBase` import；
 - 本地 `scripts/shared-main-cache.sh run lake build KIP126` 通过（1904/1904），
-  `scripts/Axioms.lean` 通过（4677 个 KIP126 声明，仅允许
+  `scripts/Axioms.lean` 通过（4678 个 KIP126 声明，仅允许
   `propext`、`Classical.choice`、`Quot.sound`），Python 迁移回归 28 项通过；
 - 迁移校验器仍因归档文件中既有的
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
