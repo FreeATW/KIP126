@@ -25,9 +25,9 @@ universe u v
 
 variable {C : Type u} [Category.{v} C] [Abelian C]
 
-/-- A page-level view of the canonical associated graded pieces of a filtered
-complex.  The page construction and its comparison isomorphisms are exactly
-the data that a future `toSpectralSequence` proof must provide. -/
+/-- A page-level view of the canonical quotient pages of a filtered complex.
+The page construction and its comparison isomorphisms are exactly the data
+that a future `toSpectralSequence` proof must provide. -/
 structure PageView (FC : FilteredComplex C) where
   shape : ℤ → ComplexShape (ℤ × ℤ)
   firstPage : ℤ
