@@ -2,7 +2,7 @@ import Mathlib.CategoryTheory.Abelian.Exact
 import KIP126.Def.SpectralSequence.FilteredDifferential.Data
 import KIP126.Def.SpectralSequence.FilteredPage.Proofs
 
-/-! # Square-zero law for the filtered-page differential -/
+/-! # Square-zero and cycle-kernel laws for the filtered-page differential -/
 
 namespace KIP126.Core.SpectralSequence.FilteredComplex
 
@@ -435,14 +435,6 @@ theorem pageDifferential_Z_succ_ge (FC : FilteredComplex C)
   rw [cokernel.condition, comp_zero]
 
 
-set_option backward.isDefEq.respectTransparency false in
-private theorem d_eqToHom_local (FC : FilteredComplex C)
-    (a b : ℤ) (h : a = b) :
-    eqToHom (show FC.complex.X a = FC.complex.X b from by subst h; rfl) ≫
-    FC.complex.d b (b - 1) = FC.complex.d a (a - 1) ≫
-    eqToHom (show FC.complex.X (a - 1) = FC.complex.X (b - 1) from by subst h; rfl) := by
-  subst h; simp
-
 private theorem eqToHom_arrow_dToK_gen_local (FC : FilteredComplex C)
     (s : ℤ) (m k : ℤ) (hmk : m + 1 = k) :
     eqToHom (show Subobject.underlying.obj (FC.filtration.F s k) =
@@ -474,6 +466,8 @@ private lemma imageSubobject_epi_comp'_local {C' : Type*} [Category C'] [Abelian
     (by rw [IsIso.inv_comp_eq]; exact (Subobject.ofLE_arrow hle).symm)
 
 set_option maxHeartbeats 6400000 in
+/-- Every class in the kernel of the finite-page differential has a representative
+in the next cycle subobject. Adapted from the filtered-complex proof in KIPBase. -/
 theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
     (s k : ℤ) (n : ℕ) :
     kernelSubobject (FC.pageDifferential s k n) ≤
@@ -529,33 +523,7 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
       imageSubobject ((kernelSubobject ψ).arrow ≫ p ≫ FC.pageπ s k ↑n) := by
     erw [kernelSubobject_cokernel_desc']
     erw [kernelSubobject_epiDesc']
-    -- Goal: imageSubobject(imageSubobject(f).arrow ≫ pageπ) ≤ imageSubobject(f ≫ pageπ)
-    -- where f = (ker ψ_internal).arrow ≫ p_internal.
-    -- These are equal by imageSubobject_epi_comp'_local, so use le_of_eq.
-    -- First get: imageSubobject(factorThru ≫ img.arrow ≫ pageπ) = imageSubobject(img.arrow ≫ pageπ)
-    -- and factorThru ≫ img.arrow ≫ pageπ = (factorThru ≫ img.arrow) ≫ pageπ = f ≫ pageπ
-    -- Use: factorThruImageSubobject(f) is epi, and
-    -- imageSubobject_epi_comp'_local(factorThru, img.arrow ≫ g) gives
-    -- imageSubobject(factorThru ≫ img.arrow ≫ g) = imageSubobject(img.arrow ≫ g)
-    -- And factorThru ≫ img.arrow = f (imageSubobject_arrow_comp), so
-    -- imageSubobject(f ≫ g) = imageSubobject(img.arrow ≫ g)
-    -- After erw, the LHS has imageSubobject(img.arrow ≫ g), and the RHS has
-    -- imageSubobject(f ≫ g). They're equal, so any ≤ or ≥ holds.
-    -- Use the Subobject.le_of_comm approach to avoid rw in polluted context.
-    -- imageSubobject(img.arrow ≫ g) ≤ imageSubobject(f ≫ g) because
-    -- imageSubobject(f ≫ g) ≤ imageSubobject(img.arrow ≫ g) [from comp_le applied to factorThru]
-    -- Wait, imageSubobject(factorThru ≫ (img.arrow ≫ g)) ≤ imageSubobject(img.arrow ≫ g) [comp_le]
-    -- and imageSubobject(factorThru ≫ (img.arrow ≫ g)) = imageSubobject(img.arrow ≫ g) [epi_comp]
-    -- So both directions hold. For the direction we need:
-    -- imageSubobject(img.arrow ≫ g) ≤ imageSubobject(f ≫ g)
-    -- = imageSubobject(factorThru ≫ img.arrow ≫ g) [by imageSubobject_arrow_comp on f]
-    -- = imageSubobject(img.arrow ≫ g) [by epi_comp]
-    -- So it's le_refl. But we can't express this directly due to erw pollution.
-    -- Instead, use that mono.arrow ≫ g generates a smaller image: img.arrow is mono
-    -- so imageSubobject(img.arrow ≫ g) ≤ imageSubobject(g) [comp_le]
-    -- Hmm, that's weaker than what we need.
-    -- OK, just try: after the three erw's, does the goal close?
-    -- Approach: do all three erw's and hope it results in ≤ le_refl
+    -- The epi image factorization identifies the two iterated images.
     erw [← imageSubobject_epi_comp'_local
       (factorThruImageSubobject ((kernelSubobject ψ).arrow ≫ p))
       ((imageSubobject ((kernelSubobject ψ).arrow ≫ p)).arrow ≫
@@ -735,7 +703,7 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
       _ = (pb1_fst ≫ factorB) ≫ B_n_t.arrow := by
         exact congrArg (fun t => t ≫ B_n_t.arrow) hpb1_cond.symm
       _ = pb1_fst ≫ (factorB ≫ B_n_t.arrow) := Category.assoc _ _ _
-      _ = pb1_fst ≫ oI_bnd ≫ πV' := by simp only [Category.assoc, hfactorB_spec]
+      _ = pb1_fst ≫ oI_bnd ≫ πV' := by simp only [hfactorB_spec]
   -- PB2: pullback of factorD (epi) against pb1_fst ≫ oI_to_imgD
   set imgD_src := (FC.filtration.F (s + ↑n - ↑n + 1) ((k - 1) + 1)).arrow ≫ FC.dToK (k - 1)
     with himgD_src_def
