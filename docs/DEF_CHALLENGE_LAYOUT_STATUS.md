@@ -104,8 +104,11 @@ The filtered-complex relation challenge now makes its page adapter explicit:
 with the canonical `pageObj` quotient. A `PageHomologyWitness` supplies a
 canonical `PageView` constructor for the finite-page assembly; its lift
 predicate factors through the canonical cycle subobject and `pageπ`, and it no
-longer identifies every page with the associated graded object. The homology
-witness and the four relation obligations remain unproved.
+longer identifies every page with the associated graded object. The proved
+`PageView.isLift_sub_factors_boundary` lemma records the resulting uniqueness
+law: two lifts of one page element differ through the canonical boundary
+subobject. The homology witness and the four relation obligations remain
+unproved.
 
 The canonical page proof layer also carries the elementary quotient-page laws
 formerly provided by `SSData`: bottom boundaries lie in every cycle object, and

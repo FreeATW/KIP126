@@ -95,6 +95,46 @@ def IsLift (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ)
     z ≫ FC.pageπ s k (P.pageNumber r hr) =
       x ≫ (P.pageToPage r hr s k).hom
 
+/-! A page lift is only determined modulo the page boundary.  The following
+lemma records the exact replacement for the historical associated-graded lift
+uniqueness statement: two lifts of the same page element differ by a map
+through the canonical boundary subobject. -/
+
+theorem isLift_sub_factors_boundary
+    {r : ℤ} {hr : P.firstPage ≤ r} {s k : ℤ} {T : C}
+    {x : P.element r hr s k T}
+    {xl₁ xl₂ : T ⟶ Subobject.underlying.obj (FC.filtration.F s k)}
+    (h₁ : P.IsLift r hr s k xl₁ x)
+    (h₂ : P.IsLift r hr s k xl₂ x) :
+    (FC.boundarySubobject s k (P.pageNumber r hr)).Factors
+      ((xl₁ - xl₂) ≫ FC.filtration.toAssociatedGraded s k) := by
+  rcases h₁ with ⟨z₁, hz₁, hp₁⟩
+  rcases h₂ with ⟨z₂, hz₂, hp₂⟩
+  let B := FC.boundarySubobject s k (P.pageNumber r hr)
+  let Z := FC.cycleSubobject s k (P.pageNumber r hr)
+  let hBZ := FC.B_le_Z_aux s k (P.pageNumber r hr)
+  let ι := Subobject.ofLE B Z hBZ
+  have hpage : (z₁ - z₂) ≫ FC.pageπ s k (P.pageNumber r hr) = 0 := by
+    rw [Preadditive.sub_comp, hp₁, hp₂, sub_self]
+  let w : T ⟶ Subobject.underlying.obj B :=
+    Abelian.monoLift ι (z₁ - z₂) hpage
+  have hw : w ≫ ι = z₁ - z₂ :=
+    Abelian.monoLift_comp ι (z₁ - z₂) hpage
+  have hdiff :
+      (xl₁ - xl₂) ≫ FC.filtration.toAssociatedGraded s k =
+        w ≫ B.arrow := by
+    calc
+      (xl₁ - xl₂) ≫ FC.filtration.toAssociatedGraded s k =
+          (xl₁ ≫ FC.filtration.toAssociatedGraded s k) -
+            (xl₂ ≫ FC.filtration.toAssociatedGraded s k) := by
+              rw [Preadditive.sub_comp]
+      _ = (z₁ ≫ Z.arrow) - (z₂ ≫ Z.arrow) := by rw [← hz₁, ← hz₂]
+      _ = (z₁ - z₂) ≫ Z.arrow := by rw [← Preadditive.sub_comp]
+      _ = w ≫ ι ≫ Z.arrow := by rw [← hw, Category.assoc]
+      _ = w ≫ B.arrow := by rw [Subobject.ofLE_arrow hBZ]
+  rw [hdiff]
+  exact Subobject.factors_comp_arrow w
+
 def relation (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ)
     {T : C} (x : P.element r hr s k T)
     (y : P.element r hr (s + r) (k - 1) T) : Prop :=

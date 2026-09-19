@@ -55,7 +55,9 @@ feat/def-challenge-layout
   `PageHomologyWitness` → Mathlib `SpectralSequence` 条件装配器；
   `PageView.ofPageHomologyWitness` 已把该装配器接入四个关系命题的 canonical
   页面入口。相邻页同调同构 witness 本身仍是开放证明义务，没有把它当作无条件的
-  `toSpectralSequence` 结论。
+  `toSpectralSequence` 结论。另已证明 `PageView.isLift_sub_factors_boundary`：同一
+  page 元素的两个 lift 之差经 canonical `boundarySubobject` 因子化；这替代了旧
+  associated-graded lift 唯一性在 page quotient 语义下不成立的版本。
 - 迁移校验器仍因归档文件中既有的
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
   PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
