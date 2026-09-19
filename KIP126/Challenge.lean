@@ -1,1 +1,13 @@
 import KIP126.Challenge.Tools.Comparison.Proof
+import KIP126.Challenge.Near126.Thm7_3BJMBX.Statement
+import KIP126.Challenge.Tools.Thm6_1Leibniz.Statement
+import KIP126.Challenge.Tools.Thm6_12Mahowald.Statement
+import KIP126.Challenge.Tools.PagePropagation.Statement
+import KIP126.Challenge.Near126.OnlyD12.Statement
+import KIP126.Challenge.Near126.CandidateReduction.Statement
+import KIP126.Challenge.Near126.Conditions.Statement
+import KIP126.Challenge.Near126.C3NotC5.Statement
+import KIP126.Challenge.Near126.ExcludeEta.Statement
+import KIP126.Challenge.Final.H6SquarePermanent.Statement
+import KIP126.Challenge.Geometry.Thm1_1Dimension126.Statement
+import KIP126.Challenge.Geometry.Cor1_2Dimensions.Statement
