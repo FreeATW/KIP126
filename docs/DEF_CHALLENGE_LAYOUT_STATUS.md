@@ -102,8 +102,11 @@ object or its convergence-morphism adapter.
 The filtered-complex relation challenge now makes its page adapter explicit:
 `PageView` supplies a page-number translation and compares each Mathlib page
 with the canonical `pageObj` quotient. A `PageHomologyWitness` supplies a
-canonical `PageView` constructor for the finite-page assembly; its lift
-predicate factors through the canonical cycle subobject and `pageπ`, and it no
+canonical `PageView` constructor for the finite-page assembly. The new
+`PageHomologyFactorization` interface records the exact epi--mono
+factorization accepted by Mathlib's homology constructor, and
+`PageHomologyWitness.ofFactorization` packages it into the assembly witness.
+Its lift predicate factors through the canonical cycle subobject and `pageπ`, and it no
 longer identifies every page with the associated graded object. The proved
 `PageView.isLift_sub_factors_boundary` lemma records the resulting uniqueness
 law: two lifts of one page element differ through the canonical boundary
@@ -125,9 +128,9 @@ local transport and kernel/image factorization infrastructure for the canonical
 `cycleSubobject` API. Each finite quotient page now has a Mathlib
 `HomologicalComplex` (`pageComplex`), and an explicit `PageHomologyWitness`
 conditionally assembles these pages into Mathlib's `SpectralSequence`. The
-witness supplying the adjacent-page homology isomorphisms, the full ESS adapter,
-and the four lift/relation obligations remain open; no unconditional
-`toSpectralSequence` claim is made.
+concrete factorizations supplying the adjacent-page homology isomorphisms, the
+full ESS adapter, and the four lift/relation obligations remain open; no
+unconditional `toSpectralSequence` claim is made.
 
 The old `SpectralSequence/Completion` construction is not copied as a second
 completion object: KIP126's quotient tower and its eventual-zero limit witness

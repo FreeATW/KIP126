@@ -52,7 +52,10 @@ feat/def-challenge-layout
   `B_succ` 均已接入生产证明，完整 Mathlib assembly 和四个关系义务仍开放；
 - 在本次 session 后，canonical finite quotient page 已有 Mathlib
   `HomologicalComplex` 适配（`pageComplex`），并新增显式的
-  `PageHomologyWitness` → Mathlib `SpectralSequence` 条件装配器；
+  `PageHomologyWitness` → Mathlib `SpectralSequence` 条件装配器；同时加入
+  `PageHomologyFactorization`，把每个页面的同调比较精确化为 Mathlib
+  `ofEpiMonoFactorisation` 所需的 epi--mono 分解，并提供
+  `PageHomologyWitness.ofFactorization` 的打包构造。具体分解的数学证明仍未完成。
   `PageView.ofPageHomologyWitness` 已把该装配器接入四个关系命题的 canonical
   页面入口。相邻页同调同构 witness 本身仍是开放证明义务，没有把它当作无条件的
   `toSpectralSequence` 结论。另已证明 `PageView.isLift_sub_factors_boundary`：同一

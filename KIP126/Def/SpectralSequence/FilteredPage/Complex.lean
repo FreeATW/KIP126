@@ -72,6 +72,59 @@ structure PageHomologyWitness (FC : FilteredComplex C) where
     (FC.pageComplex n).homology p ≅
       FC.pageObj p.1 p.2 (↑(n + 1) : WithTop ℕ)
 
+/-- An explicit epi-mono factorization of the page homology map.
+
+The source and target of `π` and `ι` are Mathlib's canonical cycles and
+opcycles of `pageComplex`.  Supplying `fac` therefore gives exactly the data
+needed by `ShortComplex.HomologyData.ofEpiMonoFactorisation`; the two
+factorization maps are required to be epi and mono rather than hidden behind a
+second spectral-sequence structure. -/
+structure PageHomologyFactorization (FC : FilteredComplex C) where
+  π : ∀ (n : ℕ) (p : ℤ × ℤ),
+    (FC.pageComplex n).cycles p ⟶
+      FC.pageObj p.1 p.2 (↑(n + 1) : WithTop ℕ)
+  ι : ∀ (n : ℕ) (p : ℤ × ℤ),
+    FC.pageObj p.1 p.2 (↑(n + 1) : WithTop ℕ) ⟶
+      (FC.pageComplex n).opcycles p
+  fac : ∀ (n : ℕ) (p : ℤ × ℤ),
+    (FC.pageComplex n).iCycles p ≫ (FC.pageComplex n).pOpcycles p =
+      π n p ≫ ι n p
+  π_epi : ∀ (n : ℕ) (p : ℤ × ℤ), Epi (π n p)
+  ι_mono : ∀ (n : ℕ) (p : ℤ × ℤ), Mono (ι n p)
+
+namespace PageHomologyFactorization
+
+variable {FC : FilteredComplex C}
+
+/-- The factorization maps identify the supplied page object with page
+homology.  This is the canonical Mathlib construction; only the factorization
+itself remains to be supplied for a concrete filtered complex. -/
+noncomputable def isoHomology (W : PageHomologyFactorization FC)
+    (n : ℕ) (p : ℤ × ℤ) :
+    FC.pageObj p.1 p.2 (↑(n + 1) : WithTop ℕ) ≅
+      (FC.pageComplex n).homology p := by
+  let K := FC.pageComplex n
+  let kf : KernelFork (K.sc p).g :=
+    KernelFork.ofι (K.iCycles p) (K.iCycles_d p _)
+  let cc : CokernelCofork (K.sc p).f :=
+    CokernelCofork.ofπ (K.pOpcycles p) (K.d_pOpcycles _ p)
+  let hkf : IsLimit kf := K.cyclesIsKernel p _ rfl
+  let hcc : IsColimit cc := K.opcyclesIsCokernel _ p rfl
+  have hEpi : Epi (W.π n p) := W.π_epi n p
+  have hMono : Mono (W.ι n p) := W.ι_mono n p
+  exact @ShortComplex.HomologyData.ofEpiMonoFactorisation.isoHomology
+    C _ _ (K.sc p) kf cc hkf hcc _ (W.π n p) (W.ι n p)
+      (W.fac n p) hEpi hMono
+
+end PageHomologyFactorization
+
+/-- Package a page-homology factorization as the adjacent-page witness used
+by the spectral-sequence assembly. -/
+noncomputable def PageHomologyWitness.ofFactorization
+    (FC : FilteredComplex C) (W : PageHomologyFactorization FC) :
+    PageHomologyWitness FC where
+  iso n p := (W.isoHomology n p).symm
+
 /-- Assemble the canonical finite page complexes into Mathlib's spectral
 sequence once the adjacent-page homology comparisons are supplied. -/
 noncomputable def pageSpectralSequence (FC : FilteredComplex C)

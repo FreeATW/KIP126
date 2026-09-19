@@ -56,6 +56,16 @@ example (FC : FilteredComplex C) (W : PageHomologyWitness FC) :
     CategoryTheory.SpectralSequence C (fun r : ℤ => pageShape r.toNat) 0 :=
   FC.pageSpectralSequence W
 
+example (FC : FilteredComplex C) (W : PageHomologyFactorization FC) :
+    PageHomologyWitness FC :=
+  PageHomologyWitness.ofFactorization FC W
+
+example (FC : FilteredComplex C) (W : PageHomologyFactorization FC)
+    (n : ℕ) (p : ℤ × ℤ) :
+    FC.pageObj p.1 p.2 (↑(n + 1) : WithTop ℕ) ≅
+      (FC.pageComplex n).homology p :=
+  W.isoHomology n p
+
 example (FC : FilteredComplex C) (n : ℕ) (p q : ℤ × ℤ)
     (_hpq : (pageShape n).Rel p q) :
     (FC.pageComplex n).d p q = FC.pageDifferentialHom n p q := rfl
