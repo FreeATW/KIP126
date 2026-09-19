@@ -19,6 +19,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Core/SpectralSequence/Convergence` | `Def/SpectralSequence/EndpointExtension/Data`, `Convergence/{Data,Predicates,Proofs}` |
 | `Core/SpectralSequence/Extension` | `Def/SpectralSequence/Extension/Data` |
 | `SpectralSequence/Crossing` | `Def/PageExtensions/Differential/{Data,Predicates,Proofs}` (partial: finite-page relations; representative equivalence still open) |
+| `StableHomotopy/{Basic,TensorTriangulatedCategory}` | `Def/StableHomotopy/Context/{Data,Proofs}` (category structure, sphere shifts, homotopy-group functor, distinguished-triangle zero-composition laws, and explicit closed/cofiber witness interfaces; long exact sequence and model-specific witnesses remain open) |
 | `Classical/Adams/Basic` | `Def/StableHomotopy/Context/Data`, `Def/ClassicalAdams/{Page/Data,Convergence/{Data,Predicates,Proofs,StrongData},SphereSequence/Data,H4D2/{Data,Predicates}}`, `External/Literature/Adams/OneLine` |
 | `Classical/SpectralSequence/Basic` | `Def/ClassicalAdams/PageSlice/Data` |
 | `Classical/ExtensionSS/Basic` | `Def/ClassicalESS/Eta/{Data,ExternalInput,Predicates,Proofs}` |

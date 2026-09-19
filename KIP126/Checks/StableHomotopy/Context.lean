@@ -1,0 +1,31 @@
+import KIP126.Def.StableHomotopy.Context.Proofs
+
+/-! Regression checks for the category-theoretic stable-homotopy interface. -/
+namespace KIP126.Checks.StableHomotopy
+
+open CategoryTheory
+open KIP126.StableHomotopy
+
+universe u v
+
+variable {C : Type u} [StableHomotopyCategory.{u, v} C]
+
+example (n : ℤ) (X : C) :
+    HomotopyGroup n X = (Sphere n ⟶ X) := rfl
+
+example (T : HoCofiberSequence (C := C)) : T.f ≫ T.g = 0 :=
+  T.fg_zero
+
+example (T : HoCofiberSequence (C := C)) : T.g ≫ T.h = 0 :=
+  T.gh_zero
+
+variable [HasFunctorialCofiber (C := C)]
+
+example {X Y : C} (f : X ⟶ Y) :
+    (HoCofiberSequence.ofMorphism f).f = f := rfl
+
+example (n : ℤ) (X : C) :
+    (homotopyGroupFunctor (C := C) n).map (𝟙 X) = 𝟙 _ := by
+  simp
+
+end KIP126.Checks.StableHomotopy

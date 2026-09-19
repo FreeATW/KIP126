@@ -21,6 +21,7 @@ import KIP126.Def.SpectralSequence.Representatives.Proofs
 import KIP126.Def.SpectralSequence.SpectralObject.Data
 import KIP126.Def.Synthetic.AdamsSequence.Data
 import KIP126.Def.StableHomotopy.Context.Data
+import KIP126.Def.StableHomotopy.Context.Proofs
 import KIP126.Def.Kervaire.Setup.Data
 import KIP126.Def.Computation.AppendixTable.Rows.Catalogue
 import KIP126.Def.Kervaire.Theta5.Proofs
