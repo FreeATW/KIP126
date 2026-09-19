@@ -53,6 +53,9 @@ feat/def-challenge-layout
   `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
   PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
   PR 或由人工审核处理。
+- PR #97 当前头为 `57f3f5e`，远端状态为 `BLOCKED`：Blueprint/sandboxed-build 门禁因累计 diff
+  超过 2000 行/文件范围上限和历史 `KIP126/` 新增 `set_option` 保护规则失败；这与本地缓存构建
+  和 Axiom 审计的通过结果是两个独立门。
 
 ## 3. 开始工作前的安全步骤
 
