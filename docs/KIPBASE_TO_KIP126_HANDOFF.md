@@ -37,7 +37,8 @@ feat/def-challenge-layout
 
 当前 session 已重新核对的状态（2026-09-19）：
 
-- 工作区干净；本次实现提交：`f9df77b`（canonical page lift 的 boundary-factorization 定理、回归检查及状态记录）；此前的
+- 工作区干净；本次实现提交：`51dbdd9`（canonical page lift 的 boundary-factorization 定理、页面同调
+  epi--mono 分解接口、回归检查及状态记录）；此前的
   `pageDifferential_Z_succ_le`、`pageDifferential_B_succ`、`pageComplex` 和条件谱序列装配提交均已保留；
 - `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
   `origin/main` 无落后提交；
