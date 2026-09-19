@@ -39,10 +39,11 @@ structure SyntheticSphereData where
   detectsH5Square : Homotopy 62 64 0 → Prop
 
 /-- A synthetic representative of `θ₅` with precisely the hypotheses used by
-Theorem 7.3: it is detected by `h₅²` and has additive order dividing two. -/
+Theorem 7.3: it is detected by `h₅²` and has exact additive order two. -/
 structure Theta5Choice (S : SyntheticSphereData) where
   value : S.Homotopy 62 64 0
   detected : S.detectsH5Square value
+  nonzero : value ≠ S.zero 62 64 0
   orderTwo : S.add 62 64 0 value value = S.zero 62 64 0
 
 /-- The expression `ληθ₅²`, with its source and target tridegrees fixed by the

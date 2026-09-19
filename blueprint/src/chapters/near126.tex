@@ -116,6 +116,8 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2133-2139, Remark rem:theta5choice.
 \begin{proposition}[Choice independence of the inductive expression]
   \label{prop:theta5-choice-independence}
+  % VERIFIED-IN: KIP126/Def/Kervaire/Theta5/Proofs.lean,
+  % KIP126.Kervaire.theta5_choice_independence (project transport; remains notready).
   \uses{def:near126-computation-input,def:synthetic-theta5-choice,evidence:theta5-order-torsion,thm:external-total-differential-identity}
   \notready
   For a near-$126$ computation input $D$, every synthetic $\theta_5$ has order
@@ -136,6 +138,8 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2117-2139, Theorem thm:bjmbx and Remark rem:theta5choice; project transport from the distinguished source choice.
 \begin{theorem}[BJM/BX criterion for any order-two choice]
   \label{thm:bjm-bx-criterion-any-choice}
+  % VERIFIED-IN: KIP126/Def/Kervaire/Theta5/Proofs.lean,
+  % KIP126.Kervaire.bjm_bx_criterion_any_choice (project transport; remains notready).
   \uses{def:near126-computation-input,def:synthetic-theta5-choice,thm:external-bjm-bx-criterion,prop:theta5-choice-independence}
   \lean{KIP126.Challenge.Near126.Thm7_3BJMBX.SyntheticSphereData}
   \lean{KIP126.Challenge.Near126.Thm7_3BJMBX.Theta5Choice}
