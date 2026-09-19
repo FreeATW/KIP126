@@ -130,6 +130,8 @@ namespace DifferentialRelationId
 
 def Valid (relation : DifferentialRelationId) : Prop := relation.value ≠ 0
 
+def validBool (relation : DifferentialRelationId) : Bool := decide (relation.value ≠ 0)
+
 end DifferentialRelationId
 
 /-- A source locator for one printed row. -/
@@ -163,8 +165,13 @@ def MetadataValid (row : AppendixRow) : Prop :=
   row.source.metadata.internalDegree = row.stem + row.filtration
 
 /-- A row record is a well-formed typed input. -/
+def RelationValid (row : AppendixRow) : Prop :=
+  match row.relation with
+  | none => True
+  | some relation => relation.Valid
+
 def Valid (row : AppendixRow) : Prop :=
-  row.KeyValid ∧ row.MetadataValid
+  row.KeyValid ∧ row.MetadataValid ∧ row.RelationValid
 
 /-- Executable key and metadata check used by catalogue regressions. -/
 def validBool (row : AppendixRow) : Bool :=
@@ -172,7 +179,10 @@ def validBool (row : AppendixRow) : Bool :=
     decide (row.source.metadata.table = row.table) &&
     decide (row.source.metadata.stem = row.stem) &&
     decide (row.source.metadata.filtration = row.filtration) &&
-    decide (row.source.metadata.internalDegree = row.stem + row.filtration)
+    decide (row.source.metadata.internalDegree = row.stem + row.filtration) &&
+    match row.relation with
+    | none => true
+    | some relation => relation.validBool
 
 end AppendixRow
 
