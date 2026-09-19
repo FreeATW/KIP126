@@ -110,6 +110,8 @@ The canonical page proof layer also carries the elementary quotient-page laws
 formerly provided by `SSData`: bottom boundaries lie in every cycle object, and
 a page is zero exactly when its boundary and cycle subobjects coincide. These
 are proved directly for `pageObj`; no historical `SSData` structure is copied.
+It also owns the nested-subobject quotient maps and third-isomorphism helper
+used by the future page-homology comparison.
 
 The old `SpectralSequence/Completion` construction is not copied as a second
 completion object: KIP126's quotient tower and its eventual-zero limit witness

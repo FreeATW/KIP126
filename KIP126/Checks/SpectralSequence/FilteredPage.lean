@@ -11,6 +11,7 @@ open CategoryTheory CategoryTheory.Limits
 universe u v
 
 variable {C : Type u} [Category.{v} C] [Abelian C]
+variable {X : C}
 
 example (FC : FilteredComplex C) (s k : ℤ) :
     Antitone (FC.cycleSubobject s k) :=
@@ -41,6 +42,11 @@ example (FC : FilteredComplex C) (s k : ℤ) (r : WithTop ℕ)
     (h : IsZero (FC.pageObj s k r)) :
     FC.boundarySubobject s k r = FC.cycleSubobject s k r :=
   FC.eq_of_pageObj_isZero s k r h
+
+example (P Q R : Subobject (C := C) X) (hPQ : P ≤ Q) (hQR : Q ≤ R) :
+    cokernel (Subobject.cokernelMapOfLE P Q R hPQ hQR) ≅
+      cokernel (Subobject.ofLE Q R hQR) :=
+  Subobject.thirdQuotientIso P Q R hPQ hQR
 
 end
 
