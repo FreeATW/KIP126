@@ -9,6 +9,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Core/Algebra/Graded`, `Coefficients` | `Def/Algebra/Graded/Data`, `Coefficients/Data` |
 | `Core/Algebra/Filtered` | `Def/Algebra/Filtration/{Data,Predicates,Proofs}` |
 | `Core/Algebra/Completion` | `Def/Algebra/Completion/{Data,Proofs}` |
+| `SpectralSequence/Truncation` | `Def/Algebra/Truncation/{Data,Proofs}` (image filtration on canonical quotient objects; no duplicate quotient tower) |
 | `Core/SpectralSequence/Basic` | `Checks/SpectralSequence/MathlibAPI`; production code imports Mathlib directly |
 | `Core/SpectralSequence/PageLevel` | `Def/SpectralSequence/PageLevel/{Data,Proofs}` |
 | `Core/SpectralSequence/FilteredComplex` | `Def/SpectralSequence/FilteredComplex/Data` |
@@ -17,7 +18,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Core/SpectralSequence/SpectralObjectAdapter` | `Def/SpectralSequence/SpectralObject/Data` |
 | `Core/SpectralSequence/Convergence` | `Def/SpectralSequence/EndpointExtension/Data`, `Convergence/{Data,Predicates,Proofs}` |
 | `Core/SpectralSequence/Extension` | `Def/SpectralSequence/Extension/Data` |
-| `SpectralSequence/Crossing` | `Def/PageExtensions/{Data,Predicates,Proofs}` (Mathlib page-level relation and crossing interface) |
+| `SpectralSequence/Crossing` | `Def/PageExtensions/Differential/{Data,Predicates,Proofs}` (partial: finite-page relations; representative equivalence still open) |
 | `Classical/Adams/Basic` | `Def/StableHomotopy/Context/Data`, `Def/ClassicalAdams/{Page/Data,Convergence/{Data,Predicates,Proofs,StrongData},SphereSequence/Data,H4D2/{Data,Predicates}}`, `External/Literature/Adams/OneLine` |
 | `Classical/SpectralSequence/Basic` | `Def/ClassicalAdams/PageSlice/Data` |
 | `Classical/ExtensionSS/Basic` | `Def/ClassicalESS/Eta/{Data,ExternalInput,Predicates,Proofs}` |
@@ -91,8 +92,11 @@ associated-graded and filtered-morphism results to construct standard
 categorical objects. Those constructor-support imports are not yet split into
 smaller, earlier data modules.
 
-`Def/PageExtensions/{Data,Predicates,Proofs}` now owns the Mathlib page-level
-differential, essentiality, crossing, and no-crossing interfaces ported from
-the historical crossing definitions. This is foundation data for the paper's
+`Def/PageExtensions/Differential/{Data,Predicates,Proofs}` now owns the Mathlib
+page-level
+differential, essentiality, crossing, and no-crossing interfaces inspired by
+the historical crossing definitions. Essentiality means the target class is
+nonzero; the original relation may be zero. This does not prove equivalence
+with the historical ambient representative or complete target-coset model. This is foundation data for the paper's
 page-extension nodes; the finite/infinite synthetic page-extension statements
 and their crossing equivalences remain open in the Blueprint.
