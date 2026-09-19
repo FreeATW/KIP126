@@ -1,5 +1,6 @@
 import KIP126.Def.Algebra.Filtration.Proofs
 import KIP126.Def.SpectralSequence.FilteredComplex.Data
+import KIP126.Def.SpectralSequence.FilteredPage.Data
 import KIP126.Def.PageExtensions.Differential.Proofs
 
 /-!
@@ -31,8 +32,20 @@ structure PageView (FC : FilteredComplex C) where
   shape : ℤ → ComplexShape (ℤ × ℤ)
   firstPage : ℤ
   sequence : SpectralSequence C shape firstPage
-  pageToAssociated : ∀ (r : ℤ) (hr : firstPage ≤ r) (s k : ℤ),
-    (sequence.page r hr).X (s, k) ≅ FC.filtration.associatedGraded s k
+  /-- The canonical finite/infinite page represented by a Mathlib page.
+
+  Mathlib indexes pages by integers, whereas the filtered-complex
+  construction indexes finite pages by `ℕ` and the limiting page by `⊤`.
+  This translation is explicit data; no convention is hidden in the
+  statement. -/
+  pageNumber : ∀ (r : ℤ), firstPage ≤ r → WithTop ℕ
+  /-- Comparison with the quotient page built from the canonical cycles and
+  boundaries.  This is the only page object used by the relation statements.
+  In particular, a page is not identified with the whole associated graded
+  object. -/
+  pageToPage : ∀ (r : ℤ) (hr : firstPage ≤ r) (s k : ℤ),
+    (sequence.page r hr).X (s, k) ≅
+      FC.pageObj s k (pageNumber r hr)
 
 namespace PageView
 
@@ -61,8 +74,12 @@ def IsLift (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ)
     {T : C}
     (xl : T ⟶ Subobject.underlying.obj (FC.filtration.F s k))
     (x : P.element r hr s k T) : Prop :=
-  xl ≫ FC.filtration.toAssociatedGraded s k =
-    x ≫ (P.pageToAssociated r hr s k).hom
+  ∃ z : T ⟶ Subobject.underlying.obj
+      (FC.cycleSubobject s k (P.pageNumber r hr)),
+    z ≫ (FC.cycleSubobject s k (P.pageNumber r hr)).arrow =
+      xl ≫ FC.filtration.toAssociatedGraded s k ∧
+    z ≫ FC.pageπ s k (P.pageNumber r hr) =
+      x ≫ (P.pageToPage r hr s k).hom
 
 def relation (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ)
     {T : C} (x : P.element r hr s k T)

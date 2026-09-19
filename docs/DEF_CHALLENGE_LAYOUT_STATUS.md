@@ -91,6 +91,13 @@ relation in `Predicates`, and the derived completion and detection results in
 in `ExternalInput`; the eta `Data` file imports only the provenance data type,
 not the claim ledger. Public names and statements were preserved.
 
+The filtered-complex relation challenge now makes its page adapter explicit:
+`PageView` supplies a page-number translation and compares each Mathlib page
+with the canonical `pageObj` quotient. Its lift predicate factors through the
+canonical cycle subobject and `pageπ`; it no longer identifies every page with
+the associated graded object. The adapter remains open construction data, and
+the four relation obligations remain unproved.
+
 Two construction files still import earlier filtration proofs:
 `Def/Algebra/Completion/Data` needs the filtration inclusion law to construct
 quotient transitions, and `Def/SpectralSequence/FilteredComplex/Data` uses
