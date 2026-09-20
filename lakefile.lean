@@ -18,11 +18,6 @@ require checkdecls from git
 @[default_target]
 lean_lib KIP126 where
   globs := #[.andSubmodules `KIP126]
-  leanOptions := #[
-    -- The categorical page constructions use explicit rewrites, but their
-    -- elaboration still needs the historical implicit-argument transparency.
-    ⟨`backward.isDefEq.respectTransparency, false⟩,
-    ⟨`maxHeartbeats, .ofNat 6400000⟩]
 
 /-!
 Historical KIP-base, ported to the pinned toolchain. Its inherited assumptions

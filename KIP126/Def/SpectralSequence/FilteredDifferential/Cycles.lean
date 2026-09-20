@@ -14,6 +14,7 @@ variable {C : Type u} [Category.{v} C] [Abelian C]
 open DifferentialHelpers
 
 -- Multi-step proof: Z_{n+1} ↪ Z_n maps to kernel of page differential via index shifting
+set_option backward.isDefEq.respectTransparency false in
 /-- The ≥ direction of Z_succ: image(ofLE(Z_{n+1}, Z_n) ≫ pageπ n) ≤ kernel(pageDifferential).
     Elements of Z_{n+1} (deeper cycle condition: dx ∈ F^{s+n+1}) map to zero under pageDiff
     because their d-image lands in F^{s+n+1}, hence projects to 0 in gr^{s+n}. -/
@@ -257,6 +258,7 @@ theorem pageDifferential_Z_succ_ge (FC : FilteredComplex C)
 
 
 
+set_option maxHeartbeats 6400000 in
 /-- Every class in the kernel of the finite-page differential has a representative
 in the next cycle subobject. Adapted from the filtered-complex proof in KIPBase. -/
 theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)

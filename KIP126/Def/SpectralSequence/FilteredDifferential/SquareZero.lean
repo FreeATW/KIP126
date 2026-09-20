@@ -13,6 +13,8 @@ variable {C : Type u} [Category.{v} C] [Abelian C]
 
 open DifferentialHelpers
 
+set_option backward.isDefEq.respectTransparency false in
+set_option maxHeartbeats 800000 in
 theorem pageDifferential_comp (FC : FilteredComplex C)
     (s k : ℤ) (n : ℕ) :
     FC.pageDifferential s k n ≫ FC.pageDifferential (s + ↑n) (k - 1) n = 0 := by

@@ -13,6 +13,7 @@ variable {C : Type u} [Category.{v} C] [Abelian C]
 
 open DifferentialHelpers
 
+set_option maxHeartbeats 6400000 in
 /-- The image of the finite-page differential is the page image of the next
     boundary subobject included in the current cycle subobject.  This is the
     canonical finite-page `B_succ` relation, adapted from the historical
@@ -186,7 +187,7 @@ theorem pageDifferential_B_succ (FC : FilteredComplex C)
     rw [hψ_def]
     calc kernel.ι p ≫ to_Z_n_t ≫ FC.pageπ (s + ↑n) (k - 1) ↑n
         = (kernel.ι p ≫ to_Z_n_t) ≫ FC.pageπ (s + ↑n) (k - 1) ↑n := (Category.assoc _ _ _).symm
-      _ = (γ' ≫ Subobject.ofLE B_n_t' Z_n_t' hB_le_Z') ≫ FC.pageπ (s + ↑n) (k - 1) ↑n := by rw [h_factor_B']
+      _ = (γ' ≫ Subobject.ofLE B_n_t' Z_n_t' hB_le_Z') ≫ FC.pageπ (s + ↑n) (k - 1) ↑n := by rw [h_factor_B'] <;> rfl
       _ = γ' ≫ (Subobject.ofLE B_n_t' Z_n_t' hB_le_Z' ≫ FC.pageπ (s + ↑n) (k - 1) ↑n) := Category.assoc _ _ _
       _ = γ' ≫ 0 := by rw [h_cok']
       _ = 0 := comp_zero
@@ -327,7 +328,7 @@ theorem pageDifferential_B_succ (FC : FilteredComplex C)
       Subobject.factorThru_arrow _ _ _
     have h_to_Z_eq : to_Z_n_t = factorγ ≫ Subobject.ofLE B_n1_t Z_n_t hB_le_Z_n1 := by
       apply (inferInstance : Mono Z_n_t.arrow).right_cancellation
-      simp only [Category.assoc, Subobject.ofLE_arrow, hfactorγ_spec]
+      simp only [Category.assoc, Subobject.ofLE_arrow, hfactorγ_spec] <;> rfl
     -- Now ψ = to_Z_n_t ≫ FC.pageπ (s + ↑n) (k - 1) ↑n = factorγ ≫ ofLE(B_{n+1}, Z_n) ≫ FC.pageπ (s + ↑n) (k - 1) ↑n
     change imageSubobject ψ ≤ imageSubobject (Subobject.ofLE B_n1_t Z_n_t hB_le_Z_n1 ≫
       FC.pageπ (s + ↑n) (k - 1) ↑n)
@@ -436,7 +437,7 @@ theorem pageDifferential_B_succ (FC : FilteredComplex C)
         factorB ≫ Subobject.ofLE B_n1_t Z_n_t hB_le_Z_n1 ≫ FC.pageπ (s + ↑n) (k - 1) ↑n =
             (factorB ≫ Subobject.ofLE B_n1_t Z_n_t hB_le_Z_n1) ≫ FC.pageπ (s + ↑n) (k - 1) ↑n :=
               (Category.assoc _ _ _).symm
-        _ = σ_to_Z ≫ FC.pageπ (s + ↑n) (k - 1) ↑n := by rw [h_factorB_ofLE_eq]
+        _ = σ_to_Z ≫ FC.pageπ (s + ↑n) (k - 1) ↑n := by rw [h_factorB_ofLE_eq] <;> rfl
         _ = (σ_bnd ≫ factorThruImageSubobject (kerZ'.arrow ≫ πV')) ≫
             FC.pageπ (s + ↑n) (k - 1) ↑n := by rw [hσ_to_Z_def]
         _ = σ_bnd ≫ factorThruImageSubobject (kerZ'.arrow ≫ πV') ≫
@@ -526,9 +527,7 @@ theorem pageDifferential_B_succ (FC : FilteredComplex C)
       (pb_snd ≫ σ_bnd) ≫ factorThruImageSubobject (kerZ'.arrow ≫ πV') ≫ FC.pageπ (s + ↑n) (k - 1) ↑n from by
       simp only [Category.assoc]]
     rw [h_pb_snd_σ_eq]
-    rw [show (w ≫ lift_to_kerZ') ≫ factorThruImageSubobject (kerZ'.arrow ≫ πV') ≫ FC.pageπ (s + ↑n) (k - 1) ↑n =
-      w ≫ (lift_to_kerZ' ≫ factorThruImageSubobject (kerZ'.arrow ≫ πV') ≫ FC.pageπ (s + ↑n) (k - 1) ↑n) from by
-      simp only [Category.assoc]]
+    simp only [Category.assoc]
     exact imageSubobject_comp_le _ _
 
 end KIP126.Core.SpectralSequence.FilteredComplex

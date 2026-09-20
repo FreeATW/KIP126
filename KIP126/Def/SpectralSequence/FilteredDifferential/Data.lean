@@ -58,6 +58,7 @@ private theorem eqToHom_arrow_dToK (FC : FilteredComplex C)
   rw [FC.eqToHom_arrow_dToK_gen s (k - 1) k (by omega)]
   simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The induced differential on pages: `d_r : E_r^{s,k} → E_r^{s+r,k-1}`.
     This maps Z_r-cycles modulo B_r-boundaries at (s,k) to the same at (s+r,k-1),
     using the original differential d of the filtered complex.
