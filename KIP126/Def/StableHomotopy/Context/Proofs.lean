@@ -25,6 +25,75 @@ def HoCofiberSequence.ofMorphism {X Y : C} (f : X ⟶ Y)
   h := HasFunctorialCofiber.cofibδ f
   distinguished := HasFunctorialCofiber.cofib_distinguished f
 
+private theorem one_plus_neg_one : (1 : ℤ) + (-1) = 0 := by omega
+
+/-! ### Connecting homomorphisms
+
+The connecting map is defined from the shift coherence isomorphisms.  It is
+kept in this proof module because a concrete stable model only needs to supply
+the distinguished triangle; no additional global axiom is introduced here.
+-/
+
+/-- The connecting homomorphism associated to a distinguished cofiber triangle.
+
+For `z : Sⁿ ⟶ Z`, this is the composite
+`Sⁿ⁻¹ → Sⁿ⟦-1⟧ → X⟦1⟧⟦-1⟧ → X` applied to `z ≫ h`. -/
+noncomputable def connectingHomomorphism (T : HoCofiberSequence (C := C)) (n : ℤ) :
+    HomotopyGroup n T.Z →+ HomotopyGroup (n - 1) T.X where
+  toFun z :=
+    (shiftFunctorAdd' C n (-1) (n - 1) (by omega)).hom.app SphereSpectrum ≫
+      eqToHom (show (shiftFunctor C n ⋙ shiftFunctor C (-1)).obj SphereSpectrum =
+        (shiftFunctor C (-1)).obj ((shiftFunctor C n).obj SphereSpectrum) by
+          simp only [Functor.comp_obj]) ≫
+      (shiftFunctor C (-1)).map (z ≫ T.h) ≫
+        eqToHom (show (shiftFunctor C (-1)).obj ((shiftFunctor C (1 : ℤ)).obj T.X) =
+          (shiftFunctor C (1 : ℤ) ⋙ shiftFunctor C (-1)).obj T.X by
+            simp only [Functor.comp_obj]) ≫
+        (shiftFunctorCompIsoId C 1 (-1) one_plus_neg_one).hom.app T.X ≫
+          eqToHom (Functor.id_obj T.X)
+  map_zero' := by
+    simp only [Functor.map_zero, Limits.zero_comp, Limits.comp_zero]
+  map_add' := by
+    intro a b
+    rw [Preadditive.add_comp]
+    simp only [Functor.map_add]
+    rw [Preadditive.add_comp]
+    rw [Preadditive.comp_add]
+    rw [Preadditive.comp_add]
+
+private theorem shiftFunctor_map_eq_zero {X Y : C} {f : X ⟶ Y} {n : ℤ}
+    (h : (shiftFunctor C n).map f = 0) : f = 0 := by
+  have inj := (shiftEquiv C n).functor.map_injective (X := X) (Y := Y)
+  apply inj
+  change (shiftFunctor C n).map f = (shiftFunctor C n).map 0
+  rw [h, (shiftFunctor C n).map_zero]
+
+private theorem comp_h_zero_of_connectingHom_zero
+    (T : HoCofiberSequence (C := C)) (n : ℤ) (z : HomotopyGroup n T.Z)
+    (hz : connectingHomomorphism T n z = 0) : z ≫ T.h = 0 := by
+  simp only [connectingHomomorphism, AddMonoidHom.coe_mk, ZeroHom.coe_mk] at hz
+  let a :=
+    (shiftFunctorAdd' C n (-1) (n - 1) (by omega)).hom.app SphereSpectrum ≫
+      eqToHom (show (shiftFunctor C n ⋙ shiftFunctor C (-1)).obj SphereSpectrum =
+        (shiftFunctor C (-1)).obj ((shiftFunctor C n).obj SphereSpectrum) by
+          simp only [Functor.comp_obj])
+  let m := (shiftFunctor C (-1)).map (z ≫ T.h)
+  let b :=
+    eqToHom (show (shiftFunctor C (-1)).obj ((shiftFunctor C (1 : ℤ)).obj T.X) =
+      (shiftFunctor C (1 : ℤ) ⋙ shiftFunctor C (-1)).obj T.X by
+        simp only [Functor.comp_obj]) ≫
+      (shiftFunctorCompIsoId C 1 (-1) one_plus_neg_one).hom.app T.X ≫
+        eqToHom (Functor.id_obj T.X)
+  have hz' : a ≫ m ≫ b = 0 := by
+    simpa [a, m, b] using hz
+  have hm' : a ≫ m = 0 := by
+    apply (cancel_mono b).1
+    simpa [Category.assoc] using hz'
+  have hm : m = 0 := by
+    apply (cancel_epi a).1
+    simpa using hm'
+  exact shiftFunctor_map_eq_zero hm
+
 /-- The first two maps in a chosen cofiber triangle compose to zero. -/
 theorem HoCofiberSequence.fg_zero (T : HoCofiberSequence (C := C)) :
     T.f ≫ T.g = 0 :=
@@ -39,6 +108,24 @@ theorem HoCofiberSequence.gh_zero (T : HoCofiberSequence (C := C)) :
 theorem HoCofiberSequence.hf_shift_zero (T : HoCofiberSequence (C := C)) :
     T.h ≫ (shiftFunctor C (1 : ℤ)).map T.f = 0 :=
   comp_distTriang_mor_zero₃₁ _ T.distinguished
+
+/-- The homotopy-group sequence is exact at the third object `Z`. -/
+theorem les_homotopy_exact_g (T : HoCofiberSequence (C := C)) (n : ℤ) :
+    ∀ (z : HomotopyGroup n T.Z),
+      (connectingHomomorphism T n) z = 0 ↔
+        ∃ (y : HomotopyGroup n T.Y), (inducedMap T.g n) y = z := by
+  intro z
+  simp only [inducedMap, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
+  constructor
+  · intro hz
+    have hz' : z ≫ T.h = 0 := comp_h_zero_of_connectingHom_zero T n z hz
+    obtain ⟨y, hy⟩ := Triangle.coyoneda_exact₃ _ T.distinguished z hz'
+    exact ⟨y, hy.symm⟩
+  · rintro ⟨y, rfl⟩
+    simp only [connectingHomomorphism, AddMonoidHom.coe_mk, ZeroHom.coe_mk,
+      Category.assoc, T.gh_zero, Limits.comp_zero, Functor.map_zero,
+      Limits.zero_comp]
+
 
 /-! ### Exactness transferred from the distinguished triangle
 
