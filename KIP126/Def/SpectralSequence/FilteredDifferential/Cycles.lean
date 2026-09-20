@@ -173,7 +173,7 @@ theorem pageDifferential_Z_succ_ge (FC : FilteredComplex C)
   -- Strategy: show it's equal to β ≫ ml ≫ πV' = 0, then prove the latter.
   -- Use `convert` to match against β ≫ ml ≫ πV' = 0.
   suffices h_main : β ≫ ml ≫ πV' = 0 by
-    convert h_main using 2 <;> try rfl
+    convert h_main using 2; try rfl
     -- Goal: P.factorThru(ml_expr, w) ≫ P.arrow ≫ πV' = ml ≫ πV'
     rw [show (_ : Subobject.underlying.obj _ ⟶ _) ≫ _ ≫ πV' = (_ ≫ _) ≫ πV'
       from (Category.assoc _ _ _).symm, Subobject.factorThru_arrow]
