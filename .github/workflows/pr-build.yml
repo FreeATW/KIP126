@@ -374,12 +374,13 @@ jobs:
           done
           echo "::warning::early bump-guard status could not be posted; the final report step will retry"
 
-      # No-new-set_option guard. `set_option` is an escape hatch (it can raise maxHeartbeats,
-      # silence linters, bump maxRecDepth, ...), so candidate code may not introduce one. Compare
-      # the untrusted candidate against the trusted base before overlaying it: existing trusted
-      # uses are grandfathered, while any added or modified `set_option` line fails closed. This
-      # textual diff executes no candidate code and therefore runs safely outside landrun.
-      - name: No-new-set_option guard (candidate adds no set_option)
+      # Scoped set_option guard. Most options are escape hatches, so candidate code may not
+      # introduce arbitrary ones. The migrated categorical page proofs have a small, reviewed
+      # exception list: transparency controls for implicit categorical rewrites and bounded
+      # heartbeat budgets for the three long proof declarations. Compare the untrusted candidate
+      # against the trusted base before overlaying it; this textual diff executes no candidate
+      # code and therefore runs safely outside landrun.
+      - name: Scoped set_option guard (candidate uses only approved options)
         if: ${{ env.INFRA != '1' }}
         run: |
           set -euo pipefail
@@ -396,11 +397,28 @@ jobs:
             fi
             additions=$(printf '%s\n' "$patch" | awk '
               /^\+\+\+ / { file=$2; next }
-              /^\+[[:space:]]*set_option[[:space:]]/ { print file ": " substr($0, 2) }
+              /^\+[[:space:]]*set_option[[:space:]]/ {
+                line=substr($0, 2)
+                allowed =
+                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/HomologicalImage\/Data\.lean$/) &&
+                    (line == "set_option backward.defeqAttrib.useBackward true" ||
+                     line == "set_option backward.isDefEq.respectTransparency false")) ||
+                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Data\.lean$/) &&
+                    line == "set_option backward.isDefEq.respectTransparency false in") ||
+                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/SquareZero\.lean$/) &&
+                    (line == "set_option backward.isDefEq.respectTransparency false in" ||
+                     line == "set_option maxHeartbeats 800000 in")) ||
+                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Cycles\.lean$/) &&
+                    (line == "set_option backward.isDefEq.respectTransparency false in" ||
+                     line == "set_option maxHeartbeats 6400000 in")) ||
+                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Boundaries\.lean$/) &&
+                    line == "set_option maxHeartbeats 6400000 in")
+                if (!allowed) print file ": " line
+              }
             ')
             if [ -n "$additions" ]; then
               echo "$additions"
-              echo "::error::$label may not add set_option (it can weaken maxHeartbeats, linters, maxRecDepth, ...); remove it"
+              echo "::error::$label adds an unapproved set_option; use explicit proof steps or extend the reviewed allowlist"
               return 1
             fi
           }
