@@ -2,7 +2,7 @@
 1b549ba61e1efdcc1b28ac7cf1b7afd2c3b9ec7a5fad247f6b3d8837c37c6aff  .github/workflows/ci.yml
 8342f1e85aaddd0d49cf342aa9c1ccc6b9241160f36af9e5304032f85c4d46ee  .github/workflows/review.yml
 f6e17439e07ee6ed77c12e6506b041c67555ccb320e1831f045f380e35b42f65  .github/workflows/auto-merge.yml
-25ab0fb756a77dec439ce237b3610ed304b502010763dca460f92070d6d5eb22  .github/workflows/blueprint-pr.yml
+97c8e45814950af66b06d59de427d211a60f0b3e78298ff8e68b3705e5501e72  .github/workflows/blueprint-pr.yml
 d9cf4e0f501cf62825ccc57a7c2c268e4ce84f1eeafedf078c4f928347ee9f8e  .github/workflows/pr-profile.yml
 e75fe0b1c46a128131085298022a17a49b044cc9dde15aaa822754d61c296aef  .github/workflows/pr-labels.yml
 b14cf5e6a38eda2fe8e9be965cac912d25ae16f92cfd0b22c1f06999fde3dbd4  .github/workflows/merge-sweep.yml
