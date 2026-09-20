@@ -512,17 +512,21 @@ jobs:
             status=$(jq -c '[.[] | select(.context == "build" and .creator.login == "github-actions[bot]")][0] // {}' <<<"$statuses")
             state=$(jq -r '.state // ""' <<<"$status")
             description=$(jq -r '.description // ""' <<<"$status")
+            warning_status=$(jq -c '[.[] | select(.context == "warnings" and .creator.login == "github-actions[bot]")][0] // {}' <<<"$statuses")
+            warning_state=$(jq -r '.state // ""' <<<"$warning_status")
             if [[ -z "$state" ]]; then
               continue
             fi
-            if [[ "$state" == success && "$description" == "$attestation" ]]; then
+            if [[ "$state" == success && "$description" == "$attestation" && "$warning_state" == success ]]; then
               {
                 echo "BUILD_REUSED=1"
                 echo "BUILD_REUSED_FROM=$ancestor"
               } >> "$GITHUB_ENV"
               echo "::notice::reusing trusted build from ancestor $ancestor (input=$input, contract=$contract)"
+            elif [[ "$state" == success && "$description" == "$attestation" && "$warning_state" == failure ]]; then
+              echo "::notice::trusted build at $ancestor has warning debt; rebuilding instead of reusing it"
             else
-              echo "::notice::nearest trusted build evidence at $ancestor is not reusable"
+              echo "::notice::nearest trusted build evidence at $ancestor is not reusable (warnings=$warning_state)"
             fi
             # Never jump past a newer trusted red or differently-versioned build result.
             break
