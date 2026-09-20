@@ -26,9 +26,6 @@ example (T : HoCofiberSequence (C := C)) (n : ℤ) :
   les_homotopy_exact_f T n
 
 example (T : HoCofiberSequence (C := C)) (n : ℤ) :
-    connectingHomomorphism T n = connectingHomomorphism T n := rfl
-
-example (T : HoCofiberSequence (C := C)) (n : ℤ) :
     ∀ (z : HomotopyGroup n T.Z),
       (connectingHomomorphism T n) z = 0 ↔
         ∃ (y : HomotopyGroup n T.Y), (inducedMap T.g n) y = z :=
