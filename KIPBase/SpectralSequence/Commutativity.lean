@@ -278,43 +278,23 @@ theorem essComm_auxA1
         (extq.complex t).filToAssocGraded (sfx + n - 1) 0 = 0 := by
   sorry
 
-/-- **引理 B1**（lift 数据产生候选微分关系）：给定一个严格短于目标页的
-    filtration-level 微分 lift，`FilteredComplex.differentialRelation_of_lift`
-    将它降到 ESS(q) 的页微分关系。
-
-    这一定理不凭空产生 `r'`：原先的陈述没有任何假设却要求
-    `∃ r' < m + l - n`，在 `m + l - n ≤ 0` 时不可能成立。候选页与其
-    lift 等式必须由 A1 后续的误差项分析提供。 -/
+/-- **引理 B1**（修正项产生竞争微分关系）：若 `yl` 的微分与 `wl` 的差
+    落在更深过滤（`A1` 的结论），则该差项在 ESS(q) 中给出从 `y` 出发、
+    次数严格小于 `m+l-n` 的候选微分关系。暂 sorry。 -/
 theorem essComm_auxB1
-    (r' : ℤ) (hr' : 0 ≤ r') (_hr'_lt : r' < m + l - n)
-    (yl : T ⟶ Subobject.underlying.obj ((extq.complex t).fil (sfx + n) 1))
-    (wl : T ⟶ Subobject.underlying.obj ((extq.complex t).fil (sfx + n + r') 0))
-    (hy : (extq.complex t).IsLift (sfx + n) 1 yl
-      (Eq.mpr (congrArg (fun X : C => T ⟶ X)
-        (show (((extq.complex t).toSpectralSequence (extq.bounded t)).ssData
-          ⟨sfx + n, 1⟩).V = (extq.complex t).assocGraded (sfx + n) 1 from rfl)) y))
-    (y₀ : T ⟶ (((extq.complex t).toSpectralSequence (extq.bounded t)).ssData
+    (yl : T ⟶ Subobject.underlying.obj ((extq.complex t).fil (sfx + n) 0))
+    (wl : T ⟶ Subobject.underlying.obj ((extq.complex t).fil (sfx + m + l) 0)) :
+    ∃ (r' : ℤ) (_ : 0 ≤ r') (_ : r' < m + l - n)
+      (y₀ : T ⟶ (((extq.complex t).toSpectralSequence (extq.bounded t)).ssData
         (⟨sfx + n, 1⟩ + ((extq.complex t).toSpectralSequence (extq.bounded t)).diffDeg
-          r')).V)
-    (hw : (extq.complex t).IsLift (sfx + n + r') 0 wl
-      (Eq.mpr (congrArg (fun X : C => T ⟶ X)
-        (show (((extq.complex t).toSpectralSequence (extq.bounded t)).ssData
-          (⟨sfx + n, 1⟩ + ((extq.complex t).toSpectralSequence (extq.bounded t)).diffDeg
-            r')).V = (extq.complex t).assocGraded (sfx + n + r') 0 from by
-          change (extq.complex t).assocGraded (sfx + n + r') 0 = _
-          rfl)) y₀))
-    (hd : yl ≫ (extq.complex t).filDiff (sfx + n) 1 =
-      wl ≫ Subobject.ofLE ((extq.complex t).fil (sfx + n + r') 0)
-        ((extq.complex t).fil (sfx + n) 0)
-        ((extq.complex t).fil_anti_of_le 0 (by omega))) :
-    DifferentialRelation ((extq.complex t).toSpectralSequence (extq.bounded t))
-      r' ⟨sfx + n, 1⟩
-      (Eq.mpr (congrArg (fun X : C => T ⟶ X)
-        (show (((extq.complex t).toSpectralSequence (extq.bounded t)).ssData
-          ⟨sfx + n, 1⟩).V = (extq.complex t).assocGraded (sfx + n) 1 from rfl)) y)
-      y₀ := by
-  exact FilteredComplex.differentialRelation_of_lift (extq.complex t)
-    (extq.bounded t) r' hr' (sfx + n) 1 hy hw hd
+          r')).V),
+      DifferentialRelation ((extq.complex t).toSpectralSequence (extq.bounded t))
+        r' ⟨sfx + n, 1⟩
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((extq.complex t).toSpectralSequence (extq.bounded t)).ssData
+            ⟨sfx + n, 1⟩).V = (extq.complex t).assocGraded (sfx + n) 1 from rfl)) y)
+        y₀ := by
+  sorry
 
 /-- **引理 B2**（non-crossing 排除竞争）：`_hf_or_p_nc`、`_hg_nc_range`、
     `_hq_nc` 联合蕴含：从 `y` 出发不存在次数严格小于 `m+l-n` 且目标过滤
