@@ -399,21 +399,20 @@ jobs:
               /^\+\+\+ / { file=$2; next }
               /^\+[[:space:]]*set_option[[:space:]]/ {
                 line=substr($0, 2)
-                allowed =
-                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/HomologicalImage\/Data\.lean$/) &&
+                if (file ~ /\/KIP126\/Def\/SpectralSequence\/HomologicalImage\/Data\.lean$/ &&
                     (line == "set_option backward.defeqAttrib.useBackward true" ||
-                     line == "set_option backward.isDefEq.respectTransparency false")) ||
-                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Data\.lean$/) &&
-                    line == "set_option backward.isDefEq.respectTransparency false in") ||
-                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/SquareZero\.lean$/) &&
+                     line == "set_option backward.isDefEq.respectTransparency false")) next
+                if (file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Data\.lean$/ &&
+                    line == "set_option backward.isDefEq.respectTransparency false in") next
+                if (file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/SquareZero\.lean$/ &&
                     (line == "set_option backward.isDefEq.respectTransparency false in" ||
-                     line == "set_option maxHeartbeats 800000 in")) ||
-                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Cycles\.lean$/) &&
+                     line == "set_option maxHeartbeats 800000 in")) next
+                if (file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Cycles\.lean$/ &&
                     (line == "set_option backward.isDefEq.respectTransparency false in" ||
-                     line == "set_option maxHeartbeats 6400000 in")) ||
-                  ((file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Boundaries\.lean$/) &&
-                    line == "set_option maxHeartbeats 6400000 in")
-                if (!allowed) print file ": " line
+                     line == "set_option maxHeartbeats 6400000 in")) next
+                if (file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Boundaries\.lean$/ &&
+                    line == "set_option maxHeartbeats 6400000 in") next
+                print file ": " line
               }
             ')
             if [ -n "$additions" ]; then
