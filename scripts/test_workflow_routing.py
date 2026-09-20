@@ -62,6 +62,8 @@ class WorkflowRoutingTests(unittest.TestCase):
         self.assertIn('ancestor_input" != "$input', workflow)
         self.assertIn('.creator.login == "github-actions[bot]"', workflow)
         self.assertIn('description" == "$attestation', workflow)
+        self.assertIn('warning_state" == success', workflow)
+        self.assertIn('warnings=$warning_state', workflow)
         self.assertIn("BUILD_REUSED=1", workflow)
         self.assertIn("github.event_name != 'merge_group'", workflow)
 
