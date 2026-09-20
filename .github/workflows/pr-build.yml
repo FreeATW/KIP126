@@ -810,7 +810,8 @@ jobs:
           # is deliberate: a comment's apostrophe once closed this single-quoted string
           # early and reddened every PR build (#694). All prose now lives in the script.
           # The marker comes from the trusted sandbox script only after an
-          # ordinary build, the axiom audit, and project gates have all passed.
+          # ordinary build, the project gates, and either a clean axiom audit or
+          # a sorry-only audit warning have passed.
           # Capture it outside landrun, where untrusted Lean code cannot alter
           # the result file; a forged marker can only fail closed into review.
           set -o pipefail
@@ -825,6 +826,9 @@ jobs:
             -- bash -euxo pipefail -c 'cd base && exec bash scripts/sandbox-build.sh' 2>&1 | tee "$build_log"
           if grep -qx 'KIP126_WARNING_ONLY_BUILD=1' "$build_log"; then
             echo "BUILD_WARNINGS=1" >> "$GITHUB_ENV"
+          fi
+          if grep -qx 'KIP126_SORRY_AUDIT=1' "$build_log"; then
+            echo "BUILD_SORRY_AUDIT=1" >> "$GITHUB_ENV"
           fi
 
       # This separate namespace never feeds the trusted-main cache. It only supplies compiled
@@ -913,14 +917,17 @@ jobs:
           fi
           post_status build "$state" "$desc"
 
-          # warnings: a strict `lake build --iofail` may find warnings even
-          # though an ordinary Lean build, the axiom audit, and all project
-          # gates pass.  Such a PR satisfies GitHub's required `build` check
-          # but is deliberately rejected by the automatic merge gate.  This
-          # context is not a repository-required check, so a human reviewer
-          # can still place the PR in the merge queue after review.
+          # warnings: a strict `lake build --iofail` may find warnings, or the
+          # axiom audit may find only `sorryAx` development debt, even though
+          # the ordinary Lean build and project gates pass. Such a PR satisfies
+          # GitHub's required `build` check but is deliberately rejected by the
+          # automatic merge gate. This context is not a repository-required
+          # check, so a human reviewer can still place the PR in the merge queue
+          # after review.
           if [ "$state" != success ]; then
             warn_state=failure; warn_desc="warning policy unavailable because the build failed"
+          elif [ "${{ env.BUILD_SORRY_AUDIT }}" = "1" ]; then
+            warn_state=failure; warn_desc="sorryAx present — human review + merge required"
           elif [ "${{ env.BUILD_WARNINGS }}" = "1" ]; then
             warn_state=failure; warn_desc="Lean build completed with warnings — human review + merge required"
           else
