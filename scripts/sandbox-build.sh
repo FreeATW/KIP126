@@ -25,8 +25,9 @@ fi
 
 # The compiled axiom audit remains strict when invoked directly.  During PR
 # development, however, an open theorem may carry `sorryAx`: that is review
-# debt, not a compiler or trust-boundary violation.  Treat an audit containing
-# only `sorryAx` entries as a warning so the required `build` status can pass;
+# debt that should be routed to human review rather than treated as a compiler
+# failure. Treat an audit containing only `sorryAx` entries as a warning so the
+# required `build` status can pass;
 # the outer workflow publishes the warning status separately, which keeps
 # automatic merge disabled until a human review accepts the open proofs.
 axiom_log=$(mktemp "$PWD/.lake/axioms.XXXXXX")
