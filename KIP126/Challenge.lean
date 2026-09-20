@@ -8,5 +8,3 @@ import KIP126.Challenge.Near126.Conditions.Statement
 import KIP126.Challenge.Near126.C3NotC5.Statement
 import KIP126.Challenge.Near126.ExcludeEta.Statement
 import KIP126.Challenge.Final.H6SquarePermanent.Statement
-import KIP126.Challenge.Geometry.Thm1_1Dimension126.Statement
-import KIP126.Challenge.Geometry.Cor1_2Dimensions.Statement

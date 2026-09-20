@@ -108,7 +108,6 @@ KIP126/
     Tools/                  comparison, generalized rules, page propagation
     Near126/                candidate reduction through final exclusion
     Final/                  conditional h6-square permanent-cycle theorem
-    Geometry/               dimension 126 and complete dimension list
   Checks/                   focused regression and statement-shape modules
 ```
 
@@ -191,12 +190,11 @@ the cross-reference. The permanent-cycle main theorem is an additional node.
 | Proposition 7.8, three-condition equivalence | `Near126/Conditions` | `prop:possible-h62` and its supporting nodes |
 | Proposition 7.9, C3/C5 incompatibility | `Near126/C3NotC5` | `prop:near126-c3-not-c5` |
 | Theorem 1.4 / 7.1, permanent h6-square | `Final/H6SquarePermanent` | `thm:h6-square-permanent` |
-| Theorem 1.1, dimension 126 | `Geometry/Thm1_1Dimension126` | `thm:kervaire-126-conditional` |
-| Corollary 1.2, exact dimension list | `Geometry/Cor1_2Dimensions` | `cor:kervaire-dimensions-exact` |
 
-`Geometry/` follows the permanent-cycle theorem and the separately supplied
-Browder, low-dimensional, and HHR results. It is outside diagram 1's bottom
-endpoint but remains inside `PROJECT_BOUNDARY.md`.
+The geometric endpoints follow the permanent-cycle theorem and the separately
+supplied Browder, low-dimensional, and HHR results. They remain in the
+Blueprint and `PROJECT_BOUNDARY.md`, but their typed Challenge nodes are
+deferred until the permanent-cycle chain is ready.
 
 ## Import and trust rules
 
@@ -204,7 +202,7 @@ endpoint but remains inside `PROJECT_BOUNDARY.md`.
 Mathlib -> Def/*/Data -> Def/*/Predicates -> Def/*/Proofs
                   \-> External input types and records
 Def + External -> Challenge/*/Statement (paper milestones, possibly `sorry`)
-Challenge/Tools -> Challenge/Near126 -> Challenge/Final -> Challenge/Geometry
+Challenge/Tools -> Challenge/Near126 -> Challenge/Final
 ```
 
 1. `Def/` never imports `Challenge/`. Challenge statements import only the

@@ -46,7 +46,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Proposition 7.8 dichotomy` | `Challenge/Near126/OnlyD12/Statement` |
 | `Proposition 7.9 incompatibility` | `Challenge/Near126/C3NotC5/Statement` |
 | `Permanent h₆² endpoint` | `Challenge/Final/H6SquarePermanent/Statement` |
-| `Dimension-126 geometry` | `Challenge/Geometry/Thm1_1Dimension126/Statement`, `Challenge/Geometry/Cor1_2Dimensions/Statement` |
+| `Dimension-126 geometry` | Blueprint/project-boundary target; its Challenge statements are deferred until the permanent-cycle chain is ready |
 | `Appendix computation catalogue` | `Def/Computation/AppendixTable/{Data,Rows/{Data,Catalogue}}` |
 | `*/Regression`, `*Regression` | corresponding `Checks/` modules |
 
@@ -72,9 +72,11 @@ canonical Lean proof: Theorem 6.1 (generalized Leibniz), Theorem 6.12
 126), and Corollary 1.2 (exact dimension list). Their precise Lean statements
 require the paper-specific stable and synthetic homotopy objects, page
 extensions, computation interpretations, and fixed MainInput that are still
-Blueprint targets. Each target now has a typed open `Statement.lean`; no
-statement is marked as a proof, and no arbitrary witness or external input
-asserts an endpoint.
+Blueprint targets. Each process and permanent-cycle target has a typed open
+`Statement.lean`; no statement is marked as a proof, and no arbitrary witness
+or external input asserts an endpoint. The two geometric endpoints are
+intentionally deferred from `Challenge/` until the permanent-cycle chain is
+ready.
 
 The appendix row schema and all 401 nonempty rows are now encoded as typed AST
 records with source locators, 124 joined differential relation pairs, 31
