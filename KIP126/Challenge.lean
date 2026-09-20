@@ -1,10 +1,4 @@
-import KIP126.Challenge.Tools.Comparison.Proof
 import KIP126.Challenge.Near126.Thm7_3BJMBX.Statement
-import KIP126.Challenge.Tools.Thm6_1Leibniz.Statement
-import KIP126.Challenge.Tools.Thm6_12Mahowald.Statement
-import KIP126.Challenge.Tools.PagePropagation.Statement
-import KIP126.Challenge.Tools.FilteredComplexRelations.Statement
-import KIP126.Challenge.Tools.StableHomotopy.Statement
 import KIP126.Challenge.Near126.OnlyD12.Statement
 import KIP126.Challenge.Near126.CandidateReduction.Statement
 import KIP126.Challenge.Near126.Conditions.Statement
