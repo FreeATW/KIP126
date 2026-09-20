@@ -9,9 +9,13 @@ structure Input (O : Operations) where
   base : Thm6_1Leibniz.Input O
   noLoss : ∀ q : ℤ, base.n ≤ q → q ≤ base.r → Prop
 
-def statement {O : Operations} (I : Input O) : Prop :=
+theorem statement {O : Operations} (I : Input O) :
   (∀ (q : ℤ) (h₁ : I.base.n ≤ q) (h₂ : q ≤ I.base.r),
       I.noLoss q h₁ h₂) →
-    conclusion I.base
+    O.targetDifferential (I.base.r + I.base.l - I.base.m)
+        (I.base.r - 1 - I.base.m + I.base.e)
+        (I.base.s + I.base.m, I.base.t + I.base.m) I.base.y =
+      transportTarget I.base.targetDegreeCoherence.symm I.base.yInfinity := by
+  sorry
 
 end KIP126.Challenge.Tools.PagePropagation

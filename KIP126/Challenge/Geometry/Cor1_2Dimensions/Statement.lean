@@ -15,10 +15,11 @@ structure Input where
 
 /-- The exact dimensions carrying framed Kervaire invariant one are
 `2, 6, 14, 30, 62, 126`. -/
-def statement (I : Input) : Prop :=
+theorem statement (I : Input) :
   ∀ n : ℕ,
     ((∃ M : ManifoldOf I.base.framed,
         dimension I.base.framed M = n ∧ kervaireOne I.base.framed M) ↔
-      n = 2 ∨ n = 6 ∨ n = 14 ∨ n = 30 ∨ n = 62 ∨ n = 126)
+      n = 2 ∨ n = 6 ∨ n = 14 ∨ n = 30 ∨ n = 62 ∨ n = 126) := by
+  sorry
 
 end KIP126.Challenge.Geometry.Cor1_2Dimensions

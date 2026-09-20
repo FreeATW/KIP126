@@ -1,8 +1,8 @@
-import KIP126.Challenge.Tools.FilteredComplexRelations.Statement
+import KIP126.Def.SpectralSequence.FilteredComplex.Relations.Proofs
 
 /-! Regression check for the canonical filtered-complex page view. -/
 
-namespace KIP126.Challenge.Tools.FilteredComplexRelations
+namespace KIP126.Core.SpectralSequence.FilteredComplex
 
 noncomputable section
 
@@ -34,4 +34,4 @@ example (FC : FilteredComplex C) (P : PageView FC)
 
 end
 
-end KIP126.Challenge.Tools.FilteredComplexRelations
+end KIP126.Core.SpectralSequence.FilteredComplex

@@ -19,9 +19,11 @@ retain the responsibilities assigned by `README.md`.
    definition carries only the data and laws required to construct its type.
    Properties such as locality, convergence, vanishing, comparison isomorphisms,
    and detection are named propositions with separate proofs.
-3. Put the paper's internal deductions in `Challenge/`, including supporting
-   lemmas as well as the Prove2me milestones. An open challenge has a compiling
-   proposition statement; it has no `sorry` theorem in the canonical library.
+3. Put only paper-level milestone statements in `Challenge/`. Concrete object
+   properties belong in `Def/*/Predicates.lean`; reusable internal deductions
+   belong in `Def/*/Proofs.lean`. Both kinds of theorem are written directly as
+   `theorem` declarations; during development an unfinished proof body may be
+   `by sorry`. A compiling declaration is not a proof-completion marker.
 4. Keep literature results and finite computational facts as explicit,
    provenance-carrying `ExternalResult` or `ExternalEvidence` parameters. The
    final permanent-cycle theorem remains conditional on these inputs and has
@@ -31,6 +33,48 @@ retain the responsibilities assigned by `README.md`.
    not an import path into the trusted `KIP126` library. A reusable historical
    declaration enters `Def/` only after its statement, model, and recursive
    axiom dependencies have been checked and its proof ported.
+
+## Three-layer declaration rule
+
+This is the source-level rule for the migration discussed in this document.
+It is deliberately stricter than merely splitting files by topic.
+
+1. **Data / definitions.** `Def/*/Data.lean` defines the mathematical objects,
+   maps, operations, and witness records. A structure may contain the laws
+   required to construct that object. It must not hide an unproved theorem in
+   an arbitrary field merely to make later code typecheck.
+2. **Predicates.** `Def/*/Predicates.lean` defines reusable properties and
+   relations of those objects as `Prop`. Examples are `IsLift`,
+   `DifferentialRelation`, and `RelationCrossedBy`. A predicate describes an
+   object or configuration; it is not itself a paper milestone.
+3. **Proofs.** `Def/*/Proofs.lean` states reusable mathematical results as
+   direct `theorem` declarations. The theorem type is the statement, and its
+   proof body is written immediately after `:=`; while a proof is being
+   developed that body may be `by sorry`. There is no parallel
+   `def statement : Prop` or `def conclusion : Prop` for the same result.
+
+The same direct-theorem rule applies to `Challenge/*/Statement.lean`, but a
+Challenge file is reserved for an important paper milestone. A supporting
+lemma that is useful because of the formalization, rather than because it is a
+milestone of the paper, belongs in `Def/*/Proofs.lean`. A milestone theorem may
+take the formalized definitions, predicates, and explicit external inputs as
+premises. Its temporary `by sorry` body records an unfinished proof; it does
+not make the theorem trusted or complete, and it must not receive a Blueprint
+completion marker.
+
+For migration decisions, use this test:
+
+```text
+Is it an object or witness?                 -> Def/*/Data.lean
+Is it a reusable property or relation?      -> Def/*/Predicates.lean
+Is it a reusable mathematical implication?  -> Def/*/Proofs.lean theorem
+Is it a paper-level milestone?              -> Challenge/*/Statement.lean theorem
+```
+
+The file split is not a requirement to rename public declarations. Existing
+names may be retained when that avoids unnecessary downstream churn; what must
+change is the ownership and the absence of a separate proposition alias for a
+theorem statement.
 
 ## Target source tree
 
@@ -84,12 +128,12 @@ review, prove the law, and then assemble the standard object. No arbitrary
 choice from an unproved existence statement may stand in for the specified
 object.
 
-Each `Challenge/<node>/` normally has `Statement.lean` and, once a proof exists,
-`Proof.lean`. `Statement.lean` defines the exact goal as a proposition, with
-all required parameters and explicit external conditions. It must compile
-without a theorem-body placeholder. `Proof.lean` imports that statement and
-the earlier theorems it actually uses. A source file for an open node is never
-treated as a proof-completion marker.
+Each `Challenge/<node>/` normally has a `Statement.lean` containing the exact
+paper milestone as a direct theorem declaration, with all required parameters
+and explicit external conditions. An open theorem may use the temporary body
+`by sorry`; there is no separate `def statement : Prop`. Reusable supporting
+theorems are kept in the corresponding `Def/*/Proofs.lean` module rather than
+in `Challenge/`.
 
 ## Correspondence with KIP126 dependency diagram 1
 
@@ -106,7 +150,7 @@ chapter and label remain the mathematical index.
 | Classical and synthetic ESS | `Def/ClassicalESS/`, `Def/SyntheticESS/` | `extension_spectral_sequences.tex`, `synthetic_extensions.tex` |
 | Page extensions, crossing, no-crossing | `Def/PageExtensions/` | `page_extensions.tex` |
 | Kervaire setup and conditions C3/C4/C5 | `Def/KervaireSetup/` | `kervaire_setup.tex`, `near126.tex` |
-| Classical/synthetic comparison interface and proof | `Def/Comparison/`, `Challenge/Tools/Comparison/` | `comparison_and_rules.tex` |
+| Classical/synthetic comparison interface and proof | `Def/Comparison/` | `comparison_and_rules.tex` |
 | Generalized Leibniz and Mahowald | `Challenge/Tools/Thm6_1Leibniz/`, `Challenge/Tools/Thm6_12Mahowald/` | `thm:generalized-leibniz`, `thm:generalized-mahowald` |
 | Page stretching and extension propagation | `Challenge/Tools/PagePropagation/` | `comparison_and_rules.tex` |
 | Candidate reduction | `Challenge/Near126/CandidateReduction/` | `near126.tex` |
@@ -159,8 +203,7 @@ endpoint but remains inside `PROJECT_BOUNDARY.md`.
 ```text
 Mathlib -> Def/*/Data -> Def/*/Predicates -> Def/*/Proofs
                   \-> External input types and records
-Def + External -> Challenge/*/Statement
-Statement + earlier proofs + explicit External values -> Challenge/*/Proof
+Def + External -> Challenge/*/Statement (paper milestones, possibly `sorry`)
 Challenge/Tools -> Challenge/Near126 -> Challenge/Final -> Challenge/Geometry
 ```
 
@@ -195,10 +238,10 @@ Challenge/Tools -> Challenge/Near126 -> Challenge/Final -> Challenge/Geometry
    `Core/SpectralSequence`, then stable, classical, synthetic, ESS, page
    extension, comparison, and Kervaire setup declarations. Keep temporary
    import-only facades where needed; remove them after consumers move.
-4. **Add the internal proof graph.** Create the `Tools`, `Near126`, `Final`,
-   and `Geometry` statements in the order above. Add proof files only with
-   actual proof terms. Do not mark a node `leanok` because its proposition
-   file compiles.
+4. **Add the paper milestone graph.** Create the `Tools`, `Near126`, `Final`,
+   and `Geometry` theorem declarations in the order above. Keep reusable
+   object-level predicates and supporting theorem declarations under `Def/`.
+   Do not mark a node `leanok` because its theorem compiles with `sorry`.
 5. **Reconcile the project map.** Update the `README.md` and `docs/ROADMAP.md`
    chapter-to-module wording from an intended one-file mapping to a chapter
    entry point over multiple small modules. Keep the Blueprint chapters in
@@ -216,9 +259,12 @@ mathematical change, with the relevant Blueprint node updated.
   included in `scripts/Axioms.lean`'s recursive audit.
 - The proposed import direction is acyclic. No canonical module imports
   `KIPBase`; no `Def` module imports `Challenge`.
-- Open Challenge statements compile without `sorry`, `admit`, project `axiom`,
-  or arbitrary data standing in for the specified object. Only actual proofs
-  cause Blueprint completion markers to advance.
+- Open Challenge statements may compile with an explicit `sorry` theorem body
+  and contain no project-defined axiom or arbitrary data standing in for the
+  specified object. Before merge, the reusable `Def/*/Proofs.lean` theorem
+  bodies required by a milestone must be checked for `sorry`, `admit`, and
+  project axioms. Only actual proofs cause Blueprint completion markers to
+  advance.
 - Existing public declarations retain their names or have reviewed import,
   Blueprint, and downstream-reference updates. The proof and assumption
   meaning of each moved declaration is unchanged.

@@ -17,6 +17,10 @@ import KIP126.Def.SpectralSequence.FilteredComplex.Data
 import KIP126.Def.SpectralSequence.FilteredPage.Proofs
 import KIP126.Def.SpectralSequence.FilteredDifferential.Proofs
 import KIP126.Def.SpectralSequence.FilteredPage.Complex
+import KIP126.Def.SpectralSequence.FilteredPage.AssemblyProofs
+import KIP126.Def.SpectralSequence.FilteredComplex.Relations.Data
+import KIP126.Def.SpectralSequence.FilteredComplex.Relations.Predicates
+import KIP126.Def.SpectralSequence.FilteredComplex.Relations.Proofs
 import KIP126.Def.SpectralSequence.HomologicalImage.Data
 import KIP126.Def.SpectralSequence.PageLevel.Proofs
 import KIP126.Def.PageExtensions.Differential.Proofs

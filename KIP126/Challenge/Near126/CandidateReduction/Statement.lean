@@ -16,12 +16,13 @@ structure Input
 
 /- The reduction retains both the exclusion of every other length and the
    exact relation between the remaining length and the displayed target. -/
-def statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
+theorem statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
     {A : SyntheticAdamsSS} {Carrier : Type} [AddCommGroup Carrier]
-    (I : Input (C := C) (S := S) (A := A) (Carrier := Carrier)) : Prop :=
+    (I : Input (C := C) (S := S) (A := A) (Carrier := Carrier)) :
   (∀ r : ℕ, r ≠ 12 → ¬ I.differential r) ∧
     (I.differential 12 ↔
       (I.near.d12Value = I.near.d12Target ∧ I.near.d12Value ≠ 0)) ∧
-    (¬ I.differential 12 ↔ I.near.context.h6Permanent)
+    (¬ I.differential 12 ↔ I.near.context.h6Permanent) := by
+  sorry
 
 end KIP126.Challenge.Near126.CandidateReduction

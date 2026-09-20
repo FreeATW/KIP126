@@ -30,9 +30,10 @@ structure Input where
 
 /-- If the selected sphere input has the permanent `h₆²` class, a framed
 Kervaire-invariant-one manifold exists in dimension 126. -/
-def statement (I : Input) : Prop :=
+theorem statement (I : Input) :
   ∃ M : I.framed.Manifold 126,
     I.framed.closedSmoothFramed M ∧
-      I.framed.hasKervaireInvariantOne M
+      I.framed.hasKervaireInvariantOne M := by
+  sorry
 
 end KIP126.Challenge.Geometry.Thm1_1Dimension126

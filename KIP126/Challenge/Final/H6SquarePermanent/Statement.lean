@@ -17,9 +17,10 @@ structure Input
 
 /-- The endpoint theorem consumes the near-126 no-`d₁₂` branch and concludes
 permanence of the same `h₆²` class recorded by the input context. -/
-def statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
+theorem statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
     {A : SyntheticAdamsSS} {Carrier : Type} [AddCommGroup Carrier]
-    (I : Input (C := C) (S := S) (A := A) (Carrier := Carrier)) : Prop :=
-  I.near.context.h6Permanent
+    (I : Input (C := C) (S := S) (A := A) (Carrier := Carrier)) :
+  I.near.context.h6Permanent := by
+  sorry
 
 end KIP126.Challenge.Final.H6SquarePermanent

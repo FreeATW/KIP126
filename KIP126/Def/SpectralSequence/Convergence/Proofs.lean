@@ -139,4 +139,22 @@ theorem detect_difference (W : StrongConvergenceWitness P A F)
 
 end StrongConvergenceWitness
 
+variable {FC : FilteredComplex C} {P : EndpointExtension FC}
+variable {A : Type*} [Category A] [Abelian A]
+variable {F : HomotopyCategory C (ComplexShape.up ℤ) ⥤ A}
+variable [F.ShiftSequence ℤ] [F.IsHomological]
+
+/-- A supplied page/abutment comparison can be extended to coherent strong
+convergence data.  The construction remains an open proof obligation for the
+canonical interface. -/
+theorem strongConvergenceFromComparison :
+    ∀ {C : Type u} [Category.{v} C] [Abelian C]
+      (FC : FilteredComplex C) (P : EndpointExtension FC)
+      (A : Type u) [Category.{v} A] [Abelian A]
+      (F : HomotopyCategory C (ComplexShape.up ℤ) ⥤ A)
+      [F.ShiftSequence ℤ] [F.IsHomological]
+      (W : PageAbutmentComparisonWitness P A F),
+      ∃ S : StrongConvergenceWitness P A F, S.comparison = W := by
+  sorry
+
 end KIP126.Core.SpectralSequence

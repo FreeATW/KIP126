@@ -1,4 +1,4 @@
-import KIP126.Challenge.Tools.Comparison.Proof
+import KIP126.Def.Comparison.ClassicalSynthetic.Proofs
 import KIP126.External.Claims
 
 /-!

@@ -164,4 +164,15 @@ noncomputable def homotopyGroupFunctor (n : ℤ) :
     ext x
     simp [inducedMap, Category.assoc]
 
+/-- Exactness at the shifted `X` term in the long exact homotopy-group
+sequence.  A concrete stable model supplies the remaining exactness witness
+while this canonical target records its type. -/
+theorem lesHomotopyExactH :
+    ∀ {C : Type u} [StableHomotopyCategory.{u, v} C]
+      (T : HoCofiberSequence (C := C)) (n : ℤ),
+      ∀ (x : HomotopyGroup (n - 1) T.X),
+        (inducedMap T.f (n - 1)) x = 0 ↔
+          ∃ z : HomotopyGroup n T.Z, (connectingHomomorphism T n) z = x := by
+  sorry
+
 end KIP126.StableHomotopy

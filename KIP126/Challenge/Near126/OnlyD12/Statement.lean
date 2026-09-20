@@ -24,9 +24,9 @@ structure Input
 
 /-- The two alternatives are exclusive and exhaustive, and the nonzero
 `d₁₂` alternative is equivalent to the three displayed conditions. -/
-def statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
+theorem statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
     {A : SyntheticAdamsSS} {Carrier : Type} [AddCommGroup Carrier]
-    (I : Input (C := C) (S := S) (A := A) (Carrier := Carrier)) : Prop :=
+    (I : Input (C := C) (S := S) (A := A) (Carrier := Carrier)) :
   let c3 : Prop := I.near.d6 (I.near.x12684 + I.near.x1268) = 0
   let c4 : Prop :=
     I.near.theta5Square = I.near.lambda6 I.near.h0SquaredX1248 ∧
@@ -39,6 +39,7 @@ def statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
     ((I.d12Value = I.d12Target ∧ I.d12Value ≠ 0) ∧
       ¬ I.context.h6Permanent)) ∧
     ((I.d12Value = I.d12Target ∧ I.d12Value ≠ 0) ↔
-      (c3 ∧ c4 ∧ c5))
+      (c3 ∧ c4 ∧ c5)) := by
+  sorry
 
 end KIP126.Challenge.Near126.OnlyD12

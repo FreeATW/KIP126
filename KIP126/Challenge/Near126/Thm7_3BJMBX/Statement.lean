@@ -32,8 +32,8 @@ choice `theta5`, `h₆²` survives to `E_(r+3)` precisely when the displayed
 equivalent to vanishing in the untruncated sphere.  The `Int.toNat` coercions
 make the paper's integer parameter explicit while retaining the natural-number
 quotient indices of the canonical finite-quotient interface. -/
-def anyChoiceCriterion {Carrier : Type} [AddCommGroup Carrier]
-    (I : Input (Carrier := Carrier)) : Prop :=
+theorem anyChoiceCriterion {Carrier : Type} [AddCommGroup Carrier]
+    (I : Input (Carrier := Carrier)) :
   ∀ (theta5 : Carrier), I.context.isChoice theta5 →
     IsOrderTwo theta5 →
       (∀ (r : ℤ), 1 ≤ r →
@@ -42,6 +42,7 @@ def anyChoiceCriterion {Carrier : Type} [AddCommGroup Carrier]
             (I.context.lambdaEta (I.context.square theta5)))) ∧
       (I.context.h6Permanent ↔
         I.context.untruncatedZero
-          (I.context.lambdaEta (I.context.square theta5)))
+          (I.context.lambdaEta (I.context.square theta5))) := by
+  sorry
 
 end KIP126.Challenge.Near126.Thm7_3BJMBX

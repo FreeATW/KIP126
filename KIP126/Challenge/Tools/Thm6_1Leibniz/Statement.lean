@@ -87,15 +87,13 @@ input package. -/
 def transportTarget {O : Operations} {a b : Degree} (h : a = b)
     (z : O.TargetPermanent a) : O.TargetPermanent b := h ▸ z
 
-/-- The target asserted by the generalized Leibniz rule. -/
-def conclusion
-    {O : Operations} (I : Input O) : Prop :=
-  O.targetDifferential (I.r + I.l - I.m)
-      (I.r - 1 - I.m + I.e) (I.s + I.m, I.t + I.m) I.y =
-    transportTarget I.targetDegreeCoherence.symm I.yInfinity
-
 /-- The open Theorem 6.1 statement over an explicit page and extension
 interface. -/
-def generalizedLeibniz : Prop := ∀ (O : Operations) (I : Input O), conclusion I
+theorem generalizedLeibniz :
+    ∀ (O : Operations) (I : Input O),
+      O.targetDifferential (I.r + I.l - I.m)
+          (I.r - 1 - I.m + I.e) (I.s + I.m, I.t + I.m) I.y =
+        transportTarget I.targetDegreeCoherence.symm I.yInfinity := by
+  sorry
 
 end KIP126.Challenge.Tools.Thm6_1Leibniz

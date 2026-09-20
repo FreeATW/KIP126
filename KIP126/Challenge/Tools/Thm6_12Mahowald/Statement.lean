@@ -80,17 +80,16 @@ structure Input (O : Operations) where
   gExtension : O.gExtension g m (m1 + 2) (m1 + 1) r
     (s + n + l, t + n + l - 1) (targetDegree r (s, t)) y yBar
 
-/-- The exact endpoint conclusion of Theorem 6.12. -/
-def conclusion {O : Operations} (I : Input O) : Prop :=
-  O.survivesX (I.n + I.m + I.eH) I.n1
-      (I.s + I.l, I.t + I.l - 1) I.x ∧
-    O.moduloBoundary I.rPrime (I.m1 + 1) (I.m1 + 1)
-      (I.s + I.n + I.l, I.t + I.n + I.l - 1)
-      (O.fTarget I.f (I.n + I.m + 1 + I.eH) I.n I.n1
-        (I.m1 + 1) (I.s + I.l, I.t + I.l - 1)
-        (I.s + I.n + I.l, I.t + I.n + I.l - 1) I.x) I.y
-
 /-- The open Theorem 6.12 statement over the explicit triangle package. -/
-def generalizedMahowald : Prop := ∀ (O : Operations) (I : Input O), conclusion I
+theorem generalizedMahowald :
+    ∀ (O : Operations) (I : Input O),
+      O.survivesX (I.n + I.m + I.eH) I.n1
+          (I.s + I.l, I.t + I.l - 1) I.x ∧
+        O.moduloBoundary I.rPrime (I.m1 + 1) (I.m1 + 1)
+          (I.s + I.n + I.l, I.t + I.n + I.l - 1)
+          (O.fTarget I.f (I.n + I.m + 1 + I.eH) I.n I.n1
+            (I.m1 + 1) (I.s + I.l, I.t + I.l - 1)
+            (I.s + I.n + I.l, I.t + I.n + I.l - 1) I.x) I.y := by
+  sorry
 
 end KIP126.Challenge.Tools.Thm6_12Mahowald

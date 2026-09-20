@@ -15,7 +15,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `SpectralSequence/Commutativity` | Retained as isolated historical evidence; its ESS and convergence statements depend on the retired `PreSS`/`ConvergenceMorphism` architecture and are not asserted in KIP126 |
 | `SpectralSequence/UnboundedExtension` | Retained as isolated historical evidence; its stabilization and weak-convergence declarations remain open and depend on the retired extension architecture |
 | `Core/SpectralSequence/PageLevel` | `Def/SpectralSequence/PageLevel/{Data,Proofs}` |
-| `Core/SpectralSequence/FilteredComplex` | `Def/SpectralSequence/FilteredComplex/Data`, `Def/SpectralSequence/FilteredPage/{Data,Proofs,Complex}`, `Def/SpectralSequence/FilteredDifferential/{Data,Proofs}`, `Checks/SpectralSequence/{FilteredComplex,FilteredPage,FilteredDifferential}`, `Challenge/Tools/FilteredComplexRelations/Statement` (canonical filtered complex, homology filtration, cycle/boundary subobjects, page quotient, finite-page differential, and proved `B ≤ Z`/`d² = 0`; Mathlib `SpectralSequence` assembly, full ESS adapter, and four lift/relation obligations remain open) |
+| `Core/SpectralSequence/FilteredComplex` | `Def/SpectralSequence/FilteredComplex/Data`, `Def/SpectralSequence/FilteredPage/{Data,Proofs,Complex,AssemblyProofs}`, `Def/SpectralSequence/FilteredComplex/Relations/{Data,Predicates,Proofs}`, `Def/SpectralSequence/FilteredDifferential/{Data,Proofs}`, `Checks/SpectralSequence/{FilteredComplex,FilteredPage,FilteredDifferential}`, `Challenge/` only for paper milestones (canonical filtered complex, homology filtration, cycle/boundary subobjects, page quotient, finite-page differential, and proved `B ≤ Z`/`d² = 0`; Mathlib `SpectralSequence` assembly, its homology-witness existence, full ESS adapter, and four lift/relation theorems remain open) |
 | `Core/SpectralSequence/FilteredRepresentatives` | `Def/SpectralSequence/Representatives/Proofs` |
 | `Core/SpectralSequence/HomologicalImage` | `Def/SpectralSequence/HomologicalImage/Data` |
 | `Core/SpectralSequence/SpectralObjectAdapter` | `Def/SpectralSequence/SpectralObject/Data` |
@@ -33,7 +33,7 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Classical/ExtensionSS/Basic` | `Def/ClassicalESS/Eta/{Data,ExternalInput,Predicates,Proofs}` |
 | `Classical/ExtensionSS/EtaData` | `External/Computation/EtaRows/Data` |
 | `Synthetic/SpectralSequence/Basic` | `Def/Synthetic/AdamsSequence/Data` |
-| `Comparison/ClassicalSynthetic/Basic` | `Def/Comparison/ClassicalSynthetic/{Data,Proofs}`, `Challenge/Tools/Comparison/{Statement,Proof}` |
+| `Comparison/ClassicalSynthetic/Basic` | `Def/Comparison/ClassicalSynthetic/{Data,Proofs}` |
 | `Classical/Synthetic Kervaire setup` | `Def/Kervaire/Setup/Data`, `Def/Kervaire/Theta5/{Data,Predicates,Proofs}` |
 | `External BJM/BX, Xu/IWX, Browder, HHR, BJM inputs` | `External/Literature/Kervaire` |
 | `Theorem 6.1 generalized Leibniz` | `Challenge/Tools/Thm6_1Leibniz/Statement` |
@@ -59,8 +59,9 @@ APIs retain their paths.
 
 ## Open mathematical obligations
 
-`Challenge/Tools/Comparison/Proof.lean` proves the structural differential
-naturality of an existing reindexed chain map. This is a supporting lemma,
+The structural differential naturality of the classical/synthetic reindexed
+chain map is now a direct theorem in
+`Def/Comparison/ClassicalSynthetic/Proofs.lean`. It is a supporting lemma,
 not the open `h₄` correspondence or one of the paper's main milestones.
 
 The following paper targets remain `\notready` in the Blueprint and have no
@@ -99,7 +100,7 @@ degreewise-Mittag-Leffler predicate and the bounded-above/bounded proofs. This
 is a filtration property only; it does not recreate the retired completion
 object or its convergence-morphism adapter.
 
-The filtered-complex relation challenge now makes its page adapter explicit:
+The filtered-complex relation definition layer now makes its page adapter explicit:
 `PageView` supplies a page-number translation and compares each Mathlib page
 with the canonical `pageObj` quotient. A `PageHomologyWitness` supplies a
 canonical `PageView` constructor for the finite-page assembly. The new
@@ -109,11 +110,12 @@ factorization accepted by Mathlib's homology constructor, and
 the inverse `PageHomologyWitness.toFactorization` exposes the same factorization
 from any supplied witness.
 Its lift predicate factors through the canonical cycle subobject and `pageπ`, and it no
-longer identifies every page with the associated graded object. The proved
-`PageView.isLift_sub_factors_boundary` lemma records the resulting uniqueness
-law: two lifts of one page element differ through the canonical boundary
-subobject. The homology witness and the four relation obligations remain
-unproved.
+longer identifies every page with the associated graded object. The
+`Relations/Proofs.lean` module contains the direct theorem declarations: the
+uniqueness lemma is proved, while the four relation theorems currently have
+`by sorry` proof bodies. They are reusable internal lemmas, not Challenge
+milestones. The homology witness remains an explicit input; its existence is
+recorded as the open direct theorem in `FilteredPage/AssemblyProofs.lean`.
 
 The canonical page proof layer also carries the elementary quotient-page laws
 formerly provided by `SSData`: bottom boundaries lie in every cycle object, and

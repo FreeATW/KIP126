@@ -15,12 +15,13 @@ structure Input
   c4At : Carrier → Prop
   c5At : Carrier → Prop
 
-def statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
+theorem statement {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
     {A : SyntheticAdamsSS} {Carrier : Type} [AddCommGroup Carrier]
-    (I : Input (C := C) (S := S) (A := A) (Carrier := Carrier)) : Prop :=
+    (I : Input (C := C) (S := S) (A := A) (Carrier := Carrier)) :
   ((I.c4At I.near.context.sourceChoice ↔
       ∀ θ, I.near.context.isChoice θ → I.c4At θ) ∧
     (I.c5At I.near.context.sourceChoice ↔
-      ∀ θ, I.near.context.isChoice θ → I.c5At θ))
+      ∀ θ, I.near.context.isChoice θ → I.c5At θ)) := by
+  sorry
 
 end KIP126.Challenge.Near126.Conditions
