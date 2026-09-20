@@ -141,7 +141,6 @@ theorem dToK_comp_d (FC : FilteredComplex C) (k : ℤ) :
     FC.dToK k ≫ FC.complex.d k (k - 1) = 0 := by
   exact FC.complex.d_comp_d (k + 1) k (k - 1)
 
-set_option maxHeartbeats 800000 in
 /-- Boundaries are cycles in every associated graded piece. -/
 theorem B_le_Z_aux (FC : FilteredComplex C) (s k : ℤ)
     (r : WithTop ℕ) :

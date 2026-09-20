@@ -21,7 +21,6 @@ variable {C : Type u} [Category.{v} C] [Abelian C]
 def pageShape (n : ℕ) : ComplexShape (ℤ × ℤ) :=
   ComplexShape.up' ((n : ℤ), (-1 : ℤ))
 
-set_option maxHeartbeats 800000 in
 /-- The differential on a finite quotient page, extended by zero off the page shape. -/
 noncomputable def pageDifferentialHom (FC : FilteredComplex C) (n : ℕ)
     (p q : ℤ × ℤ) :
@@ -33,7 +32,6 @@ noncomputable def pageDifferentialHom (FC : FilteredComplex C) (n : ℕ)
     rfl
   · exact 0
 
-set_option maxHeartbeats 800000 in
 @[simp]
 lemma pageDifferentialHom_of_rel (FC : FilteredComplex C) (n : ℕ)
     (p q : ℤ × ℤ) (hpq : (pageShape n).Rel p q) :
@@ -44,7 +42,6 @@ lemma pageDifferentialHom_of_rel (FC : FilteredComplex C) (n : ℕ)
   dsimp [pageDifferentialHom]
   rw [dif_pos hpq]
 
-set_option maxHeartbeats 800000 in
 /-- The finite page as a Mathlib homological complex. -/
 noncomputable def pageComplex (FC : FilteredComplex C) (n : ℕ) :
     HomologicalComplex C (pageShape n) where

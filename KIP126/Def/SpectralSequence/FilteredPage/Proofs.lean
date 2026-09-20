@@ -16,7 +16,6 @@ universe u v
 
 variable {C : Type u} [Category.{v} C] [Abelian C]
 
-set_option maxHeartbeats 800000 in
 /-- The Z_anti law for the canonical page subobjects. -/
 theorem cycleSubobject_antitone (FC : FilteredComplex C) (s k : ℤ) :
     Antitone (FC.cycleSubobject s k) := by
@@ -81,7 +80,6 @@ theorem cycleSubobject_antitone (FC : FilteredComplex C) (s k : ℤ) :
     rw [← Category.assoc, Subobject.ofLE_arrow]]
   exact imageSubobject_comp_le _ _
 
-set_option maxHeartbeats 800000 in
 /-- The B_mono law for the canonical page subobjects. -/
 theorem boundarySubobject_monotone (FC : FilteredComplex C) (s k : ℤ) :
     Monotone (FC.boundarySubobject s k) := by
@@ -121,7 +119,6 @@ theorem boundarySubobject_monotone (FC : FilteredComplex C) (s k : ℤ) :
     rw [← Category.assoc, Subobject.ofLE_arrow]]
   exact imageSubobject_comp_le _ _
 
-set_option maxHeartbeats 800000 in
 /-- The Z_zero law for the canonical page subobjects. -/
 theorem cycleSubobject_zero (FC : FilteredComplex C) (s k : ℤ) :
     FC.cycleSubobject s k 0 = ⊤ := by
