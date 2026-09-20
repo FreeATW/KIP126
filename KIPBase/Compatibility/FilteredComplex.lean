@@ -1,5 +1,5 @@
 import KIPBase.SpectralSequence.FilteredComplex
-import KIP126.Def.SpectralSequence.Representatives.Proofs
+import KIP126.Core.SpectralSequence.FilteredRepresentatives
 
 /-!
 # Relating the historical filtered-complex API to KIP126

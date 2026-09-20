@@ -52,10 +52,13 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 
 Import-only facades and empty `Classical/FExtension`, `Classical/PageExtensions`,
 `Synthetic/{Adams,ExtensionSS,Rigidity}`, and `Kervaire` placeholders were
-removed. `KIPBase/Compatibility/FilteredComplex` now imports the canonical
-representatives module; the trusted `KIP126` library still has no `KIPBase`
-import. The existing `External/{Provenance,Claims,SourceInventory,Results,Evidence}`
-APIs retain their paths.
+removed from the canonical tree. The historical
+`KIPBase/Compatibility/FilteredComplex` import is kept working through the
+thin `Core/SpectralSequence/FilteredRepresentatives` compatibility entry point,
+which only imports the canonical `Def/SpectralSequence/Representatives/Proofs`
+module; the trusted `KIP126` library still has no `KIPBase` import. The existing
+`External/{Provenance,Claims,SourceInventory,Results,Evidence}` APIs retain
+their paths.
 
 ## Open mathematical obligations
 
