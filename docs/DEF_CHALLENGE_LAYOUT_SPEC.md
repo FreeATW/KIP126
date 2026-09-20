@@ -76,6 +76,29 @@ names may be retained when that avoids unnecessary downstream churn; what must
 change is the ownership and the absence of a separate proposition alias for a
 theorem statement.
 
+## Challenge / Solution mirror contract
+
+`KIP126/Solution/` is a parallel proof track for the current Challenge graph.
+It must have the same relative directories and Lean files as
+`KIP126/Challenge/`, including a matching `KIP126/Solution.lean` entrypoint.
+The mirrored files use the `KIP126.Solution` namespace and import other
+Solution nodes rather than importing `Challenge/`; this keeps the two tracks
+independent for a later comparator.
+
+For every mirrored node, the public statement is the same: declaration names,
+namespaces modulo the `Challenge`/`Solution` prefix, parameters, typeclass
+arguments, structure fields, and theorem types must agree. A Solution proof
+may replace the Challenge file's temporary `by sorry` body, but it must not
+silently change the statement while the comparator is being used.
+
+The two trees are synchronized in the same change. Adding, deleting, or
+renaming a Challenge node requires the corresponding operation in
+`Solution/`; changing a Challenge mathematical object, structure field, or
+theorem statement requires the matching Solution statement to be updated at
+the same time. Proof-body-only changes in Solution do not require a Challenge
+change. Validation must include a tree/statement comparison before a change is
+considered ready for the future comparator.
+
 ## Target source tree
 
 All new Lean modules stay below `KIP126/`. Lake's recursive library glob, the
@@ -108,6 +131,7 @@ KIP126/
     Tools/                  comparison, generalized rules, page propagation
     Near126/                candidate reduction through final exclusion
     Final/                  conditional h6-square permanent-cycle theorem
+  Solution/                 one-to-one proof-track mirror of `Challenge/`
   Checks/                   focused regression and statement-shape modules
 ```
 
@@ -201,7 +225,8 @@ deferred until the permanent-cycle chain is ready.
 ```text
 Mathlib -> Def/*/Data -> Def/*/Predicates -> Def/*/Proofs
                   \-> External input types and records
-Def + External -> Challenge/*/Statement (paper milestones, possibly `sorry`)
+Def + External -> Challenge/*/Statement and Solution/*/Statement
+                   (paper milestones; temporary `sorry` is allowed)
 Challenge/Tools -> Challenge/Near126 -> Challenge/Final
 ```
 
@@ -221,13 +246,17 @@ Challenge/Tools -> Challenge/Near126 -> Challenge/Final
 5. `KIPBase` has no import edge into `KIP126`. Its 94 historical axioms and
    source placeholders do not enter the canonical final theorem's dependency
    cone. Reuse proceeds declaration by declaration with a trusted proof.
+6. `Challenge/` and `Solution/` are synchronized statement tracks. A
+   comparator may reject a change when their relative trees or public theorem
+   statements diverge.
 
 ## Migration sequence
 
 1. **Inventory and freeze.** Record the exact `origin/main` SHA, current
    declaration names, import graph, Blueprint `\lean` and `\uses` links, and
-   the nine Challenge targets above. Classify each current declaration as
-   data, predicate, proof, external-input machinery, or regression check.
+   the current Challenge targets above and their Solution mirrors. Classify
+   each current declaration as data, predicate, proof, external-input
+   machinery, or regression check.
 2. **Representative vertical slice.** Split one existing filtration concept
    under `Def/Algebra/Filtration/` and add one compiling Challenge statement.
    Preserve the public declaration names where possible. Verify that Lake,
@@ -266,6 +295,10 @@ mathematical change, with the relevant Blueprint node updated.
 - Existing public declarations retain their names or have reviewed import,
   Blueprint, and downstream-reference updates. The proof and assumption
   meaning of each moved declaration is unchanged.
+- `Solution/` mirrors the current Challenge tree and statement types. Any
+  Challenge statement change has a matching Solution update in the same
+  change; a Solution proof body may become stronger without changing that
+  mirrored type.
 - External inputs remain explicit and catalogued; the main theorem cannot
   obtain its own conclusion from an input field.
 - Focused module builds pass during migration. For the final structural PR,
