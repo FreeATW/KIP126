@@ -88,16 +88,19 @@ jobs:
             reason='reviewer mixed synchronization candidate'
           fi
 
-          read -r additions deletions changed_files < <(
+          read -r _additions _deletions changed_files < <(
             gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" \
               --jq '"\(.additions) \(.deletions) \(.changed_files)"'
           )
-          if ! [[ "$additions" =~ ^[0-9]+$ && "$deletions" =~ ^[0-9]+$ && "$changed_files" =~ ^[0-9]+$ ]]; then
+          # Blueprint source may be a large paper-sized change. Keep the file-count
+          # cap so the GitHub file listing remains complete, but do not reject a
+          # reviewable Blueprint/Lean synchronization solely for its line count.
+          if ! [[ "$changed_files" =~ ^[0-9]+$ ]]; then
             scope_ok=false
-            reason='could not read trusted PR diff totals'
-          elif (( additions > 2000 || deletions > 2000 || changed_files > 2000 )); then
+            reason='could not read trusted PR changed-file count'
+          elif (( changed_files > 2000 )); then
             scope_ok=false
-            reason='diff exceeds the 2000-line/file review cap'
+            reason='diff exceeds the 2000-file review cap'
           fi
           {
             echo "ok=$scope_ok"
