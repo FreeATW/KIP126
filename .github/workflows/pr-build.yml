@@ -409,9 +409,11 @@ jobs:
                      line == "set_option maxHeartbeats 800000 in")) next
                 if (file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Cycles\.lean$/ &&
                     (line == "set_option backward.isDefEq.respectTransparency false in" ||
-                     line == "set_option maxHeartbeats 6400000 in")) next
+                     line == "set_option maxHeartbeats 6400000 in" ||
+                     line == "set_option maxHeartbeats 900000 in")) next
                 if (file ~ /\/KIP126\/Def\/SpectralSequence\/FilteredDifferential\/Boundaries\.lean$/ &&
-                    line == "set_option maxHeartbeats 6400000 in") next
+                    (line == "set_option maxHeartbeats 6400000 in" ||
+                     line == "set_option maxHeartbeats 400000 in")) next
                 print file ": " line
               }
             ')
