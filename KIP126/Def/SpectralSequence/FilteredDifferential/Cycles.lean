@@ -258,7 +258,7 @@ theorem pageDifferential_Z_succ_ge (FC : FilteredComplex C)
 
 
 
-set_option maxHeartbeats 6400000 in
+set_option maxHeartbeats 900000 in
 /-- Every class in the kernel of the finite-page differential has a representative
 in the next cycle subobject. Adapted from the filtered-complex proof in KIPBase. -/
 theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)

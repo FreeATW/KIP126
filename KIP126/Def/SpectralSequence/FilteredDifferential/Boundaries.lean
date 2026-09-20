@@ -13,7 +13,7 @@ variable {C : Type u} [Category.{v} C] [Abelian C]
 
 open DifferentialHelpers
 
-set_option maxHeartbeats 6400000 in
+set_option maxHeartbeats 400000 in
 /-- The image of the finite-page differential is the page image of the next
     boundary subobject included in the current cycle subobject.  This is the
     canonical finite-page `B_succ` relation, adapted from the historical

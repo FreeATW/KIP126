@@ -23,7 +23,6 @@ variable {C A ι : Type*} [Category C] [Category ι]
   [Category A] [Abelian A]
 
 set_option backward.defeqAttrib.useBackward true
-set_option backward.isDefEq.respectTransparency false
 
 /-- Apply a homological functor with a shift sequence to a triangulated
 spectral object.  The connecting maps are the homology-sequence connecting
