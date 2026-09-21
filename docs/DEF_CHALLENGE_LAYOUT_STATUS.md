@@ -2,7 +2,7 @@
 
 The source paths below describe the current branch. Public Lean declaration names
 remain in their original namespaces. The Blueprint chapters and labels remain
-the mathematical index; compiling a `Statement.lean` does not prove its node.
+the mathematical index; compiling a Challenge module does not prove its node.
 
 | Former source | Current owner |
 | --- | --- |
@@ -36,16 +36,16 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 | `Comparison/ClassicalSynthetic/Basic` | `Def/Comparison/ClassicalSynthetic/{Data,Proofs}` |
 | `Classical/Synthetic Kervaire setup` | `Def/Kervaire/Setup/Data`, `Def/Kervaire/Theta5/{Data,Predicates,Proofs}` |
 | `External BJM/BX, Xu/IWX, Browder, HHR, BJM inputs` | `External/Literature/Kervaire` |
-| `Theorem 6.1 generalized Leibniz` | `Challenge/Tools/Thm6_1Leibniz/Statement` |
-| `Theorem 6.12 generalized Mahowald` | `Challenge/Tools/Thm6_12Mahowald/Statement` |
-| `Page-extension stretching` | `Challenge/Tools/PagePropagation/Statement` |
-| `Theorem 7.3 BJM/BX choice transport` | `Challenge/Near126/Thm7_3BJMBX/Statement`, `Def/Kervaire/Theta5/Proofs` |
-| `Candidate differential reduction` | `Challenge/Near126/CandidateReduction/Statement` |
-| `C₃/C₄/C₅ choice transport` | `Challenge/Near126/Conditions/Statement` |
-| `Final eta-extension exclusion` | `Challenge/Near126/ExcludeEta/Statement` |
-| `Proposition 7.8 dichotomy` | `Challenge/Near126/OnlyD12/Statement` |
-| `Proposition 7.9 incompatibility` | `Challenge/Near126/C3NotC5/Statement` |
-| `Permanent h₆² endpoint` | `Challenge/Final/H6SquarePermanent/Statement` |
+| `Theorem 6.1 generalized Leibniz` | `Challenge/Tools/generalized_leibniz` |
+| `Theorem 6.12 generalized Mahowald` | `Challenge/Tools/generalized_mahowald` |
+| `Page-extension stretching` | `Challenge/Tools/page_extension_stretch` |
+| `Theorem 7.3 BJM/BX choice transport` | `Challenge/Near126/any_choice_criterion`, `Def/Kervaire/Theta5/Proofs` |
+| `Candidate differential reduction` | `Challenge/Near126/only_d12_differential_reduction` |
+| `C₃/C₄/C₅ choice transport` | `Challenge/Near126/c4_c5_choice_equivalence` |
+| `Final eta-extension exclusion` | `Challenge/Near126/c3_excludes_c5` |
+| `Proposition 7.8 dichotomy` | `Challenge/Near126/d12_dichotomy_and_condition_equivalence` |
+| `Proposition 7.9 incompatibility` | `Challenge/Near126/c3_excludes_c5` |
+| `Permanent h₆² endpoint` | `Challenge/Final/h6_sq_permanent` |
 | `Dimension-126 geometry` | Blueprint/project-boundary target; its Challenge statements are deferred until the permanent-cycle chain is ready |
 | `Appendix computation catalogue` | `Def/Computation/AppendixTable/{Data,Rows/{Data,Catalogue}}` |
 | `*/Regression`, `*Regression` | corresponding `Checks/` modules |
@@ -53,10 +53,10 @@ the mathematical index; compiling a `Statement.lean` does not prove its node.
 Import-only facades and empty `Classical/FExtension`, `Classical/PageExtensions`,
 `Synthetic/{Adams,ExtensionSS,Rigidity}`, and `Kervaire` placeholders were
 removed from the canonical tree. The historical
-`KIPBase/Compatibility/FilteredComplex` import is kept working through the
-thin `Core/SpectralSequence/FilteredRepresentatives` compatibility entry point,
-which only imports the canonical `Def/SpectralSequence/Representatives/Proofs`
-module; the trusted `KIP126` library still has no `KIPBase` import. The existing
+`KIPBase/Compatibility/FilteredComplex` module now directly imports
+`Def/SpectralSequence/Representatives/Proofs`; the redundant
+`Core/SpectralSequence/FilteredRepresentatives` compatibility entry point has
+been removed. The trusted `KIP126` library still has no `KIPBase` import. The existing
 `External/{Provenance,Claims,SourceInventory,Results,Evidence}` APIs retain
 their paths.
 
@@ -76,7 +76,7 @@ canonical Lean proof: Theorem 6.1 (generalized Leibniz), Theorem 6.12
 require the paper-specific stable and synthetic homotopy objects, page
 extensions, computation interpretations, and fixed MainInput that are still
 Blueprint targets. Each process and permanent-cycle target has a typed open
-`Statement.lean`; no statement is marked as a proof, and no arbitrary witness
+Challenge module; no statement is marked as a proof, and no arbitrary witness
 or external input asserts an endpoint. The two geometric endpoints are
 intentionally deferred from `Challenge/` until the permanent-cycle chain is
 ready.

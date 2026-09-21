@@ -89,7 +89,7 @@ def transportTarget {O : Operations} {a b : Degree} (h : a = b)
 
 /-- The open Theorem 6.1 statement over an explicit page and extension
 interface. -/
-theorem generalizedLeibniz :
+theorem generalized_leibniz :
     ∀ (O : Operations) (I : Input O),
       O.targetDifferential (I.r + I.l - I.m)
           (I.r - 1 - I.m + I.e) (I.s + I.m, I.t + I.m) I.y =

@@ -29,7 +29,7 @@ def BJM_BXCriterion : Prop :=
     (∀ r : ℕ, 1 ≤ r →
       (C.h6Survives (r + 3) ↔
         C.finiteZero (r + 1) C.sourceExpression)) ∧
-    (C.h6Permanent ↔ C.untruncatedZero C.sourceExpression)
+    (C.is_permanent C.sourceExpression ↔ C.untruncatedZero C.sourceExpression)
 
 /-- The located total-differential identity for every order-two choice. -/
 def TotalDifferentialIdentity : Prop :=

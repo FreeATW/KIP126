@@ -53,7 +53,7 @@ It is deliberately stricter than merely splitting files by topic.
    developed that body may be `by sorry`. There is no parallel
    `def statement : Prop` or `def conclusion : Prop` for the same result.
 
-The same direct-theorem rule applies to `Challenge/*/Statement.lean`, but a
+The same direct-theorem rule applies to `Challenge/<category>/<semantic_name>.lean`, but a
 Challenge file is reserved for an important paper milestone. A supporting
 lemma that is useful because of the formalization, rather than because it is a
 milestone of the paper, belongs in `Def/*/Proofs.lean`. A milestone theorem may
@@ -68,7 +68,7 @@ For migration decisions, use this test:
 Is it an object or witness?                 -> Def/*/Data.lean
 Is it a reusable property or relation?      -> Def/*/Predicates.lean
 Is it a reusable mathematical implication?  -> Def/*/Proofs.lean theorem
-Is it a paper-level milestone?              -> Challenge/*/Statement.lean theorem
+Is it a paper-level milestone?              -> Challenge/<category>/<semantic_name>.lean theorem
 ```
 
 The file split is not a requirement to rename public declarations. Existing
@@ -151,7 +151,7 @@ review, prove the law, and then assemble the standard object. No arbitrary
 choice from an unproved existence statement may stand in for the specified
 object.
 
-Each `Challenge/<node>/` normally has a `Statement.lean` containing the exact
+Each `Challenge/<category>/<semantic_name>.lean` directly contains the exact
 paper milestone as a direct theorem declaration, with all required parameters
 and explicit external conditions. An open theorem may use the temporary body
 `by sorry`; there is no separate `def statement : Prop`. Reusable supporting
@@ -225,7 +225,7 @@ deferred until the permanent-cycle chain is ready.
 ```text
 Mathlib -> Def/*/Data -> Def/*/Predicates -> Def/*/Proofs
                   \-> External input types and records
-Def + External -> Challenge/*/Statement and Solution/*/Statement
+Def + External -> Challenge/<category>/<semantic_name>.lean and Solution proof modules
                    (paper milestones; temporary `sorry` is allowed)
 Challenge/Tools -> Challenge/Near126 -> Challenge/Final
 ```

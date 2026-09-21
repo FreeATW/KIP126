@@ -1,4 +1,4 @@
-import KIP126.Challenge.Tools.Thm6_1Leibniz.Statement
+import KIP126.Challenge.Tools.generalized_leibniz
 
 /-! Exact page-stretch endpoint over the typed extension operations. -/
 namespace KIP126.Challenge.Tools.PagePropagation
@@ -9,7 +9,7 @@ structure Input (O : Operations) where
   base : Thm6_1Leibniz.Input O
   noLoss : ∀ q : ℤ, base.n ≤ q → q ≤ base.r → Prop
 
-theorem statement {O : Operations} (I : Input O) :
+theorem page_extension_stretch (I : Input O) :
   (∀ (q : ℤ) (h₁ : I.base.n ≤ q) (h₂ : q ≤ I.base.r),
       I.noLoss q h₁ h₂) →
     O.targetDifferential (I.base.r + I.base.l - I.base.m)

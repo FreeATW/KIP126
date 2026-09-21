@@ -14,6 +14,16 @@ namespace KIP126.Kervaire
 
 open KIP126.External
 
+/-- Semantic input for the BJM/BX criterion transported across all choices. -/
+class AnyChoiceCriterion where
+  Carrier : Type
+  [carrierAddCommGroup : AddCommGroup Carrier]
+  context : Theta5ChoiceContext (Carrier := Carrier)
+  criterion : CataloguedExternalResult (BJM_BXCriterion context)
+  order : CataloguedExternalResult (Theta5OrderData context)
+
+attribute [instance] AnyChoiceCriterion.carrierAddCommGroup
+
 section Theta5
 
 variable {Carrier : Type} [AddCommGroup Carrier]

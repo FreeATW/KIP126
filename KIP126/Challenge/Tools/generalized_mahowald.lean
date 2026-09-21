@@ -1,4 +1,4 @@
-import KIP126.Challenge.Tools.Thm6_1Leibniz.Statement
+import KIP126.Challenge.Tools.generalized_leibniz
 
 /-!
 # The generalized Mahowald trick (Theorem 6.12)
@@ -81,7 +81,7 @@ structure Input (O : Operations) where
     (s + n + l, t + n + l - 1) (targetDegree r (s, t)) y yBar
 
 /-- The open Theorem 6.12 statement over the explicit triangle package. -/
-theorem generalizedMahowald :
+theorem generalized_mahowald :
     ∀ (O : Operations) (I : Input O),
       O.survivesX (I.n + I.m + I.eH) I.n1
           (I.s + I.l, I.t + I.l - 1) I.x ∧
