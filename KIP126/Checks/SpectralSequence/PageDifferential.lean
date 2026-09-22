@@ -1,9 +1,10 @@
-import KIP126.Def.PageExtensions.Differential.Proofs
+import KIP126.Def.SpectralSequence.PageDifferential.Proofs
 
 /-! Essentiality concerns a differential value, including for nonzero maps. -/
-namespace KIP126.Checks.PageExtensions
 
-open CategoryTheory CategoryTheory.Limits KIP126.Def.PageExtensions
+namespace KIP126.Checks.SpectralSequence.PageDifferential
+
+open CategoryTheory CategoryTheory.Limits KIP126.Core.SpectralSequence
 
 universe u v w
 
@@ -22,4 +23,4 @@ example (y : PageElement c r₀ E r hr target T)
     y = 0 := by
   simpa only [DifferentialRelation, zero_comp] using h.symm
 
-end KIP126.Checks.PageExtensions
+end KIP126.Checks.SpectralSequence.PageDifferential

@@ -1,17 +1,14 @@
 import Mathlib.Algebra.Homology.SpectralSequence.Basic
 
 /-!
-# Page-level differential relations
+# Page-level differential data
 
-The historical KIPBase crossing API used the nested `Z/B` presentation of a
-spectral sequence.  KIP126 uses Mathlib's page kernel instead: a page element
-is a generalized element of a page object, and a differential relation is the
-single page equation obtained by composing with the page differential.  This
-file owns only that data-level interface; filtration and crossing predicates
-are in `Predicates.lean`.
+This file defines the generic data used to state differential equations on a
+page of a Mathlib spectral sequence.  It is independent of filtered-complex
+representatives and of the paper-specific `(f, E_r)` page-extension theory.
 -/
 
-namespace KIP126.Def.PageExtensions
+namespace KIP126.Core.SpectralSequence
 
 open CategoryTheory
 
@@ -45,4 +42,4 @@ abbrev sourceDegree (D : DifferentialDatum (c := c) (r₀ := r₀) E) : ℤ :=
 
 end DifferentialDatum
 
-end KIP126.Def.PageExtensions
+end KIP126.Core.SpectralSequence

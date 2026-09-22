@@ -10,10 +10,7 @@ candidate is exactly the displayed `d₁₂` differential. -/
 theorem only_d12_differential_reduction [D : Near126Adams] :
   (∀ r : ℕ, r ≠ 12 → ¬ D.differential r) ∧
     (D.differential 12 ↔ D.d12_differential_is_nonzero) ∧
-    (¬ D.differential 12 ↔
-      ∃ hx : D.h6_square ∈
-        (D.ordinaryTower (2, 128)).ZInfinity,
-        (D.ordinaryTower (2, 128)).classOf D.h6_square hx ≠ 0) := by
+    (¬ D.differential 12 ↔ D.h6_square_isPermanent) := by
   sorry
 
 end KIP126.Solution.Near126.CandidateReduction

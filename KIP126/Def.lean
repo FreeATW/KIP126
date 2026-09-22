@@ -4,6 +4,7 @@ import KIP126.Def.Algebra.Truncation.Proofs
 import KIP126.Def.Algebra.Filtration.Proofs
 import KIP126.Def.Algebra.Graded.Data
 import KIP126.Def.ClassicalAdams.PageSlice.Data
+import KIP126.Def.ClassicalAdams.Permanence.Data
 import KIP126.Def.ClassicalAdams.Convergence.Proofs
 import KIP126.Def.ClassicalAdams.SphereSequence.Data
 import KIP126.Def.ClassicalAdams.H4D2.Predicates
@@ -23,7 +24,7 @@ import KIP126.Def.SpectralSequence.FilteredComplex.Relations.Predicates
 import KIP126.Def.SpectralSequence.FilteredComplex.Relations.Proofs
 import KIP126.Def.SpectralSequence.HomologicalImage.Data
 import KIP126.Def.SpectralSequence.PageLevel.Proofs
-import KIP126.Def.PageExtensions.Differential.Proofs
+import KIP126.Def.SpectralSequence.PageDifferential.Proofs
 import KIP126.Def.SpectralSequence.Representatives.Proofs
 import KIP126.Def.SpectralSequence.SpectralObject.Data
 import KIP126.Def.Synthetic.AdamsSequence.Data

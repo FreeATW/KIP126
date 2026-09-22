@@ -1,14 +1,14 @@
-import KIP126.Def.PageExtensions.Differential.Data
+import KIP126.Def.SpectralSequence.PageDifferential.Data
 
 /-!
-# Filtration and crossing predicates
+# Page-level differential and crossing predicates
 
-These predicates port the mathematical content of KIPBase's crossing
-definitions to the page-level Mathlib API.  The target filtration is supplied
-by the caller; no page convention or hidden `Z/B` model is introduced here.
+These predicates concern ordinary differentials in a Mathlib spectral
+sequence.  The target filtration is supplied by the caller; no page convention,
+filtered-complex presentation, or paper-specific page extension is hidden here.
 -/
 
-namespace KIP126.Def.PageExtensions
+namespace KIP126.Core.SpectralSequence
 
 open CategoryTheory
 
@@ -40,7 +40,6 @@ def EssentialDifferentialRelation (E : SpectralSequence C c r₀) (r : ℤ)
     (y : PageElement c r₀ E r hr target T) : Prop :=
   DifferentialRelation E r hr source target x y ∧
     y ≠ 0
-
 
 /-- A relation for `D` is crossed by an essential differential whose source is
 at a strictly higher filtration and whose target lies no higher than the
@@ -79,4 +78,4 @@ condition. -/
 def NoCrossing (D : DifferentialDatum (c := c) (r₀ := r₀) E) : Prop :=
   NoCrossingRange D (D.sourceDegree + 1)
 
-end KIP126.Def.PageExtensions
+end KIP126.Core.SpectralSequence

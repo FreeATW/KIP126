@@ -1,8 +1,8 @@
-import KIP126.Def.PageExtensions.Differential.Predicates
+import KIP126.Def.SpectralSequence.PageDifferential.Predicates
 
 /-! Basic, proof-carrying facts for page differential relations. -/
 
-namespace KIP126.Def.PageExtensions
+namespace KIP126.Core.SpectralSequence
 
 open CategoryTheory CategoryTheory.Limits
 
@@ -44,4 +44,4 @@ theorem not_hasCrossingAt_of_noCrossing (D : DifferentialDatum (c := c) (r₀ :=
   exact ⟨a, ha, r', hr', source', target', hsource, hessential,
     htarget ▸ le_rfl, hbound⟩
 
-end KIP126.Def.PageExtensions
+end KIP126.Core.SpectralSequence

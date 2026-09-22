@@ -1,4 +1,4 @@
-import Mathlib.Data.Set.Defs
+import KIP126.Def.ClassicalAdams.Permanence.Data
 import KIP126.Def.ClassicalAdams.SphereSequence.Data
 import KIP126.Def.Kervaire.Theta5.Data
 
@@ -13,12 +13,6 @@ second, unrelated carrier element.
 
 namespace KIP126.Kervaire
 
-/-- The ordinary Adams tower at one bidegree, with its limiting cycles and
-the corresponding abutment class map. -/
-structure OrdinaryTower (Source Carrier : Type) [AddCommGroup Carrier] where
-  ZInfinity : Set Source
-  classOf : ∀ (x : Source), x ∈ ZInfinity → Carrier
-
 /-- Semantic near-126 data used by the open differential statements.
 
 The fields are predicates and candidate data; none of them asserts the final
@@ -27,12 +21,11 @@ class Near126Adams where
   stable : KIP126.Classical.Adams.StableHomotopyContext
   adams : KIP126.Classical.Adams.ClassicalAdamsSS stable stable.sphere
   presentation : KIP126.Classical.Adams.SphereAdamsPresentation adams
+  lawfulAlgebra : KIP126.Classical.Adams.SphereAdamsAlgebraPresentation presentation
   Carrier : Type
   [carrierAddCommGroup : AddCommGroup Carrier]
   d12_value : Carrier
   d12_target : Carrier
-  ordinaryTower : ℕ × ℕ → OrdinaryTower
-    (KIP126.Classical.Adams.AdamsClass adams) Carrier
   differential : ℕ → Prop
   c3 : Prop
   c4 : Prop
@@ -47,6 +40,11 @@ variable (D : Near126Adams)
 /-- The named page-2 class represented by `h₆²` for the selected Adams object. -/
 def h6_square : KIP126.Classical.Adams.AdamsClass D.adams :=
   KIP126.Classical.Adams.h6Square D.presentation
+
+/-- The final spectral-sequence endpoint proposition for the selected sphere
+Adams sequence. -/
+def h6_square_isPermanent : Prop :=
+  D.h6_square.IsPermanent
 
 /-- The displayed `d₁₂` candidate is nonzero. -/
 def d12_differential_is_nonzero : Prop :=

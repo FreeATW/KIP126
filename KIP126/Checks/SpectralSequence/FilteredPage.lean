@@ -1,4 +1,4 @@
-import KIP126.Def.SpectralSequence.FilteredPage.Complex
+import KIP126.Def.SpectralSequence.FilteredPage.AssemblyProofs
 
 /-! Regression checks for the canonical filtered-complex quotient pages. -/
 
@@ -52,23 +52,14 @@ example (FC : FilteredComplex C) (n : ℕ) :
     HomologicalComplex C (pageShape n) :=
   FC.pageComplex n
 
-example (FC : FilteredComplex C) (W : PageHomologyWitness FC) :
+example (FC : FilteredComplex C) (n : ℕ) (p : ℤ × ℤ) :
+    (FC.pageComplex n).homology p ≅
+      FC.pageObj p.1 p.2 (↑(n + 1) : WithTop ℕ) :=
+  FC.pageHomologyIso n p
+
+example (FC : FilteredComplex C) :
     CategoryTheory.SpectralSequence C (fun r : ℤ => pageShape r.toNat) 0 :=
-  FC.pageSpectralSequence W
-
-example (FC : FilteredComplex C) (W : PageHomologyFactorization FC) :
-    PageHomologyWitness FC :=
-  PageHomologyWitness.ofFactorization FC W
-
-example (FC : FilteredComplex C) (W : PageHomologyWitness FC) :
-    PageHomologyFactorization FC :=
-  W.toFactorization
-
-example (FC : FilteredComplex C) (W : PageHomologyFactorization FC)
-    (n : ℕ) (p : ℤ × ℤ) :
-    FC.pageObj p.1 p.2 (↑(n + 1) : WithTop ℕ) ≅
-      (FC.pageComplex n).homology p :=
-  W.isoHomology n p
+  FC.canonicalPageSpectralSequence
 
 example (FC : FilteredComplex C) (n : ℕ) (p q : ℤ × ℤ)
     (_hpq : (pageShape n).Rel p q) :

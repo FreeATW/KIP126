@@ -51,6 +51,9 @@ document:
   order: audit the earlier repositories and form KIP126's best-progress
   envelope, continue the chapter-level formalization, and finish with a
   repository-wide trust, provenance, completeness, and reproducibility audit.
+- [`docs/SPECTRAL_SEQUENCE_STATUS.md`](docs/SPECTRAL_SEQUENCE_STATUS.md) is the
+  concise current checkpoint for the canonical finite-page construction and
+  its remaining implementation gaps; implemented facts remain owned by Lean.
 - [`blueprint/src/content.tex`](blueprint/src/content.tex) and the chapters
   under [`blueprint/src/chapters`](blueprint/src/chapters) form the
   natural-language formalization sketch.  The Blueprint follows the paper's
