@@ -51,6 +51,9 @@ document:
   order: audit the earlier repositories and form KIP126's best-progress
   envelope, continue the chapter-level formalization, and finish with a
   repository-wide trust, provenance, completeness, and reproducibility audit.
+- [`docs/SPECTRAL_SEQUENCE_STATUS.md`](docs/SPECTRAL_SEQUENCE_STATUS.md) is the
+  concise current checkpoint for the canonical finite-page construction and
+  its remaining implementation gaps; implemented facts remain owned by Lean.
 - [`blueprint/src/content.tex`](blueprint/src/content.tex) and the chapters
   under [`blueprint/src/chapters`](blueprint/src/chapters) form the
   natural-language formalization sketch.  The Blueprint follows the paper's
@@ -58,12 +61,14 @@ document:
   mathematical statement, dependencies, sources, and intended Lean object can
   be checked together.  A chapter indexes several small Lean modules under
   `KIP126/Def/`, `KIP126/External/`, and `KIP126/Challenge/`;
-  `KIP126/Def.lean` and `KIP126/Challenge.lean` are package entry points.
+  `KIP126/Def.lean`, `KIP126/Challenge.lean`, and `KIP126/Solution.lean`
+  are package entry points.
 - [`KIP126.lean`](KIP126.lean) and the modules under [`KIP126/`](KIP126/) are
   authoritative for interfaces and proofs that are actually implemented, as
   well as their import graph.  `Def/` owns mathematical data and properties,
   `External/` owns provenance-bearing inputs, `Challenge/` owns internal proof
-  targets, and `Checks/` owns compilation regressions.  The
+  targets, `Solution/` owns their matching proofs, and `Checks/` owns
+  compilation regressions.  The
   [layout migration map](docs/DEF_CHALLENGE_LAYOUT_STATUS.md) records moved
   source modules and remaining open milestones.
 - [`reference/source-inventory.json`](reference/source-inventory.json), the
@@ -184,9 +189,9 @@ python3 scripts/check_source_inventory.py
 python3 -m unittest discover -s scripts -p 'test_check_source_inventory.py'  # unit tests
 python3 -m unittest discover -s scripts -p 'test_source_inventory_projection.py'  # Lean integration tests
 python3 -m unittest discover -s scripts -p 'test_*.py'  # all tests
-lake build KIP126.External.ProvenanceRegression \
-  KIP126.External.SourceInventoryRegression \
-  KIP126.External.ClaimsRegression
+bash scripts/shared-main-cache.sh run lake build KIP126.Checks.External.Provenance \
+  KIP126.Checks.External.SourceInventory \
+  KIP126.Checks.External.Claims
 ```
 
 On a slow or cold checkout, increase the two Lean subprocess timeouts with

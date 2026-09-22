@@ -20,60 +20,15 @@
 
 ## 2. 分支和交接状态
 
-目标分支：
+本文件描述迁移工作的约束，不把历史分支、提交号或本地检查结果作为当前验收证据。
+开始工作时按 AGENTS.md fetch 并核对实际分支、最新 origin/main、PR base/head 和
+该 head 的检查结果；不要根据旧交接记录切换分支或宣称 CI 已通过。
 
-```text
-feat/def-challenge-layout
-```
-
-交接时已知状态（新 session 必须重新核对）：
-
-- 工作区干净；
-- 最近核验的代码头：`1810679890a57537e1d3b5b1ac30e74faa64e287`；纯文档提交后以
-  `git rev-parse HEAD` 为准；
-- `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；
-- 本分支已包含 `origin/main`；
-- PR #97：<https://github.com/SII-MATH/KIP126/pull/97>；
-- 最近的比较和讨论没有产生额外代码修改。
-
-当前 session 已重新核对的状态（2026-09-19）：
-
-- 工作区干净；当前实现提交：`9267418`（canonical page lift 的 boundary-factorization 定理、页面同调
-  epi--mono 分解接口、直接 PageView 入口、回归检查及状态记录）；此前的
-  `pageDifferential_Z_succ_le`、`pageDifferential_B_succ`、`pageComplex` 和条件谱序列装配提交均已保留；
-- `origin/main`：`dc4a7d1b50d50f3c535acb6b46eb5c5aadbfc964`；本分支相对
-  `origin/main` 无落后提交；
-- 已补入 canonical `pageObj` 的零页等价律（含 `pageObj_isZero_iff`）、嵌套商映射/第三同构辅助构造，
-  稳定三角形中项同调群的 exactness，有限页 `Z_succ` 的容易方向，以及两个通用核/上像引理；这些改动均未引入
-  `KIPBase` import；
-- 本地 `scripts/shared-main-cache.sh run lake build KIP126` 曾通过（1906/1906）；当前增量的
-  `FilteredPage.Complex`、`FilteredPage` 和 `FilteredComplexRelations` 检查均通过，
-  `scripts/Axioms.lean` 通过（4763 个 KIP126 声明，仅允许
-  `propext`、`Classical.choice`、`Quot.sound`），源码清单通过（18 sources, 88 artifacts）；
-- 反向 `Z_{n+1}` 包含已接入生产 `FilteredDifferential/Proofs.lean`，并在
-  `Checks/SpectralSequence/FilteredDifferential.lean` 增加回归检查；有限页 `Z_succ` 两个方向和
-  `B_succ` 均已接入生产证明，完整 Mathlib assembly 和四个关系义务仍开放；
-- 在本次 session 后，canonical finite quotient page 已有 Mathlib
-  `HomologicalComplex` 适配（`pageComplex`），并新增显式的
-  `PageHomologyWitness` → Mathlib `SpectralSequence` 条件装配器；同时加入
-  `PageHomologyFactorization`，把每个页面的同调比较精确化为 Mathlib
-  `ofEpiMonoFactorisation` 所需的 epi--mono 分解，并提供
-  `PageHomologyWitness.ofFactorization` 的打包构造；已有的
-  `PageHomologyWitness.toFactorization` 也可反向暴露同一分解。具体分解的数学证明仍未完成。
-  `PageView.ofPageHomologyWitness` 与
-  `PageView.ofPageHomologyFactorization` 已把该装配器接入四个关系命题的
-  canonical 页面入口。相邻页同调同构 witness 本身仍是开放证明义务，没有把它当作无条件的
-  `toSpectralSequence` 结论。另已证明 `PageView.isLift_sub_factors_boundary`：同一
-  page 元素的两个 lift 之差经 canonical `boundarySubobject` 因子化；这替代了旧
-  associated-graded lift 唯一性在 page quotient 语义下不成立的版本。
-- 迁移校验器仍因归档文件中既有的
-  `KIPBase/SpectralSequence/BoundedExtension.lean` trust-debt 漂移而拒绝刷新归档；
-  PR #97 的自动构建门禁还报告历史大分支的范围/新增 `set_option` 策略问题，需拆分
-  PR 或由人工审核处理。
-- PR #97 当前远端头为 `1810679`，状态为 `BLOCKED`：Blueprint 门禁报告相对
-  `origin/main` 的 diff 超过 2000 行/文件审查上限；sandboxed-build 门禁报告分支历史相对
-  `origin/main` 新增 `set_option`，并将 `scope` 标为需人工审核。这与本地缓存构建和 Axiom
-  审计的通过结果是两个独立门。
+当前目录映射和未完成分层见 `docs/DEF_CHALLENGE_LAYOUT_STATUS.md`；
+有限页构造和剩余数学缺口见 `docs/SPECTRAL_SEQUENCE_STATUS.md`。
+当前源码已直接构造 `pageHomologyIso`、`canonicalPageSpectralSequence`
+和 `PageView.canonical`，不再要求额外的 page-homology witness/factorization 输入。
+四个代表元关系定理仍未完成；有限页装配不等于收敛或论文主定理已经完成。
 
 ## 3. 开始工作前的安全步骤
 
@@ -146,10 +101,12 @@ KIP126 是新布局和主接口的权威来源。KIPBase 只有在提供独有�
 - `cycleSubobject`；
 - `boundarySubobject`；
 - `B_le_Z_aux`；
-- `toSSData`；
 - `pageDifferential`；
-- `toPreSS`；
-- `toSpectralSequence`。
+- `pageComplex`；
+- `pageHomologyIso`；
+- `canonicalPageSpectralSequence`。
+
+旧 `SSData` / `PreSS` 及其装配函数只作迁移参考，不重新引入平行谱序列模型。
 
 以下四个 KIPBase 定理仍然是开放目标，不能作为现成证明迁移：
 
@@ -158,7 +115,8 @@ KIP126 是新布局和主接口的权威来源。KIPBase 只有在提供独有�
 - `differentialRelation_crossed_of_two`；
 - `lift_rel_of_not_crossed`。
 
-它们只能写入 Challenge 的 `Statement.lean`，真实证明完成后才能增加 `Proof.lean`。
+它们是内部支持定理，位于 `Def/SpectralSequence/FilteredComplex/Relations/Proofs.lean`；
+开发期间可用 `by sorry`，完成前不能作为已证结论或 Blueprint 完成证据。
 
 旧 `weakConvergence` 中标注未完成的收敛同构，也不能作为证明来源。
 
@@ -182,10 +140,10 @@ KIP126/Def/<数学模块>/<概念>/
 
 - 候选数据放 `Data.lean`；
 - 独立性质的 Prop 放 `Predicates.lean`；
-- 已完成证明放 `Proofs.lean`；
+- 定理和证明放 `Proofs.lean`，开发中的未完成证明可显式使用 `by sorry`；
 - 一个文件只承担一个主要概念；
-- 类型构造必需的结构律可以留在构造链中；
-- 不机械拆分每个辅助引理；
+- Data 中不放命名引理；构造需要的性质先在下层 Proofs 证明，再由后续 Data 使用；
+- 辅助证明仍遵守分层，不为满足目录形式创建空层；
 - 尽量保留现有公开声明名和数学陈述。
 
 ### 5.2 Challenge
@@ -196,18 +154,24 @@ KIP126/Def/<数学模块>/<概念>/
 KIP126/Challenge/Tools
 KIP126/Challenge/Near126
 KIP126/Challenge/Final
-KIP126/Challenge/Geometry
+KIP126/Solution/Tools
+KIP126/Solution/Near126
+KIP126/Solution/Final
 ```
 
 要求：
 
 - 节点对应 spec 中的依赖图和 milestone；
-- 开放节点有可编译、精确的 `Statement.lean`；
-- 只有真实证明完成后才增加 `Proof.lean`；
-- 禁止 `sorry`；
+- 使用 `<category>/<semantic_name>.lean`，不再采用 `Statement.lean` / `Proof.lean` 布局；
+- Challenge 与 Solution 的相对路径和完整定理签名同步；
+- Challenge 定理始终保留 `by sorry`；证明只写在 Solution，开发中的 Solution 可暂用 `by sorry`；
+- Solution 及其证明依赖不得调用 Challenge 占位声明；
 - 禁止新增项目 axiom；
-- 禁止任意选取对象、弱化命题或占位证明；
+- 禁止任意选取对象、弱化命题或把占位证明当作完成证据；
 - Blueprint 中“目标命题可编译”不能标记为证明完成。
+
+几何终点的 Challenge/Solution 声明推迟到 permanent-cycle 主链就绪后加入，
+项目的几何目标不变。
 
 ### 5.3 External
 
@@ -249,7 +213,8 @@ KIP126/Challenge/Geometry
   - README 和 Roadmap；
   - 回归检查；
   - `scripts/Axioms.lean`；
-  - 主库没有新增项目 axiom 或 sorryAx；
+  - 规范库没有项目 axiom；已完成的 Solution/Def 证明及其依赖不含 sorryAx，
+    Challenge 占位与开发中证明分别记录，不能冒充完成证据；
   - 尚未证明的主目标仍保持开放。
 
 ## 8. Git 与 PR 交付

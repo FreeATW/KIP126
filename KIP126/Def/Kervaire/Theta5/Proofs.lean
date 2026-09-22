@@ -51,7 +51,8 @@ theorem bjm_bx_criterion_any_choice
     (∀ r : ℕ, 1 ≤ r →
       (C.h6Survives (r + 3) ↔
         C.finiteZero (r + 1) (C.lambdaEta (C.square θ)))) ∧
-      (C.h6Permanent ↔ C.untruncatedZero (C.lambdaEta (C.square θ))) := by
+      (C.is_permanent (C.lambdaEta (C.square θ)) ↔
+        C.untruncatedZero (C.lambdaEta (C.square θ))) := by
   have hSourceChoice : C.isChoice C.sourceChoice := C.sourceChoice_isChoice
   have hSourceOrder : IsOrderTwo C.sourceChoice := criterion.value.proof.1
   have hEqual : C.lambdaEta (C.square θ) =
@@ -76,7 +77,8 @@ theorem bjm_bx_criterion_any_choice_iff
     (∀ r : ℕ, 1 ≤ r →
       (C.h6Survives (r + 3) ↔
         C.finiteZero (r + 1) (C.lambdaEta (C.square θ)))) ∧
-      (C.h6Permanent ↔ C.untruncatedZero (C.lambdaEta (C.square θ))) :=
+      (C.is_permanent (C.lambdaEta (C.square θ)) ↔
+        C.untruncatedZero (C.lambdaEta (C.square θ))) :=
   bjm_bx_criterion_any_choice C criterion order hθ hθOrder
 
 end ChoiceTransport

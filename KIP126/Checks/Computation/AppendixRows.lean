@@ -1,4 +1,4 @@
-import KIP126.Def.Computation.AppendixTable.Rows.Catalogue
+import KIP126.External.Computation.AppendixTable.Rows.Catalogue.Proofs
 
 namespace KIP126.Checks.Computation
 

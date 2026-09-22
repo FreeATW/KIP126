@@ -87,6 +87,24 @@ structure Near126Input
   lambda6H1h4 : S.homotopy (125, 133) S.sphere → S.homotopy (125, 133) S.sphere
   theta5Square : S.homotopy (124, 128) S.sphere
 
+namespace Near126Input
+
+variable {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}
+  {A : SyntheticAdamsSS}
+
+/-- The three named conditions from the near-126 argument. -/
+def c3 (D : Near126Input S A) : Prop :=
+  D.d6 (D.x12684 + D.x1268) = 0
+
+def c4 (D : Near126Input S A) : Prop :=
+  D.theta5Square = D.lambda6 D.h0SquaredX1248 ∧ D.theta5Square ≠ 0
+
+def c5 (D : Near126Input S A) : Prop :=
+  D.lambda3 (D.etaAction D.h0SquaredX1248) =
+    D.lambda6H1h4 D.h1h4X10912
+
+end Near126Input
+
 /-- The exact propositional forms of $C_3$, $C_4$, and $C_5$. -/
 structure Near126Conditions
     {C : StableHomotopyContext} {S : SyntheticHomotopyContext C}

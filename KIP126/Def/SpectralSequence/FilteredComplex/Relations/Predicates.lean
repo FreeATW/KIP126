@@ -5,7 +5,6 @@ import KIP126.Def.SpectralSequence.FilteredComplex.Relations.Data
 namespace KIP126.Core.SpectralSequence.FilteredComplex
 
 open CategoryTheory
-open KIP126.Def.PageExtensions
 
 universe u v
 

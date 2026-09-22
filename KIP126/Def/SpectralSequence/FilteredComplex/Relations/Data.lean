@@ -1,8 +1,8 @@
 import KIP126.Def.Algebra.Filtration.Proofs
 import KIP126.Def.SpectralSequence.FilteredComplex.Data
 import KIP126.Def.SpectralSequence.FilteredPage.Data
-import KIP126.Def.SpectralSequence.FilteredPage.Complex
-import KIP126.Def.PageExtensions.Differential.Proofs
+import KIP126.Def.SpectralSequence.FilteredPage.AssemblyProofs
+import KIP126.Def.SpectralSequence.PageDifferential.Proofs
 
 /-!
 # Data for filtered-complex/page relations
@@ -17,7 +17,6 @@ namespace KIP126.Core.SpectralSequence.FilteredComplex
 open CategoryTheory
 open KIP126.Core.Algebra
 open KIP126.Core.SpectralSequence
-open KIP126.Def.PageExtensions
 
 universe u v
 
@@ -42,21 +41,14 @@ structure PageView (FC : FilteredComplex C) where
     (sequence.page r hr).X (s, k) ≅
       FC.pageObj s k (pageNumber r hr)
 
-/-- The canonical page view obtained once adjacent-page homology comparisons
-have been supplied. -/
-noncomputable def PageView.ofPageHomologyWitness
-    (FC : FilteredComplex C) (W : PageHomologyWitness FC) : PageView FC where
+/-- The canonical page view of a filtered complex. -/
+noncomputable def PageView.canonical
+    (FC : FilteredComplex C) : PageView FC where
   shape := fun r : ℤ => pageShape r.toNat
   firstPage := 0
-  sequence := FC.pageSpectralSequence W
+  sequence := FC.canonicalPageSpectralSequence
   pageNumber := fun r _ => (r.toNat : WithTop ℕ)
   pageToPage := fun _ _ _ _ => Iso.refl _
-
-/-- Obtain the canonical page view from the epi--mono factorizations used to
-compare adjacent-page homology. -/
-noncomputable def PageView.ofPageHomologyFactorization
-    (FC : FilteredComplex C) (W : PageHomologyFactorization FC) : PageView FC :=
-  PageView.ofPageHomologyWitness FC (PageHomologyWitness.ofFactorization FC W)
 
 namespace PageView
 

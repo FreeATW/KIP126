@@ -47,7 +47,7 @@ structure Theta5ChoiceContext where
   finiteZero : ℕ → Carrier → Prop
   untruncatedZero : Carrier → Prop
   h6Survives : ℕ → Prop
-  h6Permanent : Prop
+  is_permanent : Carrier → Prop
   deltaH6 : Carrier
   /-- Finite evidence that the two comparison groups have no relevant
   `lambda`-torsion.  The concrete group interpretation supplies these
@@ -56,6 +56,8 @@ structure Theta5ChoiceContext where
   noLambdaTorsion125 : Prop
 
 namespace Theta5ChoiceContext
+
+variable {Carrier : Type} [AddCommGroup Carrier]
 
 variable (C : Theta5ChoiceContext (Carrier := Carrier))
 

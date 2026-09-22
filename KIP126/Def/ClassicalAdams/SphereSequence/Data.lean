@@ -72,6 +72,22 @@ def sphereProduct {stable : StableHomotopyContext}
     (P : SphereAdamsPresentation A) (x y : AdamsClass A) : AdamsClass A :=
   P.multiplication.product x y
 
+/-- The named page-2 class represented by the square `h₆²` in the sphere
+Adams presentation.  This is defined from the existing Adams object and its
+chosen sphere multiplication; it is not a second, independent carrier. -/
+def h6Square {stable : StableHomotopyContext}
+    {A : ClassicalAdamsSS stable stable.sphere}
+    (P : SphereAdamsPresentation A) : AdamsClass A :=
+  sphereProduct P (P.h 6) (P.h 6)
+
+theorem h6Square_degree {stable : StableHomotopyContext}
+    {A : ClassicalAdamsSS stable stable.sphere}
+    (P : SphereAdamsPresentation A) :
+    (h6Square P).degree = (2, (128 : ℤ)) := by
+  rw [h6Square, sphereProduct, P.multiplication.product_degree,
+    P.h_degree]
+  norm_num
+
 /-- Algebraic laws for a chosen sphere presentation.  The product on named
 classes is required to be represented by a bilinear, unital, associative
 product on the actual Mathlib `E₂` page and to satisfy the page-`2` Leibniz

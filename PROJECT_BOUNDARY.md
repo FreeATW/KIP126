@@ -28,6 +28,20 @@ relaxation of this boundary must be agreed explicitly and recorded here.
    high-stem values, computer output, and table entries are external inputs
    represented by `ExternalResult` or `ExternalEvidence`.
 
+   For the statement of the permanent `h_6^2` target, the confirmed abstract
+   foundation may include an explicit mod--2 Eilenberg--Mac Lane object and
+   Milnor cooperation coordinates. These coordinates identify the constructed
+   first Adams page with the explicitly defined normalized Milnor cobar
+   cochains and intertwine the constructed first differential with the Milnor
+   coproduct differential. This structural input is not inferred from the
+   homotopy groups of the Eilenberg--Mac Lane object alone. The Adams tower,
+   quotient pages, later differentials, page passage, standard `h_6`, its
+   concatenation square, and pagewise nonzero permanence must be defined from
+   these foundations; they must not be supplied as fields. Proof-route results
+   such as C3, C4, and C5 are not part of the statement's defining data. This
+   statement-only stage does not establish the conditional final theorem or
+   relax the project's proof-completion and axiom-audit acceptance criteria.
+
 3. **Appendix data.** Every entry in the Appendix tables is to be encoded,
    not only the entries used directly in the final proof. The encoding records
    the relevant stem, filtration, class names, differential length, target,
@@ -233,8 +247,11 @@ not unconditional declarations of the external mathematics.
 The project is complete only when all of the following hold:
 
 - `lake build` succeeds with the pinned Lean/mathlib versions;
-- no Lean source file contains `sorry`, `admit`, or a project-declared
-  `axiom`;
+- all canonical KIP126 source outside the intentional Challenge statement
+  track contains no `sorry` or `admit`, and canonical KIP126 declares no project
+  `axiom`; Challenge statements retain their required `by sorry` bodies and
+  are excluded from proof-completion evidence, while the isolated historical
+  KIPBase component remains subject to its separate migration audit;
 - every external input is passed through `ExternalResult` or `ExternalEvidence`;
 - every Appendix table entry has a Lean encoding;
 - the two geometric conclusions are available as conditional theorems;
