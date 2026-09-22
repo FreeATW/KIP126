@@ -1,4 +1,5 @@
 import KIP126.Def.ClassicalAdams.TowerPages.Data
+import KIP126.Def.ClassicalAdams.Tower.Proofs
 
 /-!
 # Cycle membership and lift properties
@@ -35,10 +36,31 @@ theorem adamsJ_mem_cycles (r : ℕ) (hr : 1 ≤ r) (s t : ℤ)
     (HoCofiberSequence.ofMorphism (adamsTowerMapAt unit X s (s + 1) (by omega)))
     (t - s) _).mpr ⟨y, rfl⟩
 
+/-- Boundaries lie in the cycle submodule on every page. -/
+theorem adamsBoundaries_le_cycles (r : ℕ) (hr : 1 ≤ r) (s t : ℤ) :
+    adamsBoundaries unit X r hr s t ≤ adamsCycles unit X r hr s t := by
+  rintro x ⟨y, _, rfl⟩
+  exact adamsJ_mem_cycles unit X r hr s t y
+
+@[simp] theorem adamsI_self (n s : ℤ) :
+    adamsI unit X n s s le_rfl = LinearMap.id := by
+  ext x
+  simp [adamsI, inducedMap]
+
+theorem adamsI_comp (n s t z : ℤ) (hst : s ≤ t) (htz : t ≤ z)
+    (x : HomotopyGroup n (adamsTowerAt unit X z)) :
+    adamsI unit X n s t hst (adamsI unit X n t z htz x) =
+      adamsI unit X n s z (by omega) x := by
+  simp [adamsI, inducedMap, Category.assoc, adamsTowerMapAt_comp]
+
 /-- A cycle which lifts one stage farther is in particular an `r`-cycle. -/
 theorem adamsCycles_succ_le (r : ℕ) (hr : 1 ≤ r) (s t : ℤ) :
     adamsCycles unit X (r + 1) (by omega) s t ≤ adamsCycles unit X r hr s t := by
-  sorry
+  intro x hx
+  obtain ⟨y, hy⟩ := hx
+  refine ⟨adamsI unit X (t - s - 1) (s + r) (s + (r + 1 : ℕ)) (by omega) y, ?_⟩
+  rw [adamsI_comp]
+  exact hy
 
 end
 

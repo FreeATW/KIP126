@@ -42,6 +42,15 @@ relaxation of this boundary must be agreed explicitly and recorded here.
    statement-only stage does not establish the conditional final theorem or
    relax the project's proof-completion and axiom-audit acceptance criteria.
 
+   The next agreed stage retains the abstract background and moves the
+   comparison foundation below the Adams pages: an associative unital
+   structure on the specified `H`, its graded cooperations, and the tensor,
+   exactness, and Künneth compatibility needed to construct the comparison.
+   The first-page coordinates and their differential compatibility must be
+   derived from those foundations. Until that derivation is implemented,
+   the existing `MilnorCooperations` argument remains an explicit uneliminated
+   dependency; merely renaming or rebundling it does not complete this stage.
+
 3. **Appendix data.** Every entry in the Appendix tables is to be encoded,
    not only the entries used directly in the final proof. The encoding records
    the relevant stem, filtration, class names, differential length, target,

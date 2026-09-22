@@ -164,15 +164,47 @@ noncomputable def homotopyGroupFunctor (n : ℤ) :
     ext x
     simp [inducedMap, Category.assoc]
 
-/-- Exactness at the shifted `X` term in the long exact homotopy-group
-sequence.  A concrete stable model supplies the remaining exactness witness
-while this canonical target records its type. -/
+set_option backward.isDefEq.respectTransparency false in
+/-- Exactness at the shifted `X` term, transferred through the shift equivalence
+from exactness of the distinguished triangle. -/
 theorem lesHomotopyExactH :
     ∀ {C : Type u} [StableHomotopyCategory.{u, v} C]
       (T : HoCofiberSequence (C := C)) (n : ℤ),
       ∀ (x : HomotopyGroup (n - 1) T.X),
         (inducedMap T.f (n - 1)) x = 0 ↔
           ∃ z : HomotopyGroup n T.Z, (connectingHomomorphism T n) z = x := by
-  sorry
+  intro C _ T n x
+  let F := shiftFunctor C (-1 : ℤ)
+  let a := (shiftFunctorAdd' C n (-1) (n - 1) (by omega)).app SphereSpectrum
+  let b := shiftFunctorCompIsoId C (1 : ℤ) (-1) (by omega)
+  have hc (z : HomotopyGroup n T.Z) :
+      connectingHomomorphism T n z = a.hom ≫ F.map (z ≫ T.h) ≫ b.hom.app T.X := by
+    simp [connectingHomomorphism, a, b, F]
+  have hb : b.inv.app T.X ≫ F.map ((shiftFunctor C (1 : ℤ)).map T.f) =
+      T.f ≫ b.inv.app T.Y := (b.inv.naturality T.f).symm
+  constructor
+  · intro hx
+    change x ≫ T.f = 0 at hx
+    let w := F.preimage (a.inv ≫ x ≫ b.inv.app T.X)
+    have hw : F.map w = a.inv ≫ x ≫ b.inv.app T.X := F.map_preimage _
+    have hwf : w ≫ (shiftFunctor C (1 : ℤ)).map T.f = 0 := by
+      apply F.map_injective
+      rw [Functor.map_comp, hw, Functor.map_zero]
+      simp only [Category.assoc, hb, ← Category.assoc x T.f, hx,
+        Limits.zero_comp, Limits.comp_zero]
+    obtain ⟨z, hz⟩ := Triangle.coyoneda_exact₁ _ T.distinguished w hwf
+    change HomotopyGroup n T.Z at z
+    change w = z ≫ T.h at hz
+    refine ⟨z, ?_⟩
+    rw [hc, ← hz, hw]
+    simp
+  · rintro ⟨z, rfl⟩
+    change connectingHomomorphism T n z ≫ T.f = 0
+    rw [hc]
+    have hb' : b.hom.app T.X ≫ T.f =
+        F.map ((shiftFunctor C (1 : ℤ)).map T.f) ≫ b.hom.app T.Y :=
+      (b.hom.naturality T.f).symm
+    simp only [Category.assoc, hb', ← F.map_comp_assoc,
+      T.hf_shift_zero, Limits.comp_zero, F.map_zero, Limits.zero_comp]
 
 end KIP126.StableHomotopy

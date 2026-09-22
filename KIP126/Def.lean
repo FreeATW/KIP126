@@ -35,6 +35,7 @@ import KIP126.Def.StableHomotopy.Context.Proofs
 import KIP126.Def.StableHomotopy.Context.MappingProofs
 import KIP126.Def.StableHomotopy.Cohomology.Data
 import KIP126.Def.StableHomotopy.Cohomology.Proofs
+import KIP126.Def.StableHomotopy.Cohomology.Multiplication.Proofs
 import KIP126.Def.Kervaire.Setup.Data
 import KIP126.Def.Kervaire.SphereAdams
 import KIP126.Def.Kervaire.Theta5.Proofs

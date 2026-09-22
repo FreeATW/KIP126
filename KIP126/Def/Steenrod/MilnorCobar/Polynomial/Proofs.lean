@@ -1,15 +1,45 @@
 import KIP126.Def.Steenrod.MilnorCobar.Polynomial.Predicates
+import Mathlib.Algebra.CharP.Lemmas
+import Mathlib.Algebra.CharP.Two
 
 /-!
 # Polynomial preservation and membership proofs
 
-The three mathematical properties needed to restrict the raw operations
-remain open. They are not parameters of the constructed cochains.
+Concatenation preserves normalization and degree, and the specified
+representatives are normalized cocycles. Preservation by the general
+coproduct differential is the remaining open obligation in this module.
 -/
 
 namespace KIP126.Steenrod.Milnor
 
 noncomputable section
+
+open KIP126.Core.Algebra MvPolynomial
+
+/-- Renaming tensor slots does not change internal degree. -/
+theorem homogeneous_rename_slots {s s' t : ℕ} (f : Fin s → Fin s')
+    {x : TensorPower s} (hx : IsWeightedHomogeneous weight x t) :
+    IsWeightedHomogeneous weight (rename (fun a : Fin s × ℕ => (f a.1, a.2)) x) t := by
+  induction hx using IsWeightedHomogeneous.induction_on with
+  | zero => simpa using isWeightedHomogeneous_zero F2 (@weight s') t
+  | add x y hx hy ihx ihy => simpa using ihx.add ihy
+  | monomial d r hd =>
+    rw [rename_monomial]
+    apply isWeightedHomogeneous_monomial
+    rw [← hd]
+    simp only [Finsupp.weight_apply, weight, smul_eq_mul]
+    rw [Finsupp.sum_mapDomain_index (by simp) (by intros; simp [add_mul])]
+
+/-- Augmenting a renamed slot agrees with renaming after augmentation. -/
+theorem augmentSlot_rename {s s' : ℕ} (f : Fin s → Fin s')
+    (hf : Function.Injective f) (slot : Fin s) (x : TensorPower s) :
+    augmentSlot (f slot) (rename (fun a : Fin s × ℕ => (f a.1, a.2)) x) =
+      rename (fun a : Fin s × ℕ => (f a.1, a.2)) (augmentSlot slot x) := by
+  have h : (augmentSlot (f slot)).comp (rename (fun a : Fin s × ℕ => (f a.1, a.2))) =
+      (rename (fun a : Fin s × ℕ => (f a.1, a.2))).comp (augmentSlot slot) := by
+    ext a : 1
+    by_cases ha : a.1 = slot <;> simp [augmentSlot, hf.eq_iff, ha]
+  exact DFunLike.congr_fun h x
 
 /-- The coproduct differential preserves normalization and internal degree. -/
 theorem differentialPolynomial_mem (s t : ℕ) (x : cochains s t) :
@@ -19,10 +49,53 @@ theorem differentialPolynomial_mem (s t : ℕ) (x : cochains s t) :
 /-- Concatenation preserves normalization and adds the two internal degrees. -/
 theorem cupPolynomial_mem {s s' t t' : ℕ} (x : cochains s t) (y : cochains s' t') :
     IsCochain (t + t') (cupPolynomial x.val y.val) := by
-  sorry
+  constructor
+  · exact (homogeneous_rename_slots (Fin.castAdd s') x.property.1).mul
+      (homogeneous_rename_slots (Fin.natAdd s) y.property.1)
+  · change cupPolynomial x.val y.val ∈
+      (⨅ slot : Fin (s + s'), LinearMap.ker (augmentSlot slot).toLinearMap)
+    rw [Submodule.mem_iInf]
+    intro slot
+    refine Fin.addCases (fun i => ?_) (fun i => ?_) slot
+    · change augmentSlot (i.castAdd s') (cupPolynomial x.val y.val) = 0
+      have hx : augmentSlot i x.val = 0 := (Submodule.mem_iInf _).mp x.property.2 i
+      rw [cupPolynomial, map_mul,
+        augmentSlot_rename (Fin.castAdd s') (Fin.castAdd_injective s s'), hx, map_zero, zero_mul]
+    · change augmentSlot (i.natAdd s) (cupPolynomial x.val y.val) = 0
+      have hy : augmentSlot i y.val = 0 := (Submodule.mem_iInf _).mp y.property.2 i
+      rw [cupPolynomial, map_mul,
+        augmentSlot_rename (Fin.natAdd s) (Fin.natAdd_injective s' s), hy, map_zero, mul_zero]
 
 theorem h6Polynomial_mem : IsCochain 64 h6Polynomial := by
-  sorry
+  constructor
+  · simpa [h6Polynomial, weight] using
+      (MvPolynomial.isWeightedHomogeneous_X (R := KIP126.Core.Algebra.F2)
+        (@weight 1) (0, 0)).pow 64
+  · change h6Polynomial ∈ (⨅ slot : Fin 1, LinearMap.ker (augmentSlot slot).toLinearMap)
+    rw [Submodule.mem_iInf]
+    intro slot
+    have hslot : slot = 0 := Subsingleton.elim _ _
+    subst slot
+    simp [LinearMap.mem_ker, augmentSlot, h6Polynomial]
+
+/-- The primitive power representative is closed, independently of the
+restriction of the differential to normalized cochains. -/
+theorem h6Polynomial_differential : differentialPolynomial 1 h6Polynomial = 0 := by
+  have hp (x y : TensorPower 2) : (x + y) ^ 64 = x ^ 64 + y ^ 64 :=
+    add_pow_char_pow x y 2 6
+  simp [differentialPolynomial, h6Polynomial, insertLeft, insertRight,
+    splitSlot, coproductGenerator, xi, Finset.sum_range_succ, hp,
+    add_assoc, CharTwo.add_self_eq_zero, CharTwo.add_cancel_left]
+
+/-- The concatenated square is closed at the polynomial level. -/
+theorem h6SquarePolynomial_differential :
+    differentialPolynomial 2 (cupPolynomial h6Polynomial h6Polynomial) = 0 := by
+  have hp (x y : TensorPower 3) : (x + y) ^ 64 = x ^ 64 + y ^ 64 :=
+    add_pow_char_pow x y 2 6
+  simp [differentialPolynomial, cupPolynomial, h6Polynomial, insertLeft, insertRight,
+    splitSlot, coproductGenerator, xi, Fin.sum_univ_succ, Finset.sum_range_succ, hp]
+  ring_nf
+  simp [CharTwo.two_eq_zero]
 
 end
 
