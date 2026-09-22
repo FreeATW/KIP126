@@ -247,8 +247,11 @@ not unconditional declarations of the external mathematics.
 The project is complete only when all of the following hold:
 
 - `lake build` succeeds with the pinned Lean/mathlib versions;
-- no Lean source file contains `sorry`, `admit`, or a project-declared
-  `axiom`;
+- all canonical KIP126 source outside the intentional Challenge statement
+  track contains no `sorry` or `admit`, and canonical KIP126 declares no project
+  `axiom`; Challenge statements retain their required `by sorry` bodies and
+  are excluded from proof-completion evidence, while the isolated historical
+  KIPBase component remains subject to its separate migration audit;
 - every external input is passed through `ExternalResult` or `ExternalEvidence`;
 - every Appendix table entry has a Lean encoding;
 - the two geometric conclusions are available as conditional theorems;
