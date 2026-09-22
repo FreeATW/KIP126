@@ -502,16 +502,21 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:128-130 and 2106-2214, Theorems thm:h62 and thm:126survives.
 \begin{theorem}[$h_6^2$ is a permanent cycle]
   \label{thm:h6-square-permanent}
-  \lean{KIP126.Kervaire.Near126Adams}
   \lean{KIP126.Challenge.Final.H6SquarePermanent.h6_sq_permanent}
-  \uses{def:kervaire-main-input,prop:possible-h62,prop:near126-c3-not-c5}
+  \uses{def:h6-constructed-square,def:h6-pagewise-permanence}
   \notready
-  For every main input $I$, the class $h_6^2$ is a permanent cycle in
-  $I.\mathrm{classicalSphere}$, the classical mod--$2$ Adams spectral sequence
-  of the sphere.
+  The standard class $h_6^2\in E_2^{2,128}(S^0)$ is nonzero permanent
+  in the classical mod--$2$ Adams spectral sequence of the sphere.
+  The corresponding formal declaration records this proposition over the
+  abstract foundation and explicit Milnor coordinates; it does not prove
+  it for every abstract model.  The external hypotheses required by a
+  solution are separate from the definitions of its objects.
 \end{theorem}
 
 \begin{proof}
+  \uses{def:kervaire-main-input,prop:possible-h62,prop:near126-c3-not-c5}
+  Take a main input $I$ whose classical sphere sequence and named classes
+  are identified with the constructions above through its coherence data.
   Put $D=I.\mathrm{computation}$.  Instantiate every literature leaf with its
   named projection from $I.\mathrm{literature}$, every table and finite-search
   theorem with this same $D$, and every spectral-sequence comparison through

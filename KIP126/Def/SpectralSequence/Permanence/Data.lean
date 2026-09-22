@@ -8,7 +8,7 @@ import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 
 Mathlib's categorical spectral sequence has no map from one page object to the
 next: the next page is the homology of the current one.  For spectral sequences
-of `F₂`-modules, this file makes the corresponding elementwise passage
+of modules, this file makes the corresponding elementwise passage
 explicit.  A page trajectory is a compatible choice of representatives on all
 later pages.  A class is permanent when such a trajectory stays nonzero on
 every page.
@@ -19,7 +19,9 @@ namespace KIP126.Core.SpectralSequence
 open CategoryTheory
 open KIP126.Core.Algebra
 
-universe w
+universe w u v
+
+variable {R : Type u} [Ring R]
 
 variable {κ : Type w} {c : ℤ → ComplexShape κ} {r₀ : ℤ}
 
@@ -43,7 +45,7 @@ theorem iteratedPage_ge {r : ℤ} (hr : r₀ ≤ r) :
 
 /-- The class on the successor page represented by a cycle on page `r`. -/
 noncomputable def nextPageClass
-    (E : CategoryTheory.SpectralSequence F2ModuleCat c r₀)
+    (E : CategoryTheory.SpectralSequence (ModuleCat.{v} R) c r₀)
     (r : ℤ) (hr : r₀ ≤ r) (p : κ)
     (x : (E.page r hr).X p)
     (hx : ((E.page r hr).d p ((c r).next p)) x = 0) :
@@ -56,7 +58,7 @@ noncomputable def nextPageClass
 pages.  This structure by itself permits a descendant to become zero; the
 predicate `IsPermanent` below rules that out. -/
 structure PageTrajectory
-    (E : CategoryTheory.SpectralSequence F2ModuleCat c r₀)
+    (E : CategoryTheory.SpectralSequence (ModuleCat.{v} R) c r₀)
     (r : ℤ) (hr : r₀ ≤ r) (p : κ) (x : (E.page r hr).X p) where
   classAt : ∀ n : ℕ, (E.page (iteratedPage r n) (iteratedPage_ge hr n)).X p
   classAt_zero : classAt 0 = x
@@ -71,13 +73,13 @@ structure PageTrajectory
 every successor page.  This includes both halves of survival: it supports no
 outgoing differential and is never killed by an incoming differential. -/
 def IsPermanent
-    (E : CategoryTheory.SpectralSequence F2ModuleCat c r₀)
+    (E : CategoryTheory.SpectralSequence (ModuleCat.{v} R) c r₀)
     (r : ℤ) (hr : r₀ ≤ r) (p : κ) (x : (E.page r hr).X p) : Prop :=
   ∃ trajectory : PageTrajectory E r hr p x,
     ∀ n : ℕ, trajectory.classAt n ≠ 0
 
 theorem IsPermanent.ne_zero
-    {E : CategoryTheory.SpectralSequence F2ModuleCat c r₀}
+    {E : CategoryTheory.SpectralSequence (ModuleCat.{v} R) c r₀}
     {r : ℤ} {hr : r₀ ≤ r} {p : κ} {x : (E.page r hr).X p}
     (h : IsPermanent E r hr p x) : x ≠ 0 := by
   rintro rfl

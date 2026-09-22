@@ -1,13 +1,9 @@
-import KIP126.Def.Kervaire.SphereAdams
+import KIP126.Challenge.Final.h6_sq_permanent
 
-/-! Exact conditional endpoint statement for the permanent `h₆²` class. -/
-namespace KIP126.Solution.Final.H6SquarePermanent
-
-open KIP126.Kervaire
-
-/-- The near-126 argument proves that `h₆²` is a nonzero permanent class. -/
-theorem h6_sq_permanent [D : Near126Adams] :
-    D.h6_square_isPermanent := by
-  sorry
-
-end KIP126.Solution.Final.H6SquarePermanent
+/-!
+The exact proof target is
+`KIP126.Challenge.Final.H6SquarePermanent.h6_sq_permanent`.
+Its proof and the explicit external hypotheses needed by that proof are not
+implemented yet.  This module does not duplicate the target as an unrelated
+theorem about arbitrary near-126 interface fields.
+-/

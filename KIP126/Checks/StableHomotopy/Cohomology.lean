@@ -11,17 +11,17 @@ universe u v
 
 variable {C : Type u} [StableHomotopyCategory.{u, v} C]
 
-example (H : Mod2Context (C := C)) (n : ℤ) (X : C) :
+example (H : Mod2EilenbergMacLane (C := C)) (n : ℤ) (X : C) :
     Mod2Cohomology H n X = ((shiftFunctor C n).obj X ⟶ H.HF2) := rfl
 
-example (H : Mod2Context (C := C)) {X Y : C} (f : X ⟶ Y) (n : ℤ) :
+example (H : Mod2EilenbergMacLane (C := C)) {X Y : C} (f : X ⟶ Y) (n : ℤ) :
     Mod2Cohomology.pullback H f n = Mod2Cohomology.pullback H f n := rfl
 
-example (H : Mod2Context (C := C)) {X Y : C} (f : X ⟶ Y) (n : ℤ) :
+example (H : Mod2EilenbergMacLane (C := C)) {X Y : C} (f : X ⟶ Y) (n : ℤ) :
     (Mod2Homology.pushforward H f n) 0 = 0 := by
   simp [Mod2Homology.pushforward]
 
-example (H : Mod2Context (C := C)) (n : ℤ) (X : C) :
+example (H : Mod2EilenbergMacLane (C := C)) (n : ℤ) (X : C) :
     Nonempty
       (Mod2Cohomology H n X ≃
         (X ⟶ (shiftFunctor C (-n)).obj H.HF2)) :=
