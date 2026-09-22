@@ -1,4 +1,4 @@
-import KIP126.Def.Computation.AppendixTable.Data
+import KIP126.External.Computation.AppendixTable.Data
 
 /-!
 # Typed Appendix rows
@@ -58,9 +58,6 @@ mutual
     | value :: values => validBool value && (values.isEmpty || validListBool values)
 end
 
-/-- A term contains at least one atom with a nonempty catalogue name. -/
-def Valid (term : ClassTerm) : Prop := term.validBool = true
-
 end ClassTerm
 
 /-- The metadata attached to every displayed expression. -/
@@ -72,25 +69,10 @@ structure ExpressionMetadata where
   internalDegree : Nat
   cell : Option Cell := none
 
-
 /-- A class expression with its paper bidegree and source table. -/
 structure TypedClassExpression where
   metadata : ExpressionMetadata
   term : ClassTerm
-
-
-namespace TypedClassExpression
-
-/-- Metadata degree is the Adams total degree `t = (t-s)+s`. -/
-def DegreeValid (expression : TypedClassExpression) : Prop :=
-  expression.metadata.internalDegree =
-    expression.metadata.stem + expression.metadata.filtration
-
-/-- The syntax tree is nonempty and its metadata names the table's spectrum. -/
-def Valid (expression : TypedClassExpression) : Prop :=
-  expression.term.Valid ∧ expression.DegreeValid
-
-end TypedClassExpression
 
 /-- Direction of a differential row in the paper table. -/
 inductive DifferentialDirection
@@ -105,7 +87,6 @@ inductive AppendixRowStatus
   | differential (direction : DifferentialDirection) (length : Nat)
       (target : Option TypedClassExpression) (possibleTargets : List TypedClassExpression)
   | survivesThrough (page : Nat)
-
 
 namespace AppendixRowStatus
 
@@ -135,8 +116,6 @@ structure DifferentialRelationId where
 
 namespace DifferentialRelationId
 
-def Valid (relation : DifferentialRelationId) : Prop := relation.value ≠ 0
-
 def validBool (relation : DifferentialRelationId) : Bool := decide (relation.value ≠ 0)
 
 end DifferentialRelationId
@@ -158,27 +137,7 @@ structure AppendixRow where
   relation : Option DifferentialRelationId
   locator : AppendixRowLocator
 
-
 namespace AppendixRow
-
-/-- The row key is unique in the canonical catalogue. -/
-def KeyValid (row : AppendixRow) : Prop := row.key ≠ 0
-
-/-- The row's expression metadata agrees with its table and bidegree. -/
-def MetadataValid (row : AppendixRow) : Prop :=
-  row.source.metadata.table = row.table ∧
-  row.source.metadata.stem = row.stem ∧
-  row.source.metadata.filtration = row.filtration ∧
-  row.source.metadata.internalDegree = row.stem + row.filtration
-
-/-- A row record is a well-formed typed input. -/
-def RelationValid (row : AppendixRow) : Prop :=
-  match row.relation with
-  | none => True
-  | some relation => relation.Valid
-
-def Valid (row : AppendixRow) : Prop :=
-  row.KeyValid ∧ row.MetadataValid ∧ row.RelationValid
 
 /-- Executable key and metadata check used by catalogue regressions. -/
 def validBool (row : AppendixRow) : Bool :=
@@ -203,10 +162,7 @@ structure AppendixZeroBand where
   high : Nat
   locator : AppendixRowLocator
 
-
 namespace AppendixZeroBand
-
-def Valid (band : AppendixZeroBand) : Prop := band.low ≤ band.high
 
 def validBool (band : AppendixZeroBand) : Bool := decide (band.low ≤ band.high)
 

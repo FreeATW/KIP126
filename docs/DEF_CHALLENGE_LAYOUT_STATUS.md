@@ -30,6 +30,7 @@ the mathematical index; compiling a Challenge module does not prove its node.
 | `Synthetic/{Lift,Rigidity}` | `Def/Synthetic/Context/Data`, `Def/Comparison/ClassicalSynthetic/{Data,Proofs}`, and the open Challenge/External interfaces (normalized lifts, λ-Bockstein identification, and rigidity are not claimed as proved) |
 | `Classical/Adams/Basic` | `Def/StableHomotopy/Context/Data`, `Def/ClassicalAdams/{Page/Data,Convergence/{Data,Predicates,Proofs,StrongData},SphereSequence/Data,H4D2/{Data,Predicates}}`, `External/Literature/Adams/OneLine` |
 | `Classical/SpectralSequence/Basic` | `Def/ClassicalAdams/PageSlice/Data` |
+| `Constructed sphere Adams sequence and standard classes` | `Def/ClassicalAdams/{Tower/Data,TowerPages/{Data,Proofs},TowerDifferential,TowerPageComplex/Data,TowerSequence,Mod2Sphere/Data,MilnorCooperations/{Data,Proofs},SphereClasses/Data}`; differential and page-passage stages each separate data from proofs |
 | `Classical/ExtensionSS/Basic` | `Def/ClassicalESS/Eta/{Data,ExternalInput,Predicates,Proofs}` |
 | `Classical/ExtensionSS/EtaData` | `External/Computation/EtaRows/Data` |
 | `Synthetic/SpectralSequence/Basic` | `Def/Synthetic/AdamsSequence/Data` |
@@ -47,7 +48,7 @@ the mathematical index; compiling a Challenge module does not prove its node.
 | `Proposition 7.9 incompatibility` | `Challenge/Near126/c3_excludes_c5` |
 | `Permanent h₆² endpoint` | `Challenge/Final/h6_sq_permanent` |
 | `Dimension-126 geometry` | Blueprint/project-boundary target; its Challenge statements are deferred until the permanent-cycle chain is ready |
-| `Appendix computation catalogue` | `Def/Computation/AppendixTable/{Data,Rows/{Data,Catalogue}}` |
+| `Appendix computation catalogue` | `External/Computation/AppendixTable/{Data,Proofs,Rows/{Data,Predicates,Catalogue/{Data,Proofs}}}` plus the three unchanged row-chunk modules |
 | `*/Regression`, `*Regression` | corresponding `Checks/` modules |
 
 Import-only facades and empty `Classical/FExtension`, `Classical/PageExtensions`,
@@ -89,10 +90,24 @@ regressions.  It remains an input catalogue: the mathematical interpretation
 of each row and its evidence proof are still open.  The existing eta rows are
 kept as a separate located computation slice.
 
-`Def/Computation/AppendixTable/Data` gives the twelve paper tables stable
+`External/Computation/AppendixTable/Data` gives the twelve paper tables stable
 identities, printed table numbers, TeX labels and source line ranges, PDF
-pages, spectra, stems, and filtration bands. `Rows/Catalogue` contains the
-source-shaped 401-row input and remains `\notready` for theorem completion.
+pages, spectra, stems, and filtration bands. `Rows/Catalogue/Data` contains the
+source-shaped 401-row input; `Rows/Predicates` defines schema validity and
+`Rows/Catalogue/Proofs` checks the transcription. The mathematical interpretation
+of the recorded differential and permanence statuses remains `\notready`.
+The complete paper-specific schema and catalogue are exported by `KIP126.External`,
+not `KIP126.Def`; public names in `KIP126.Computation` are preserved.
+
+The six former loose `ClassicalAdams` implementation files now live in
+component directories. Cycle membership is proved before the differential
+formula is built; linearity precedes its linear-map construction; boundary
+vanishing precedes quotient descent; and the page-passage bijectivity theorem
+precedes assembly of the spectral sequence. Each stage separates `Data` and
+`Proofs` without introducing artificial predicate layers or additional input
+hypotheses. `MilnorCooperations` contains the explicit foundational coordinates
+and their cocycle consequence, while `SphereClasses/Data` constructs the standard
+classes. Both final Challenge and Solution statements import that same module.
 
 The convergence witness structures now live in `Data`, their detection
 relation in `Predicates`, and the derived completion and detection results in

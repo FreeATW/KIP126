@@ -7,9 +7,9 @@ import KIP126.Def.ClassicalAdams.PageSlice.Data
 import KIP126.Def.ClassicalAdams.Permanence.Data
 import KIP126.Def.ClassicalAdams.Convergence.Proofs
 import KIP126.Def.ClassicalAdams.SphereSequence.Data
+import KIP126.Def.ClassicalAdams.SphereClasses.Data
 import KIP126.Def.ClassicalAdams.H4D2.Predicates
 import KIP126.Def.ClassicalESS.Eta.Proofs
-import KIP126.Def.Computation.AppendixTable.Data
 import KIP126.Def.Comparison.ClassicalSynthetic.Proofs
 import KIP126.Def.SpectralSequence.Convergence.Proofs
 import KIP126.Def.SpectralSequence.Extension.Data
@@ -37,5 +37,4 @@ import KIP126.Def.StableHomotopy.Cohomology.Data
 import KIP126.Def.StableHomotopy.Cohomology.Proofs
 import KIP126.Def.Kervaire.Setup.Data
 import KIP126.Def.Kervaire.SphereAdams
-import KIP126.Def.Computation.AppendixTable.Rows.Catalogue
 import KIP126.Def.Kervaire.Theta5.Proofs

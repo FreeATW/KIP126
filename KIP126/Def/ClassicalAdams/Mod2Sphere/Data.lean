@@ -1,4 +1,4 @@
-import KIP126.Def.ClassicalAdams.TowerSequence
+import KIP126.Def.ClassicalAdams.TowerSequence.Data
 import KIP126.Def.StableHomotopy.Cohomology.Data
 
 /-!

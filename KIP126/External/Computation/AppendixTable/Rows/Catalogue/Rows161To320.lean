@@ -1,4 +1,4 @@
-import KIP126.Def.Computation.AppendixTable.Rows.Data
+import KIP126.External.Computation.AppendixTable.Rows.Data
 
 /-! Appendix catalogue chunks 5–8, transcribed from `aimpaper/main.tex`. -/
 

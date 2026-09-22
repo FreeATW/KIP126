@@ -1,18 +1,9 @@
-import KIP126.Def.ClassicalAdams.Tower
+import KIP126.Def.ClassicalAdams.Tower.Data
 import KIP126.Def.StableHomotopy.Context.Proofs
 import Mathlib.LinearAlgebra.Quotient.Basic
 
 /-!
-# Quotient pages of the Adams tower
-
-These are the usual exact-couple formulas, expressed using the actual tower
-maps.  They do not take a spectral sequence or its pages as inputs.  A page
-class in bidegree `(s,t)` has stem `t-s`.
-
-For `r ≥ 1`, `Zᵣ` is the inverse image, under the connecting map, of the
-image from tower stage `s+r`.  The boundary subgroup `Bᵣ` is the image in the
-layer of the kernel of the map from stage `s` to stage `s-r+1`.  The quotient
-page is `Zᵣ / (Zᵣ ∩ Bᵣ)`; exactness implies `Bᵣ ≤ Zᵣ`.
+# Quotient pages and lifts of the Adams tower
 -/
 
 namespace KIP126.Classical.Adams
@@ -26,8 +17,7 @@ universe u v
 
 variable {C : Type u} [StableHomotopyCategory.{u, v} C]
   [HasFunctorialCofiber (C := C)]
-
-variable {H : C} (unit : 𝟙_ C ⟶ H) (X : C)
+  {H : C} (unit : 𝟙_ C ⟶ H) (X : C)
 
 /-- The underlying group of the first page. -/
 abbrev adamsE1 (s t : ℤ) := HomotopyGroup (t - s) (adamsLayerAt unit X s)
@@ -80,24 +70,6 @@ noncomputable def adamsCycleLift (r : ℕ) (hr : 1 ≤ r) (s t : ℤ)
     HomotopyGroup (t - s - 1) (adamsTowerAt unit X (s + r)) :=
   Classical.choose x.property
 
-theorem adamsCycleLift_spec (r : ℕ) (hr : 1 ≤ r) (s t : ℤ)
-    (x : adamsCycles unit X r hr s t) :
-    adamsI unit X (t - s - 1) (s + 1) (s + r) (by omega)
-      (adamsCycleLift unit X r hr s t x) = adamsK unit X s t x :=
-  Classical.choose_spec x.property
-
-/-- A tower-to-layer image is an `r`-cycle on every page. -/
-theorem adamsJ_mem_cycles (r : ℕ) (hr : 1 ≤ r) (s t : ℤ)
-    (y : HomotopyGroup (t - s) (adamsTowerAt unit X s)) :
-    adamsJ unit X s t y ∈ adamsCycles unit X r hr s t := by
-  change adamsK unit X s t (adamsJ unit X s t y) ∈ LinearMap.range _
-  refine ⟨0, ?_⟩
-  rw [map_zero]
-  symm
-  exact (les_homotopy_exact_g
-    (HoCofiberSequence.ofMorphism (adamsTowerMapAt unit X s (s + 1) (by omega)))
-    (t - s) _).mpr ⟨y, rfl⟩
-
 /-- Reindex the lift to the target bidegree of the Adams differential. -/
 noncomputable def adamsDifferentialLift (r : ℕ) (hr : 1 ≤ r) (s t : ℤ)
     (x : adamsCycles unit X r hr s t) :
@@ -105,16 +77,6 @@ noncomputable def adamsDifferentialLift (r : ℕ) (hr : 1 ≤ r) (s t : ℤ)
   Eq.mp (congrArg (fun n => HomotopyGroup n (adamsTowerAt unit X (s + r)))
     (by omega : t - s - 1 = (t + r - 1) - (s + r)))
     (adamsCycleLift unit X r hr s t x)
-
-/-- The differential formula `j(lift(k(x)))`, evaluated in the target
-quotient.  Descending this function to a linear map on `adamsPage` requires
-the independence-of-lift and boundary calculations. -/
-noncomputable def adamsDifferentialValue (r : ℕ) (hr : 1 ≤ r) (s t : ℤ)
-    (x : adamsCycles unit X r hr s t) :
-    adamsPage unit X r hr (s + r) (t + r - 1) :=
-  (adamsCycleBoundaries unit X r hr (s + r) (t + r - 1)).mkQ
-    ⟨adamsJ unit X (s + r) (t + r - 1) (adamsDifferentialLift unit X r hr s t x),
-      adamsJ_mem_cycles unit X r hr (s + r) (t + r - 1) _⟩
 
 end
 
