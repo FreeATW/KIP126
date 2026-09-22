@@ -4,14 +4,13 @@ import KIP126.Def.SpectralSequence.Permanence.Data
 /-!
 # The permanent `h₆²` proof target
 
-This declaration formalizes the statement, not a proof of it.  The sphere
+This theorem records the statement with its proof left as `sorry`.  The sphere
 Adams sequence and the class are constructed from the abstract stable
 foundation and its explicitly specified Milnor cooperations.  No near-126
 condition, differential exclusion, or intermediate theorem is an input.
 
-The external hypotheses needed to prove this proposition belong to the
-future solution theorem.  Defining the target does not assert its truth
-for every abstract model with the displayed structural data.
+The proof is not implemented; this declaration is an open Challenge theorem,
+not a completed result.
 -/
 namespace KIP126.Challenge.Final.H6SquarePermanent
 
@@ -22,10 +21,11 @@ universe u v
 
 /-- The standard `h₆² ∈ E₂^{2,128}(S⁰)` has compatible nonzero descendants
 on every later page of the constructed sphere Adams spectral sequence. -/
-def h6_sq_permanent {C : Type u} [StableHomotopyCategory.{u, v} C]
+theorem h6_sq_permanent {C : Type u} [StableHomotopyCategory.{u, v} C]
     [HasFunctorialCofiber (C := C)]
-    (H : Mod2EilenbergMacLane (C := C)) (M : MilnorCooperations H) : Prop :=
+    (H : Mod2EilenbergMacLane (C := C)) (M : MilnorCooperations H) :
   KIP126.Core.SpectralSequence.IsPermanent
-    (mod2SphereAdams H) 2 (by decide) (2, 128) (Sphere.h6Square H M)
+    (mod2SphereAdams H) 2 (by decide) (2, 128) (Sphere.h6Square H M) := by
+  sorry
 
 end KIP126.Challenge.Final.H6SquarePermanent
