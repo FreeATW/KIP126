@@ -29,6 +29,7 @@ This final chapter of the definition layer fixes the Kervaire contexts, near-$12
 \begin{definition}[Synthetic $\theta_5$ and $\eta$ choices]
   \label{def:synthetic-theta5-choice}
   \uses{def:adams-hj,def:synthetic-adams-ss,def:adams-detection}
+  \lean{KIP126.Kervaire.SyntheticTheta5EtaData}
   \notready
   A synthetic $\theta_5$ is a class in
   $\pi_{62,64}S^{0,0}$ detected by $h_5^2$; the same symbol denotes each of its
@@ -41,6 +42,8 @@ This final chapter of the definition layer fixes the Kervaire contexts, near-$12
 \begin{definition}[The three near-$126$ conditions]
   \label{def:near126-conditions}
   \uses{def:synthetic-theta5-choice,def:adams-detection}
+  \lean{KIP126.Kervaire.Near126Conditions}
+  \lean{KIP126.Kervaire.Near126Input}
   \notready
   Define:
   \begin{enumerate}
@@ -63,6 +66,8 @@ This final chapter of the definition layer fixes the Kervaire contexts, near-$12
 \begin{definition}[Framed Kervaire context]
   \label{def:framed-kervaire-context}
   \uses{def:stable-context}
+  \lean{KIP126.Kervaire.FramedKervaireContext}
+  \lean{KIP126.Kervaire.StableHomotopyData}
   \notready
   For a fixed stable context $\mathcal C$, a framed Kervaire context provides
   closed smooth framed manifolds, framed cobordism, and a Pontryagin--Thom
@@ -78,6 +83,8 @@ This final chapter of the definition layer fixes the Kervaire contexts, near-$12
 \begin{definition}[Classical--synthetic sphere coherence]
   \label{def:sphere-adams-coherence}
   \uses{def:stable-context,def:stable-sphere-suspension,def:synthetic-context,def:synthetic-sphere,def:classical-adams-ss,def:synthetic-adams-ss,def:adams-hj,def:bhs-aim-regrading}
+  \lean{KIP126.Kervaire.SphereAdamsCoherence}
+  \lean{KIP126.Kervaire.SyntheticHomotopyContext}
   \notready
   Fix a stable context $\mathcal C$, a synthetic context $\mathcal S$ over
   $\mathcal C$, a classical Adams sequence $A_{\mathrm{cl}}$ on

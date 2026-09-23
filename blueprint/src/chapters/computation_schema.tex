@@ -20,7 +20,16 @@ This chapter defines the types used to state machine and appendix results.  It c
 % SOURCE: aimpaper/main.tex:2738-3290, all twelve tables.
 \begin{definition}[Appendix table identifier]
   \label{def:appendix-table-id}
-  \notready
+  \leanok
+  \lean{KIP126.Computation.AppendixTableId}
+  \lean{KIP126.Computation.AppendixTableId.paperNumber}
+  \lean{KIP126.Computation.AppendixTableId.texLabel}
+  \lean{KIP126.Computation.AppendixTableId.sourceStart}
+  \lean{KIP126.Computation.AppendixTableId.sourceEnd}
+  \lean{KIP126.Computation.AppendixTableId.pdfPage}
+  \lean{KIP126.Computation.AppendixTableId.spectrum}
+  \lean{KIP126.Computation.AppendixTableId.stem}
+  \lean{KIP126.Computation.AppendixTableId.filtrationRange}
   The table identifier is a twelve-element finite type containing
   $C\nu126$, $S122$, $S123$, the two $S124$ bands, the two $S125$ bands, the
   two $S126$ bands, and the three $S127$ bands.  It records the paper table
@@ -31,19 +40,34 @@ This chapter defines the types used to state machine and appendix results.  It c
 \begin{definition}[Typed Ext class expression]
   \label{def:typed-class-expression}
   \uses{def:steenrod-ext,def:hopf-cofiber-cell-notation}
-  \notready
+  \leanok
+  \lean{KIP126.Computation.DatasetVersion}
+  \lean{KIP126.Computation.Cell}
+  \lean{KIP126.Computation.ClassAtom}
+  \lean{KIP126.Computation.ClassTerm}
+  \lean{KIP126.Computation.ExpressionMetadata}
+  \lean{KIP126.Computation.TypedClassExpression}
+  \lean{KIP126.Computation.ClassTerm.validBool}
+  \lean{KIP126.Computation.ClassTerm.Valid}
+  \lean{KIP126.Computation.TypedClassExpression.DegreeValid}
+  \lean{KIP126.Computation.TypedClassExpression.Valid}
   A typed class expression is a sparse $\mathbb F_2$ expression built from a
   dataset-versioned generator $x_{n,s,k}$, a named class, product, and finite
   sum, together with spectrum, stem, filtration, internal degree, and optional
-  bottom- or top-cell tag.  Constructors prove degree compatibility; a finite
-  candidate set represents ambiguity without converting it to free-form text.
+  bottom- or top-cell tag.  The Lean data records degree validity as a
+  predicate; a finite candidate set represents ambiguity without converting it
+  to free-form text.
 \end{definition}
 
 % SOURCE: aimpaper/main.tex:2738-3290, differential/status columns.
 \begin{definition}[Appendix row status]
   \label{def:appendix-row-status}
   \uses{def:typed-class-expression}
-  \notready
+  \leanok
+  \lean{KIP126.Computation.DifferentialDirection}
+  \lean{KIP126.Computation.AppendixRowStatus}
+  \lean{KIP126.Computation.AppendixRowStatus.isIncoming}
+  \lean{KIP126.Computation.AppendixRowStatus.unresolved}
   Row status is one of:
   \begin{enumerate}
     \item an explicit zero filtration band;
@@ -62,11 +86,44 @@ This chapter defines the types used to state machine and appendix results.  It c
 \begin{definition}[Differential relation identifier]
   \label{def:differential-relation-id}
   \uses{def:appendix-row-status}
-  \notready
+  \leanok
+  \lean{KIP126.Computation.DifferentialRelationId}
+  \lean{KIP126.Computation.DifferentialRelationId.Valid}
+  \lean{KIP126.Computation.DifferentialRelationId.validBool}
   Each known differential has a stable relation identifier, length, typed
-  source expression, and typed target candidate set.  The outgoing row in one
-  stem and incoming row in the next refer to the same identifier.  A validation
-  rule rejects two records with incompatible length, source, or target data.
+  source expression, and typed target candidate set.  The row schema carries
+  this identifier explicitly; joining outgoing and incoming presentations is
+  a later validation step.
+\end{definition}
+
+% SOURCE: aimpaper/main.tex:2738-3290.
+\begin{definition}[Appendix row catalogue]
+  \label{def:appendix-row-catalogue}
+  \uses{def:appendix-table-id,def:typed-class-expression,def:appendix-row-status,def:differential-relation-id}
+  \leanok
+  \lean{KIP126.Computation.AppendixRowLocator}
+  \lean{KIP126.Computation.AppendixRow}
+  \lean{KIP126.Computation.AppendixRow.KeyValid}
+  \lean{KIP126.Computation.AppendixRow.MetadataValid}
+  \lean{KIP126.Computation.AppendixRow.RelationValid}
+  \lean{KIP126.Computation.AppendixRow.Valid}
+  \lean{KIP126.Computation.AppendixRow.validBool}
+  \lean{KIP126.Computation.AppendixZeroBand}
+  \lean{KIP126.Computation.AppendixZeroBand.Valid}
+  \lean{KIP126.Computation.AppendixZeroBand.validBool}
+  \lean{KIP126.Computation.expressionAt}
+  \lean{KIP126.Computation.sourceExpression}
+  \lean{KIP126.Computation.appendixRows}
+  \lean{KIP126.Computation.appendixRows_length}
+  \lean{KIP126.Computation.appendixRows_keys_nodup}
+  \lean{KIP126.Computation.appendixRows_valid}
+  \lean{KIP126.Computation.appendixZeroBands}
+  \lean{KIP126.Computation.appendixZeroBands_length}
+  \lean{KIP126.Computation.appendixZeroBands_valid}
+  The source-shaped catalogue contains all 401 nonempty rows printed in the
+  twelve tables, with table key, stem, filtration, typed expression, status,
+  relation key, and exact source line.  The nine explicitly empty filtration
+  bands are represented separately as display records.
 \end{definition}
 
 % SOURCE: LWXMachine, Section 2.1 and Tables 1--5; Zenodo record 14875701,

@@ -116,6 +116,8 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2133-2139, Remark rem:theta5choice.
 \begin{proposition}[Choice independence of the inductive expression]
   \label{prop:theta5-choice-independence}
+  % VERIFIED-IN: KIP126/Def/Kervaire/Theta5/Proofs.lean,
+  % KIP126.Kervaire.theta5_choice_independence (project transport; remains notready).
   \uses{def:near126-computation-input,def:synthetic-theta5-choice,evidence:theta5-order-torsion,thm:external-total-differential-identity}
   \notready
   For a near-$126$ computation input $D$, every synthetic $\theta_5$ has order
@@ -136,7 +138,11 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2117-2139, Theorem thm:bjmbx and Remark rem:theta5choice; project transport from the distinguished source choice.
 \begin{theorem}[BJM/BX criterion for any order-two choice]
   \label{thm:bjm-bx-criterion-any-choice}
+  % VERIFIED-IN: KIP126/Def/Kervaire/Theta5/Proofs.lean,
+  % KIP126.Kervaire.bjm_bx_criterion_any_choice (project transport; remains notready).
   \uses{def:near126-computation-input,def:synthetic-theta5-choice,thm:external-bjm-bx-criterion,prop:theta5-choice-independence}
+  \lean{KIP126.Kervaire.AnyChoiceCriterion}
+  \lean{KIP126.Challenge.Near126.Thm7_3BJMBX.any_choice_criterion}
   \notready
   For a near-$126$ computation input $D$ and every order-two synthetic choice
   $\theta_5$:
@@ -161,6 +167,8 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2221-2241, Lemma lem:equistate4.
 \begin{lemma}[Existential and universal forms of $C_4$]
   \label{lem:near126-equiv-c4}
+  \lean{KIP126.Kervaire.ChoiceConditions}
+  \lean{KIP126.Challenge.Near126.Conditions.c4_c5_choice_equivalence}
   \uses{def:near126-computation-input,def:near126-conditions,evidence:theta5-order-torsion}
   \notready
   For a near-$126$ computation input $D$, condition $C_4$ is equivalent to the
@@ -177,6 +185,7 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2244-2258, Lemma lem:equistate5.
 \begin{lemma}[Existential and universal forms of $C_5$]
   \label{lem:near126-equiv-c5}
+  \lean{KIP126.Challenge.Near126.Conditions.c4_c5_choice_equivalence}
   \uses{def:near126-computation-input,def:near126-conditions,evidence:near126-indeterminacy}
   \notready
   For a near-$126$ computation input $D$, condition $C_5$ is equivalent to the
@@ -194,6 +203,10 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2181-2204 and 2300-2354, Proposition prop:possibleh62.
 \begin{proposition}[Only possible differential on $h_6^2$]
   \label{prop:possible-h62}
+  \lean{KIP126.Kervaire.Near126Adams}
+  \lean{KIP126.Challenge.Near126.CandidateReduction.only_d12_differential_reduction}
+  \lean{KIP126.Kervaire.Near126Adams}
+  \lean{KIP126.Challenge.Near126.OnlyD12.d12_dichotomy_and_condition_equivalence}
   \uses{def:near126-computation-input,def:near126-conditions,thm:bjm-bx-criterion-any-choice,thm:external-total-differential-identity,thm:delta-classical-equivalence,evidence:near126-core,evidence:theta5-square-tmf,lem:near126-equiv-c4,lem:near126-equiv-c5}
   \notready
   For a near-$126$ computation input $D$, exactly one of the following holds:
@@ -464,6 +477,8 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:2208-2210 and 2698-2778, Proposition prop:state5false.
 \begin{proposition}[$C_3$ excludes $C_5$]
   \label{prop:near126-c3-not-c5}
+  \lean{KIP126.Challenge.Near126.ExcludeEta.c3_excludes_c5}
+  \lean{KIP126.Challenge.Near126.C3NotC5.c3_excludes_c5}
   \uses{def:near126-computation-input,def:near126-conditions,lem:near126-equiv-c5,cor:near126-two-extension,lem:near126-nu-extension,evidence:near126-core,evidence:stem122-product-exhaustion,prop:synthetic-hopf-cofiber-equivalence,thm:external-synthetic-rigidity,evidence:cnu126-short-incoming-exclusion,def:external-evidence}
   \notready
   For a near-$126$ computation input $D$, if $C_3$ holds, then $C_5$ is false.
@@ -487,14 +502,20 @@ This chapter contains only the project deductions that assemble the setup, exter
 % SOURCE: aimpaper/main.tex:128-130 and 2106-2214, Theorems thm:h62 and thm:126survives.
 \begin{theorem}[$h_6^2$ is a permanent cycle]
   \label{thm:h6-square-permanent}
-  \uses{def:kervaire-main-input,prop:possible-h62,prop:near126-c3-not-c5}
+  \lean{KIP126.Challenge.Final.H6SquarePermanent.h6_sq_permanent}
+  \uses{def:h6-constructed-square,def:h6-pagewise-permanence}
   \notready
-  For every main input $I$, the class $h_6^2$ is a permanent cycle in
-  $I.\mathrm{classicalSphere}$, the classical mod--$2$ Adams spectral sequence
-  of the sphere.
+  The standard class $h_6^2\in E_2^{2,128}(S^0)$ is nonzero permanent
+  in the classical mod--$2$ Adams spectral sequence of the sphere.
+  The corresponding Lean theorem states this over the abstract foundation
+  and explicit Milnor coordinates, with its proof left as \texttt{sorry}.
+  It remains an open Challenge theorem; no completed proof is claimed.
 \end{theorem}
 
 \begin{proof}
+  \uses{def:kervaire-main-input,prop:possible-h62,prop:near126-c3-not-c5}
+  Take a main input $I$ whose classical sphere sequence and named classes
+  are identified with the constructions above through its coherence data.
   Put $D=I.\mathrm{computation}$.  Instantiate every literature leaf with its
   named projection from $I.\mathrm{literature}$, every table and finite-search
   theorem with this same $D$, and every spectral-sequence comparison through

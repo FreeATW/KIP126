@@ -3,6 +3,9 @@ import KIP126.External.Claims
 import KIP126.External.Evidence
 import KIP126.External.Results
 import KIP126.External.SourceInventory
+import KIP126.External.Computation.EtaRows.Data
+import KIP126.External.Computation.AppendixTable.Rows.Catalogue.Proofs
+import KIP126.External.Literature.Adams.OneLine
 
 /-!
 # External inputs

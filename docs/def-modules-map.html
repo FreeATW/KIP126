@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KIP126 / Def 模块地图</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #edf3f6;
+      --muted: #8fa4ad;
+      --panel: rgba(17, 29, 35, .92);
+      --panel-2: rgba(24, 39, 46, .86);
+      --line: rgba(174, 204, 211, .18);
+      --core: #55c2b3;
+      --spectral: #62a8ea;
+      --stable: #bb87e8;
+      --classical: #e5a34f;
+      --synthetic: #e5749b;
+      --application: #ef7569;
+      --computation: #a8bd58;
+      --warn: #ffcf6a;
+      --external: #ff8b73;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: #091116; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(70, 163, 154, .14), transparent 30rem),
+        radial-gradient(circle at 86% 12%, rgba(90, 118, 210, .14), transparent 32rem),
+        #091116;
+    }
+
+    button, input { font: inherit; }
+    a { color: #8fd7ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+    }
+
+    main { min-width: 0; padding: 34px 34px 48px; }
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 28px 26px 40px;
+      background: var(--panel);
+      border-left: 1px solid var(--line);
+      backdrop-filter: blur(20px);
+    }
+
+    .eyebrow {
+      color: #78d5c8;
+      font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h1 { max-width: 850px; margin: 10px 0 12px; font-size: clamp(34px, 4vw, 62px); line-height: .98; letter-spacing: -.04em; }
+    .lede { max-width: 850px; margin: 0; color: #b5c5cb; font-size: 17px; line-height: 1.7; }
+    .lede strong { color: var(--ink); }
+
+    .metrics { display: flex; flex-wrap: wrap; gap: 10px; margin: 23px 0 26px; }
+    .metric {
+      padding: 9px 12px;
+      color: #afc0c6;
+      background: rgba(255,255,255,.035);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 13px;
+    }
+    .metric b { color: white; font-size: 16px; margin-right: 5px; }
+
+    .toolbar { display: grid; gap: 12px; margin-bottom: 16px; }
+    .search {
+      width: 100%;
+      padding: 12px 14px;
+      color: var(--ink);
+      background: rgba(5, 14, 18, .64);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: none;
+    }
+    .search:focus { border-color: rgba(117, 217, 201, .65); box-shadow: 0 0 0 3px rgba(85,194,179,.09); }
+    .filters { display: flex; flex-wrap: wrap; gap: 7px; }
+    .filter, .zoom-btn {
+      border: 1px solid var(--line);
+      color: #aebfc5;
+      background: rgba(255,255,255,.025);
+      border-radius: 999px;
+      padding: 7px 10px;
+      cursor: pointer;
+    }
+    .filter:hover, .zoom-btn:hover { color: white; background: rgba(255,255,255,.07); }
+    .filter.active { color: #071310; background: #83d7ca; border-color: transparent; font-weight: 700; }
+
+    .graph-card {
+      position: relative;
+      min-height: 690px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px),
+        rgba(8, 19, 24, .72);
+      background-size: 32px 32px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.25);
+    }
+    #graph { display: block; width: 100%; height: min(70vh, 790px); min-height: 660px; cursor: grab; user-select: none; }
+    #graph.dragging { cursor: grabbing; }
+
+    .zoom-controls { position: absolute; right: 14px; top: 14px; display: flex; gap: 6px; }
+    .zoom-btn { width: 34px; height: 34px; padding: 0; border-radius: 9px; background: rgba(8,18,22,.86); }
+
+    .lane { fill: rgba(255,255,255,.017); stroke: rgba(255,255,255,.075); stroke-width: 1; }
+    .lane-title { fill: #70858e; font: 700 15px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; }
+    .edge { fill: none; stroke: #64808b; stroke-width: 1.7; opacity: .34; transition: opacity .16s, stroke .16s, stroke-width .16s; }
+    .edge.phase { stroke-dasharray: 7 5; }
+    .edge.dim { opacity: .045; }
+    .edge.active { opacity: .95; stroke: #d7eef3; stroke-width: 2.7; }
+
+    .node { cursor: pointer; transition: opacity .16s; }
+    .node rect { fill: #12242b; stroke: var(--node-color); stroke-width: 1.5; transition: fill .16s, stroke-width .16s, filter .16s; }
+    .node:hover rect { fill: #19313a; stroke-width: 2.7; filter: drop-shadow(0 7px 12px rgba(0,0,0,.28)); }
+    .node .bar { fill: var(--node-color); stroke: none; }
+    .node .title { fill: #f3f7f8; font: 700 14px ui-sans-serif, system-ui, sans-serif; }
+    .node .subtitle { fill: #8fa6af; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .node .count { fill: #6e858f; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .node .warning { fill: var(--warn); }
+    .node.dim { opacity: .1; }
+    .node.selected rect { fill: #203b44; stroke-width: 3.5; filter: drop-shadow(0 0 12px color-mix(in srgb, var(--node-color), transparent 48%)); }
+    .node.upstream rect { stroke-dasharray: 5 3; stroke-width: 2.6; }
+    .node.downstream rect { stroke-width: 2.6; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 15px 2px 0; color: #899ea7; font-size: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .line-key { width: 25px; height: 0; border-top: 2px solid #91a8b1; }
+    .line-key.dash { border-top-style: dashed; }
+
+    .reading {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .route { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.025); }
+    .route b { display: block; margin-bottom: 8px; }
+    .route p { margin: 0; color: #96aab2; font-size: 13px; line-height: 1.65; }
+
+    aside h2 { margin: 8px 0 7px; font-size: 26px; line-height: 1.15; letter-spacing: -.025em; }
+    .path { color: #7f949d; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+    .summary { color: #b4c4ca; line-height: 1.75; font-size: 14px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 20px; }
+    .badge { border: 1px solid var(--line); border-radius: 999px; padding: 5px 8px; color: #afc1c7; font-size: 11px; }
+    .badge.warn { color: #ffd87e; border-color: rgba(255,207,106,.32); background: rgba(255,207,106,.07); }
+    .badge.external { color: #ffad9d; border-color: rgba(255,139,115,.3); background: rgba(255,139,115,.07); }
+
+    .detail-section { margin-top: 22px; }
+    .detail-section h3 { margin: 0 0 9px; color: #788e97; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
+    .concepts { margin: 0; padding-left: 18px; color: #adbec4; font-size: 13px; line-height: 1.75; }
+    .dep-list { display: flex; flex-wrap: wrap; gap: 7px; }
+    .dep-pill { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; color: #b5c8ce; background: rgba(255,255,255,.025); cursor: pointer; font-size: 12px; }
+    .dep-pill:hover { color: white; border-color: #7398a6; }
+    .files { list-style: none; padding: 0; margin: 0; display: grid; gap: 7px; }
+    .files li { padding: 8px 9px; border-radius: 8px; background: rgba(255,255,255,.026); font: 11px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+    .empty { color: #6e838b; font-size: 12px; }
+    .note { margin-top: 26px; padding: 12px; color: #82979f; background: rgba(255,255,255,.025); border-left: 2px solid #58737d; font-size: 11px; line-height: 1.6; }
+
+    @media (max-width: 1050px) {
+      .shell { grid-template-columns: 1fr; }
+      aside { position: relative; height: auto; border-left: 0; border-top: 1px solid var(--line); }
+      .reading { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 650px) {
+      main { padding: 24px 15px 36px; }
+      aside { padding: 24px 18px 36px; }
+      #graph { min-height: 610px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <main>
+      <div class="eyebrow">KIP126 · SOURCE ARCHITECTURE</div>
+      <h1><code>Def/</code> 模块地图</h1>
+      <p class="lede">
+        <strong>这里放的是数学数据、性质和已实现证明的接口层。</strong>
+        图把 71 个 Lean 文件合并为 33 个逻辑模块；箭头从“基础依赖”指向“使用者”。
+        点击节点可查看精确文件与直接依赖。
+      </p>
+      <div class="metrics">
+        <div class="metric"><b>33</b>逻辑模块</div>
+        <div class="metric"><b>71</b>Lean 文件</div>
+        <div class="metric"><b>10,386</b>行源码</div>
+        <div class="metric"><b>4</b>个含 sorry 的模块</div>
+        <div class="metric">源码快照 <b>2179362</b></div>
+      </div>
+
+      <div class="toolbar">
+        <input id="search" class="search" type="search" placeholder="搜索模块、概念或文件，例如 filtration / eta / convergence…" aria-label="搜索模块">
+        <div class="filters" id="filters"></div>
+      </div>
+
+      <section class="graph-card" aria-label="KIP126 Def 模块依赖图">
+        <svg id="graph" viewBox="0 0 1680 1630" role="img" aria-labelledby="graph-title graph-desc">
+          <title id="graph-title">KIP126 Def 模块依赖图</title>
+          <desc id="graph-desc">箭头从被依赖模块指向导入并使用它的模块。</desc>
+        </svg>
+        <div class="zoom-controls">
+          <button class="zoom-btn" id="zoomIn" title="放大">＋</button>
+          <button class="zoom-btn" id="zoomOut" title="缩小">−</button>
+          <button class="zoom-btn" id="zoomReset" title="重置">↺</button>
+        </div>
+      </section>
+
+      <div class="legend">
+        <span><i class="line-key"></i> 依赖 → 使用者</span>
+        <span><i class="line-key dash"></i> 分阶段互用（聚合后）</span>
+        <span style="color:var(--warn)"><i class="dot"></i> 含未完成证明</span>
+        <span style="color:var(--external)"><i class="dot"></i> 接入外部证据</span>
+      </div>
+
+      <section class="reading">
+        <article class="route">
+          <b>路线 A · 谱序列核心</b>
+          <p>Graded → Filtration → FilteredComplex 后分叉：一支构造 FilteredPage / Differential；另一支直接进入 SpectralObject → EndpointExtension → Convergence。</p>
+        </article>
+        <article class="route">
+          <b>路线 B · Adams 与合成比较</b>
+          <p>Stable Context + Page/Coefficients → Classical Convergence → Sphere Sequence → Synthetic Adams → Comparison / Kervaire。</p>
+        </article>
+        <article class="route">
+          <b>路线 C · 计算输入</b>
+          <p>AppendixTable 是相对独立的数据支线：把论文的 12 张表转成带校验的 AST；它记录输入，不自动把表中断言变成定理。</p>
+        </article>
+      </section>
+    </main>
+
+    <aside id="details" aria-live="polite"></aside>
+  </div>
+
+  <script>
+    const W = 220, H = 72;
+    const colors = {
+      algebra: '#55c2b3', spectral: '#62a8ea', stable: '#bb87e8',
+      classical: '#e5a34f', synthetic: '#e5749b', application: '#ef7569',
+      computation: '#a8bd58'
+    };
+    const domainNames = {
+      algebra: '代数基础', spectral: '谱序列核心', stable: '稳定同伦',
+      classical: '经典 Adams / ESS', synthetic: '合成谱',
+      application: '比较与 Kervaire', computation: '计算数据'
+    };
+    const F = p => `KIP126/Def/${p}`;
+    const nodes = [
+      {id:'graded', label:'Graded', path:'Algebra/Graded', domain:'algebra', x:60,y:70,
+       summary:'直接采用 Mathlib 的 GradedObject，作为项目的分次对象导入边界，不另造同义包装。',
+       concepts:['分次对象的统一底座','只建立导入边界，不添加项目局部类型别名'], files:[F('Algebra/Graded/Data.lean')], deps:[]},
+      {id:'coefficients', label:'Coefficients', path:'Algebra/Coefficients', domain:'algebra', x:60,y:170,
+       summary:'固定项目使用的模 2 系数约定：F₂ = ZMod 2，以及 F₂-模的阿贝尔范畴。',
+       concepts:['F2','F2ModuleCat'], files:[F('Algebra/Coefficients/Data.lean')], deps:[]},
+      {id:'filtration', label:'Filtration', path:'Algebra/Filtration', domain:'algebra', x:330,y:70,
+       summary:'定义分次对象上的递减滤过、伴随分次商、保滤过态射，以及穷尽性、最终为零、Mittag–Leffler 与有界性。',
+       concepts:['Filtration 与 inclusion','associatedGraded / toAssociatedGraded','FilteredMorphism','IsExhaustive / IsBounded / IsMittagLeffler'],
+       files:[F('Algebra/Filtration/Data.lean'),F('Algebra/Filtration/Predicates.lean'),F('Algebra/Filtration/Proofs.lean')], deps:['graded']},
+      {id:'completion', label:'Completion', path:'Algebra/Completion', domain:'algebra', x:600,y:70,
+       summary:'把递减滤过组织为商对象逆系统 Aᵢ/FˢAᵢ，并用极限锥表达逐次数完备性；最终为零或上有界时给出完备见证。',
+       concepts:['quotientTower / quotientTowerCone','CompletionWitness','completionIso','eventually-constant quotient tower'],
+       files:[F('Algebra/Completion/Data.lean'),F('Algebra/Completion/Proofs.lean')], deps:['filtration']},
+      {id:'truncation', label:'Truncation', path:'Algebra/Truncation', domain:'algebra', x:870,y:70,
+       summary:'在滤过商对象上诱导像滤过，并证明截断后的滤过上有界；若原滤过下有界，则截断滤过双向有界。',
+       concepts:['quotientFiltration','quotientFiltration_boundedAbove','quotientFiltration_isBounded'],
+       files:[F('Algebra/Truncation/Data.lean'),F('Algebra/Truncation/Proofs.lean')], deps:['completion','filtration']},
+      {id:'pagelevel', label:'PageLevel', path:'SpectralSequence/PageLevel', domain:'spectral', x:60,y:270,
+       summary:'封装谱序列起始页及页面、循环、商指数换算约定，为经典和合成 Adams 的页编号提供公共接口。',
+       concepts:['PageLevelConvention','page_ge / cycleLevel_ge / quotientExponent_ge'],
+       files:[F('SpectralSequence/PageLevel/Data.lean'),F('SpectralSequence/PageLevel/Proofs.lean')], deps:[]},
+      {id:'pageextensions', label:'Page Differential', path:'PageExtensions/Differential', domain:'spectral', x:60,y:420,
+       summary:'在 Mathlib 页面对象上定义广义元素、页面微分关系、essential 与 crossing/no-crossing 谓词，不引入第二套 Z/B 谱序列结构。',
+       concepts:['PageElement / PageDifferential','DifferentialDatum','DifferentialRelation','RelationCrossedBy / NoCrossing'],
+       files:[F('PageExtensions/Differential/Data.lean'),F('PageExtensions/Differential/Predicates.lean'),F('PageExtensions/Differential/Proofs.lean')], deps:[]},
+      {id:'filteredcomplex', label:'FilteredComplex', path:'SpectralSequence/FilteredComplex', domain:'spectral', x:330,y:300,
+       summary:'核心结构：带递减滤过且微分保持滤过的链复形；构造同调滤过、循环/边界子对象、态射和伴随分次微分。',
+       concepts:['FilteredComplex','homologyFiltration','cycleSubobject / boundarySubobject','associatedGradedDifferential'],
+       files:[F('SpectralSequence/FilteredComplex/Data.lean')], deps:['filtration']},
+      {id:'filteredpage', label:'FilteredPage', path:'SpectralSequence/FilteredPage', domain:'spectral', x:600,y:300, status:'sorry',
+       summary:'由循环与边界子对象构造有限商页 Z/B，证明页的序关系，并把每一页装配为 Mathlib HomologicalComplex；相邻页同调装配仍有一个证明缺口。',
+       concepts:['pageObj / pageπ','cycle/boundary order laws','pageComplex','PageHomologyWitness / pageSpectralSequence'],
+       files:[F('SpectralSequence/FilteredPage/Data.lean'),F('SpectralSequence/FilteredPage/Proofs.lean'),F('SpectralSequence/FilteredPage/Complex.lean'),F('SpectralSequence/FilteredPage/AssemblyProofs.lean')], deps:['filteredcomplex','filtereddiff']},
+      {id:'filtereddiff', label:'FilteredDifferential', path:'SpectralSequence/FilteredDifferential', domain:'spectral', x:870,y:300,
+       summary:'在有限商页上构造规范微分，证明 d²=0、下一层循环给出核、下一层边界给出像。',
+       concepts:['pageDifferential','pageDifferential_comp','Z_succ = kernel','B_succ = image'],
+       files:[F('SpectralSequence/FilteredDifferential/Data.lean'),F('SpectralSequence/FilteredDifferential/Helpers.lean'),F('SpectralSequence/FilteredDifferential/SquareZero.lean'),F('SpectralSequence/FilteredDifferential/Cycles.lean'),F('SpectralSequence/FilteredDifferential/Boundaries.lean'),F('SpectralSequence/FilteredDifferential/Proofs.lean')], deps:['filteredpage'], phaseDeps:['filteredpage']},
+      {id:'representatives', label:'Representatives', path:'SpectralSequence/Representatives', domain:'spectral', x:600,y:405,
+       summary:'把伴随分次微分与滤过层上的广义元素代表元联系起来，提供提升、首项投影和代表元方程。',
+       concepts:['代表元提升','toAssociatedGraded 的首项投影','广义元素形式的微分等式'],
+       files:[F('SpectralSequence/Representatives/Proofs.lean')], deps:['filteredcomplex']},
+      {id:'relations', label:'Lift / Page Relations', path:'SpectralSequence/FilteredComplex/Relations', domain:'spectral', x:1140,y:300, status:'sorry',
+       summary:'连接“滤过复形中的提升”和“页面上的微分/交叉关系”。数据和谓词已给出，但四个核心方向的证明仍显式使用 sorry。',
+       concepts:['PageView','IsLift / relation / crossed','lift ↔ page differential relation','no-crossing transport'],
+       files:[F('SpectralSequence/FilteredComplex/Relations/Data.lean'),F('SpectralSequence/FilteredComplex/Relations/Predicates.lean'),F('SpectralSequence/FilteredComplex/Relations/Proofs.lean')], deps:['filtration','pageextensions','filteredcomplex','filteredpage']},
+      {id:'homologicalimage', label:'HomologicalImage', path:'SpectralSequence/HomologicalImage', domain:'spectral', x:330,y:520,
+       summary:'把三角范畴中的 spectral object 经同调函子送到阿贝尔范畴，补齐 Mathlib 两侧 API 之间的桥。',
+       concepts:['homologicalImage','exactness / delta naturality','homologicalImageFunctor'],
+       files:[F('SpectralSequence/HomologicalImage/Data.lean')], deps:[]},
+      {id:'spectralobject', label:'SpectralObject', path:'SpectralSequence/SpectralObject', domain:'spectral', x:600,y:520,
+       summary:'把滤过复形的整数索引余链图送入 Mathlib mapping-cone spectral object，再经 HomologicalImage 得到阿贝尔 spectral object，并证明其函子性。',
+       concepts:['filteredComplexTriangulatedSpectralObject','filteredComplexAbelianSpectralObject','对象与态射的函子化适配'],
+       files:[F('SpectralSequence/SpectralObject/Data.lean')], deps:['filteredcomplex','homologicalimage']},
+      {id:'endpoint', label:'EndpointExtension', path:'SpectralSequence/EndpointExtension', domain:'spectral', x:870,y:520,
+       summary:'显式补入 EInt 两端点、锥/余锥和边界见证，把整数滤过图延伸为可生成 Mathlib 谱序列的端点数据；不偷偷假设收敛。',
+       concepts:['decreasingFiltrationEmbedding','EndpointExtension','BoundaryWitness','endpointAbutment / spectralSequence'],
+       files:[F('SpectralSequence/EndpointExtension/Data.lean')], deps:['spectralobject','completion']},
+      {id:'convergence', label:'Convergence', path:'SpectralSequence/Convergence', domain:'spectral', x:1140,y:520, status:'sorry',
+       summary:'记录页面与完备有界终点滤过的比较、强收敛和 detection 关系；大部分推论已证明，从较弱比较见证推出强收敛的总装配仍有一个 sorry。',
+       concepts:['PageAbutmentComparisonWitness','StrongConvergenceWitness','Detects','detect_zero / detect_difference'],
+       files:[F('SpectralSequence/Convergence/Data.lean'),F('SpectralSequence/Convergence/Predicates.lean'),F('SpectralSequence/Convergence/Proofs.lean')], deps:['endpoint','completion']},
+      {id:'extension', label:'Bounded Extension', path:'SpectralSequence/Extension', domain:'spectral', x:600,y:650,
+       summary:'构造两项链复形及其滤过，作为 bounded extension spectral sequence 的底层数据；端点与收敛见证仍由专门模块提供。',
+       concepts:['twoTermObj / twoTermDiff','twoTermFil / twoTermComplex','TwoTermData'],
+       files:[F('SpectralSequence/Extension/Data.lean')], deps:['filteredcomplex','completion']},
+      {id:'stablecontext', label:'Stable Context', path:'StableHomotopy/Context', domain:'stable', x:60,y:820, status:'sorry',
+       summary:'稳定同伦范畴接口：三角、张量、移位、函子化 cofiber、内部 Hom、球谱与同伦群；长正合列末端的一项精确性证明仍有一个 sorry。',
+       concepts:['StableHomotopyCategory','HasFunctorialCofiber / closed tensor structure','Sphere / HomotopyGroups','HoCofiberSequence 与长正合列','MappingSpectrum'],
+       files:[F('StableHomotopy/Context/Data.lean'),F('StableHomotopy/Context/Proofs.lean'),F('StableHomotopy/Context/MappingProofs.lean')], deps:[]},
+      {id:'cohomology', label:'Cohomology', path:'StableHomotopy/Cohomology', domain:'stable', x:330,y:770,
+       summary:'用显式选择的 HF₂ 表示模 2（上）同调，并把 Steenrod 代数和 universal coefficient 数据装进可追踪的记录。',
+       concepts:['Mod2Context','Mod2Cohomology / Mod2Homology','SteenrodAlgebraData','UniversalCoefficientData'],
+       files:[F('StableHomotopy/Cohomology/Data.lean'),F('StableHomotopy/Cohomology/Proofs.lean')], deps:['stablecontext']},
+      {id:'syntheticcontext', label:'Synthetic Context', path:'Synthetic/Context', domain:'synthetic', x:330,y:870,
+       summary:'合成谱范畴的二分次移位、λ 及其余纤维商、ν 函子兼容性；具体模型以字段形式提供，不设全局公理。',
+       concepts:['SyntheticCategory','lambdaPow / XModLambdaN','NuFunctorData','λ-商的 distinguished triangle'],
+       files:[F('Synthetic/Context/Data.lean'),F('Synthetic/Context/Proofs.lean')], deps:['stablecontext']},
+      {id:'syntheticsphere', label:'Synthetic Sphere', path:'Synthetic/Sphere', domain:'synthetic', x:600,y:820,
+       summary:'定义二分次合成球 S^(m,n)、二分次同伦类、张量/悬挂等价和 λ 作用。',
+       concepts:['S00 / Smn','BiHom','susp_invariance','lambdaAction'],
+       files:[F('Synthetic/Sphere/Data.lean')], deps:['syntheticcontext']},
+      {id:'classicalpage', label:'Classical Adams Page', path:'ClassicalAdams/Page', domain:'classical', x:330,y:1010,
+       summary:'规定经典 Adams 的二分次、dᵣ 位移与目标次数、起始页约定，并把对象直接解释为 Mathlib SpectralSequence。',
+       concepts:['Bidegree','classicalAdamsShift / Target','classicalAdamsShape','ClassicalAdamsSpectralSequence'],
+       files:[F('ClassicalAdams/Page/Data.lean')], deps:['pagelevel','coefficients']},
+      {id:'classicalconvergence', label:'Classical Convergence', path:'ClassicalAdams/Convergence', domain:'classical', x:600,y:1010,
+       summary:'打包选定的经典 Adams 谱序列、终点滤过、页比较、2-完备稳定同伦与更强的收敛/逐谱对象界面。',
+       concepts:['ClassicalAdamsConvergence','ClassicalAdamsSS','TwoCompleteStableHomotopy','StrongClassicalAdamsConvergence'],
+       files:[F('ClassicalAdams/Convergence/Data.lean'),F('ClassicalAdams/Convergence/Predicates.lean'),F('ClassicalAdams/Convergence/Proofs.lean'),F('ClassicalAdams/Convergence/StrongData.lean')], deps:['classicalpage','stablecontext','completion','filtration']},
+      {id:'spheresequence', label:'Sphere Sequence', path:'ClassicalAdams/SphereSequence', domain:'classical', x:870,y:1010,
+       summary:'在球谱 Adams 序列上给出 E₂/E₃、d₂、命名类、乘法/模结构和 h₆² 等语义接口，成为后续具体论证的主干。',
+       concepts:['AdamsClass','SphereAdamsPresentation','sphereProduct / h6Square','外部 pairing 与 module laws'],
+       files:[F('ClassicalAdams/SphereSequence/Data.lean')], deps:['classicalconvergence']},
+      {id:'pageslice', label:'PageSlice', path:'ClassicalAdams/PageSlice', domain:'classical', x:1140,y:890,
+       summary:'为经典谱序列暴露 E₂→E₃ 的轻量页面切片别名。',
+       concepts:['AdamsE₂E₃Slice'], files:[F('ClassicalAdams/PageSlice/Data.lean')], deps:['spheresequence']},
+      {id:'h4d2', label:'h₄ d₂', path:'ClassicalAdams/H4D2', domain:'classical', x:1140,y:990,
+       summary:'把 h₄ 的 page-2 微分写成实际 Mathlib 页面微分等式，并定义其陈述与 2-完备界条件。',
+       concepts:['AdamsD₂Statement','H₄D₂BoundData','h₄D₂ / H₄D₂Bound'],
+       files:[F('ClassicalAdams/H4D2/Data.lean'),F('ClassicalAdams/H4D2/Predicates.lean')], deps:['spheresequence']},
+      {id:'eta', label:'Classical η ESS', path:'ClassicalESS/Eta', domain:'classical', x:1140,y:1090, external:['KIP126.External.Provenance','KIP126.External.Claims'],
+       summary:'论文专用的 η extension spectral sequence：有限微分表、检测/extension/crossing 谓词、带来源的外部输入以及相应条件化定理。',
+       concepts:['ClassicalEtaESSAdapter / EtaESSInput','EtaDifferential 与 E₀ 页','DetectedBy / FExtension / Crossing','带 locator 的微分结论'],
+       files:[F('ClassicalESS/Eta/Data.lean'),F('ClassicalESS/Eta/ExternalInput.lean'),F('ClassicalESS/Eta/Predicates.lean'),F('ClassicalESS/Eta/Proofs.lean')], deps:['spheresequence','pagelevel']},
+      {id:'syntheticadams', label:'Synthetic Adams', path:'Synthetic/AdamsSequence', domain:'synthetic', x:1140,y:1190,
+       summary:'三分次合成 Adams 谱序列切片：页形状、d₂、λ 次数与作用，以及和经典页相容的具体接口。',
+       concepts:['Tridegree','syntheticAdamsShape / Target','SyntheticLambdaAction','SyntheticAdamsSS / lambdaMap'],
+       files:[F('Synthetic/AdamsSequence/Data.lean')], deps:['spheresequence','pagelevel']},
+      {id:'comparison', label:'Classical ↔ Synthetic', path:'Comparison/ClassicalSynthetic', domain:'application', x:1410,y:1090,
+       summary:'通过忘掉 weight 的重指标映射连接经典与合成谱序列，验证 h₄ 相关次数和微分自然性。',
+       concepts:['ReindexedSpectralSequenceMap','sourcePageMap','forgetWeight','differential naturality'],
+       files:[F('Comparison/ClassicalSynthetic/Data.lean'),F('Comparison/ClassicalSynthetic/Proofs.lean')], deps:['spheresequence','syntheticadams']},
+      {id:'theta5', label:'θ₅ Choice', path:'Kervaire/Theta5', domain:'application', x:870,y:1380, external:['KIP126.External.Literature.Kervaire'],
+       summary:'θ₅ 的二阶选择接口及 BJM/BX、Browder、HHR 等边界谓词；把文献中指定选择的结论搬运到任意满足条件的选择。',
+       concepts:['Theta5ChoiceContext / IsOrderTwo','BJM_BXCriterion','choice independence','文献结论的条件化 transport'],
+       files:[F('Kervaire/Theta5/Data.lean'),F('Kervaire/Theta5/Predicates.lean'),F('Kervaire/Theta5/Proofs.lean')], deps:[]},
+      {id:'sphereadams', label:'Near-126 Sphere Adams', path:'Kervaire/SphereAdams', domain:'application', x:1140,y:1380,
+       summary:'near-126 Adams 端点的语义接口：普通 tower、h₆²、d₁₂ 非零和选择条件，把 θ₅ 选择与球谱 Adams 数据接起来。',
+       concepts:['OrdinaryTower','Near126Adams','h6_square','d12_differential_is_nonzero / ChoiceConditions'],
+       files:[F('Kervaire/SphereAdams.lean')], deps:['spheresequence','theta5']},
+      {id:'kervairesetup', label:'Kervaire Setup', path:'Kervaire/Setup', domain:'application', x:1410,y:1280,
+       summary:'最终 Kervaire 端点需要的稳定与合成同伦数据、检测类、near-126 条件、framed 上下文和 Adams 相容性记录。',
+       concepts:['StableHomotopyData / StableMapData','SyntheticDetectedClass','Near126Input / Near126Conditions','FramedKervaireContext / SphereAdamsCoherence'],
+       files:[F('Kervaire/Setup/Data.lean')], deps:['coefficients','stablecontext','spheresequence','syntheticadams']},
+      {id:'appendix', label:'AppendixTable', path:'Computation/AppendixTable', domain:'computation', x:60,y:1490,
+       summary:'把论文 12 张计算表转成有类型的 AST：401 条非空记录与 9 个零区间，并用可执行定理检查键、次数、元数据和完整性；这些仍是输入目录，不是自动证明。',
+       concepts:['AppendixTableId（12 张表）','ClassTerm / TypedClassExpression AST','AppendixRow / status / locator','401 rows + 9 zero bands 的回归检查'],
+       files:[F('Computation/AppendixTable/Data.lean'),F('Computation/AppendixTable/Rows/Data.lean'),F('Computation/AppendixTable/Rows/Catalogue/Rows001To160.lean'),F('Computation/AppendixTable/Rows/Catalogue/Rows161To320.lean'),F('Computation/AppendixTable/Rows/Catalogue/Rows321To401.lean'),F('Computation/AppendixTable/Rows/Catalogue.lean')], deps:[]}
+    ];
+
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    const dependents = new Map(nodes.map(n => [n.id, []]));
+    nodes.forEach(n => n.deps.forEach(d => dependents.get(d).push(n.id)));
+    const edges = [];
+    nodes.forEach(n => n.deps.forEach(d => edges.push({from:d, to:n.id, phase: n.phaseDeps?.includes(d)})));
+    // FilteredPage/Data → FilteredDifferential；FilteredPage/Complex 又在后续阶段使用
+    // FilteredDifferential/Proofs。聚合后看似双向，但 Lean 文件导入图本身没有环。
+
+    const svg = document.querySelector('#graph');
+    const NS = 'http://www.w3.org/2000/svg';
+    const mk = (tag, attrs={}) => {
+      const el = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+      return el;
+    };
+    const addText = (g, cls, x, y, value) => {
+      const t = mk('text',{class:cls,x,y}); t.textContent=value; g.append(t); return t;
+    };
+
+    const defs = mk('defs');
+    const marker = mk('marker',{id:'arrow',viewBox:'0 0 10 10',refX:'9',refY:'5',markerWidth:'5',markerHeight:'5',orient:'auto-start-reverse'});
+    marker.append(mk('path',{d:'M 0 0 L 10 5 L 0 10 z',fill:'#78919a'})); defs.append(marker); svg.append(defs);
+
+    const laneLayer = mk('g');
+    [
+      {x:28,y:28,w:1305,h:710,title:'CORE · 代数与谱序列内核'},
+      {x:28,y:750,w:1588,h:540,title:'DOMAIN · 稳定同伦、Adams 与合成谱'},
+      {x:28,y:1320,w:1588,h:275,title:'ENDPOINTS & DATA · Kervaire 与计算输入'}
+    ].forEach(l => {
+      laneLayer.append(mk('rect',{class:'lane',x:l.x,y:l.y,width:l.w,height:l.h,rx:18}));
+      addText(laneLayer,'lane-title',l.x+22,l.y+28,l.title);
+    });
+    svg.append(laneLayer);
+
+    const edgeLayer = mk('g');
+    function anchors(a,b) {
+      const ac={x:a.x+W/2,y:a.y+H/2}, bc={x:b.x+W/2,y:b.y+H/2};
+      const dx=bc.x-ac.x, dy=bc.y-ac.y;
+      if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0
+        ? {x1:a.x+W,y1:ac.y,x2:b.x,y2:bc.y}
+        : {x1:a.x,y1:ac.y,x2:b.x+W,y2:bc.y};
+      return dy >= 0
+        ? {x1:ac.x,y1:a.y+H,x2:bc.x,y2:b.y}
+        : {x1:ac.x,y1:a.y,x2:bc.x,y2:b.y+H};
+    }
+    edges.forEach(e => {
+      const a=byId.get(e.from), b=byId.get(e.to), p=anchors(a,b);
+      const horiz=Math.abs(p.x2-p.x1)>=Math.abs(p.y2-p.y1);
+      const d=horiz
+        ? `M ${p.x1} ${p.y1} C ${(p.x1+p.x2)/2} ${p.y1}, ${(p.x1+p.x2)/2} ${p.y2}, ${p.x2} ${p.y2}`
+        : `M ${p.x1} ${p.y1} C ${p.x1} ${(p.y1+p.y2)/2}, ${p.x2} ${(p.y1+p.y2)/2}, ${p.x2} ${p.y2}`;
+      const path=mk('path',{d,class:`edge${e.phase?' phase':''}`,'marker-end':'url(#arrow)','data-from':e.from,'data-to':e.to});
+      edgeLayer.append(path);
+    });
+    svg.append(edgeLayer);
+
+    const nodeLayer = mk('g');
+    nodes.forEach(n => {
+      const g=mk('g',{class:'node',transform:`translate(${n.x} ${n.y})`,'data-id':n.id,tabindex:'0',role:'button','aria-label':`${n.label}: ${n.summary}`});
+      g.style.setProperty('--node-color',colors[n.domain]);
+      g.append(mk('rect',{width:W,height:H,rx:12}));
+      g.append(mk('rect',{class:'bar',width:5,height:H,rx:3}));
+      addText(g,'title',16,26,n.label);
+      const shortPath=n.path.length>30?'…'+n.path.slice(-29):n.path;
+      addText(g,'subtitle',16,47,shortPath);
+      addText(g,n.status==='sorry'?'count warning':'count',W-13,24,n.status==='sorry'?'● sorry':`${n.files.length} file${n.files.length>1?'s':''}`).setAttribute('text-anchor','end');
+      if(n.external) addText(g,'count warning',W-13,48,'◆ external').setAttribute('text-anchor','end');
+      g.addEventListener('click',()=>selectNode(n.id));
+      g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectNode(n.id)}});
+      nodeLayer.append(g);
+    });
+    svg.append(nodeLayer);
+
+    const details=document.querySelector('#details');
+    function pill(id) { const n=byId.get(id); return `<button class="dep-pill" data-target="${id}">${n.label}</button>`; }
+    function renderDetails(n) {
+      if(!n) {
+        details.innerHTML=`
+          <div class="eyebrow">HOW TO READ</div>
+          <h2>先看主干，再看领域层</h2>
+          <p class="summary">最重要的主干在 <b>FilteredComplex</b> 后分成两支：<b>FilteredPage / FilteredDifferential</b> 构造显式有限商页与页微分；<b>SpectralObject → EndpointExtension → Convergence</b> 则直接从滤过复形图进入 Mathlib 的范畴化谱对象与收敛接口。当前源码尚未把这两支装配成同一条串行管线。</p>
+          <div class="detail-section"><h3>文件命名约定</h3><ul class="concepts"><li><b>Data</b>：结构和构造</li><li><b>Predicates</b>：命题接口</li><li><b>Proofs</b>：派生定理</li><li><b>ExternalInput</b>：带来源的外部证据</li></ul></div>
+          <div class="detail-section"><h3>重要边界</h3><ul class="concepts"><li>Def 中的记录字段是显式输入，不等于全局公理。</li><li>Eta 与 θ₅ 接入 External 的来源/文献声明。</li><li>附录表目录记录计算输入，不把纸面微分自动升级为 Lean 定理。</li></ul></div>
+          <div class="note">图按“逻辑模块”聚合。FilteredPage 与 FilteredDifferential 在不同文件阶段互用；聚合后的双向关系不代表 Lean 文件 import 成环。</div>`;
+        return;
+      }
+      const ups=n.deps.length?n.deps.map(pill).join(''):'<span class="empty">无 Def 内部依赖（只依赖 Mathlib 或外部边界）</span>';
+      const downs=dependents.get(n.id).length?dependents.get(n.id).map(pill).join(''):'<span class="empty">没有其他 Def 逻辑模块直接导入</span>';
+      const status=n.status==='sorry'?'<span class="badge warn">● 含 sorry</span>':'<span class="badge">已实现接口 / 证明</span>';
+      const ext=(n.external||[]).map(x=>`<span class="badge external">◆ ${x}</span>`).join('');
+      details.innerHTML=`
+        <div class="eyebrow">${domainNames[n.domain]}</div>
+        <h2>${n.label}</h2>
+        <div class="path">KIP126/Def/${n.path}</div>
+        <div class="badges">${status}<span class="badge">${n.files.length} 个文件</span>${ext}</div>
+        <p class="summary">${n.summary}</p>
+        <div class="detail-section"><h3>关键对象 / 职责</h3><ul class="concepts">${n.concepts.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+        <div class="detail-section"><h3>直接依赖</h3><div class="dep-list">${ups}</div></div>
+        <div class="detail-section"><h3>直接使用者</h3><div class="dep-list">${downs}</div></div>
+        <div class="detail-section"><h3>实际文件</h3><ul class="files">${n.files.map(f=>`<li><a href="../${f}" title="打开 ${f}">${f.replace('KIP126/Def/','')}</a></li>`).join('')}</ul></div>
+        ${n.id==='filteredpage'||n.id==='filtereddiff'?'<div class="note">这两个逻辑组分阶段互用：FilteredDifferential/Data 导入 FilteredPage/Data，而 FilteredPage/Complex 随后导入 FilteredDifferential/Proofs。实际文件依赖仍是有向无环的。</div>':''}`;
+      details.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',()=>selectNode(b.dataset.target)));
+    }
+
+    let selected=null, activeDomain='all', query='';
+    function selectNode(id) {
+      selected=selected===id?null:id;
+      renderDetails(selected?byId.get(selected):null);
+      applyVisualState();
+      if(window.innerWidth<1050 && selected) details.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    function matches(n) {
+      if(activeDomain!=='all'&&n.domain!==activeDomain) return false;
+      if(!query) return true;
+      const hay=[n.label,n.path,n.summary,...n.concepts,...n.files].join(' ').toLowerCase();
+      return hay.includes(query);
+    }
+    function applyVisualState() {
+      const sel=selected&&byId.get(selected);
+      const ups=new Set(sel?.deps||[]), downs=new Set(sel?dependents.get(sel.id):[]);
+      document.querySelectorAll('.node').forEach(el=>{
+        const n=byId.get(el.dataset.id), visible=matches(n);
+        el.classList.toggle('dim',!visible||(sel&&n.id!==sel.id&&!ups.has(n.id)&&!downs.has(n.id)));
+        el.classList.toggle('selected',n.id===selected);
+        el.classList.toggle('upstream',ups.has(n.id));
+        el.classList.toggle('downstream',downs.has(n.id));
+      });
+      document.querySelectorAll('.edge').forEach(el=>{
+        const a=byId.get(el.dataset.from),b=byId.get(el.dataset.to);
+        const visible=matches(a)&&matches(b);
+        const active=sel&&(el.dataset.from===sel.id||el.dataset.to===sel.id);
+        el.classList.toggle('active',!!active);
+        el.classList.toggle('dim',!visible||(sel&&!active));
+      });
+    }
+
+    const filters=document.querySelector('#filters');
+    [['all','全部'],...Object.entries(domainNames)].forEach(([id,label])=>{
+      const b=document.createElement('button'); b.className=`filter${id==='all'?' active':''}`; b.textContent=label;
+      b.addEventListener('click',()=>{activeDomain=id;filters.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));applyVisualState()});
+      filters.append(b);
+    });
+    document.querySelector('#search').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();applyVisualState()});
+
+    const initial={x:0,y:0,w:1680,h:1630}; let view={...initial};
+    function setView(){svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.w} ${view.h}`)}
+    function zoom(factor,cx=view.x+view.w/2,cy=view.y+view.h/2){
+      const nw=Math.max(500,Math.min(2600,view.w*factor)), nh=nw*(initial.h/initial.w);
+      view={x:cx-(cx-view.x)*(nw/view.w),y:cy-(cy-view.y)*(nh/view.h),w:nw,h:nh};setView();
+    }
+    document.querySelector('#zoomIn').onclick=()=>zoom(.82);
+    document.querySelector('#zoomOut').onclick=()=>zoom(1.22);
+    document.querySelector('#zoomReset').onclick=()=>{view={...initial};setView()};
+    svg.addEventListener('wheel',e=>{e.preventDefault();const r=svg.getBoundingClientRect();const cx=view.x+(e.clientX-r.left)/r.width*view.w;const cy=view.y+(e.clientY-r.top)/r.height*view.h;zoom(e.deltaY>0?1.12:.89,cx,cy)},{passive:false});
+    let drag=null;
+    svg.addEventListener('pointerdown',e=>{if(e.target.closest('.node'))return;drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y};svg.setPointerCapture(e.pointerId);svg.classList.add('dragging')});
+    svg.addEventListener('pointermove',e=>{if(!drag)return;const r=svg.getBoundingClientRect();view.x=drag.vx-(e.clientX-drag.x)*view.w/r.width;view.y=drag.vy-(e.clientY-drag.y)*view.h/r.height;setView()});
+    svg.addEventListener('pointerup',()=>{drag=null;svg.classList.remove('dragging')});
+
+    renderDetails(null);
+  </script>
+</body>
+</html>

@@ -27,6 +27,52 @@ If a worker task does not select exactly one mode, or requires a path outside th
 selected boundary, stop before editing and request that the task be split or
 clarified.
 
+## Challenge and Solution synchronization
+
+- Every theorem under `KIP126/Challenge/` must have a corresponding theorem
+  under the same relative path in `KIP126/Solution/`, using the respective
+  `KIP126.Challenge` and `KIP126.Solution` namespaces.
+- Keep their statements synchronized: declaration name, universe parameters,
+  variables, typeclass assumptions, explicit and implicit hypotheses, and
+  conclusion must agree, apart from the namespace. Update both files in the
+  same change whenever a statement changes.
+- Challenge declarations are always `theorem ... := by sorry`. Never replace
+  them with `def ... : Prop`, fill in their proofs, or remove their statements
+  merely because Solution exists.
+- Write proofs of these Challenge statements only in Solution. Until a
+  solution proof is implemented, its matching theorem also uses `by sorry`;
+  an import or explanatory comment alone is not a corresponding Solution theorem.
+- Solution proofs must not discharge their goals by invoking the Challenge
+  placeholders, directly or indirectly. Import shared definitions and genuine
+  proof dependencies instead. Audit Solution and its proof dependencies
+  separately from the intentionally unproved Challenge statements; a Challenge
+  placeholder is never evidence of proof completion.
+
+## Data, predicates, and proofs
+
+- Organize each mathematical component under `KIP126/Def/` into separate
+  `Data.lean`, `Predicates.lean`, and `Proofs.lean` modules as applicable. Do not
+  mix these responsibilities in one implementation file or create empty layers
+  solely to satisfy the naming convention.
+- `Data.lean` owns concrete mathematical objects, structures, and operations.
+  It must not contain named lemmas/theorems or unfinished property proofs, and
+  must not hide `sorry` in data definitions. Required proof fields in a
+  construction may use lower-layer property declarations.
+- `Predicates.lean` owns the definitions of mathematical conditions and
+  relations on those objects. It states predicates, not proofs of them.
+- `Proofs.lean` owns lemmas and theorems about the data and predicates,
+  including explicitly unfinished property proofs during development. It must
+  not serve as the hidden home of new mathematical data definitions.
+- Follow the dependency order `Data → Predicates → Proofs`, where each later
+  module imports the earlier layers it needs. When a further construction
+  needs preservation or well-definedness theorems, put it in a subsequent
+  component's `Data.lean` importing the lower component's `Proofs.lean`, then
+  separate its predicates and proofs in turn. Do not create cyclic imports or
+  turn these provable properties into new input hypotheses to avoid the split.
+- A public entry module may re-export these layers using imports only.
+  Preserve public declaration names when reorganizing files unless the task
+  requires an API change.
+
 ## Mandatory GitHub synchronization at task start
 
 Before investigating, planning, editing, or validating any task, synchronize the
@@ -59,9 +105,10 @@ Lean declarations and import graph. Also check current issue, pull-request, CI,
 and review evidence when they affect readiness. If those sources are missing,
 stale, or contradictory, stop and report the conflict instead of guessing.
 
-An unfinished proof may temporarily use `sorry` while it is being developed, but
-do not mark the declaration or its Blueprint node as complete. A pull request is
-not mergeable while the required axiom audit still reports `sorryAx`. Never add a
+An unfinished Solution or definition-property proof may temporarily use `sorry`
+while it is being developed; Challenge proofs remain `sorry` by the rule above.
+Do not mark an unproved declaration or its Blueprint node as complete. A pull
+request is not mergeable while the required axiom audit still reports `sorryAx`. Never add a
 project-defined `axiom`. External hypotheses belong under `KIP126/External/` as
 provenance-carrying `ExternalResult` or `ExternalEvidence` inputs, and conclusions
 that use them must remain conditional statements taking those inputs explicitly.
@@ -122,6 +169,12 @@ results as evidence for read-only analysis.
 
 ## Check selection
 
+- Challenge/Solution statement change: compare both complete signatures and
+  check both affected modules. Verify that Challenge still uses `by sorry` and
+  that Solution does not use the Challenge placeholder as its proof.
+- Definition-module reorganization: check the data/predicate/proof separation,
+  import direction, and preservation of public declarations, then compile the
+  smallest affected downstream target.
 - Lean source change: use `scripts/shared-main-cache.sh run` to check the changed module
   or smallest relevant target first. Run a full local `lake build` only when the task
   explicitly requests it or an unresolved question requires it.

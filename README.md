@@ -51,17 +51,26 @@ document:
   order: audit the earlier repositories and form KIP126's best-progress
   envelope, continue the chapter-level formalization, and finish with a
   repository-wide trust, provenance, completeness, and reproducibility audit.
+- [`docs/SPECTRAL_SEQUENCE_STATUS.md`](docs/SPECTRAL_SEQUENCE_STATUS.md) is the
+  concise current checkpoint for the canonical finite-page construction and
+  its remaining implementation gaps; implemented facts remain owned by Lean.
 - [`blueprint/src/content.tex`](blueprint/src/content.tex) and the chapters
   under [`blueprint/src/chapters`](blueprint/src/chapters) form the
   natural-language formalization sketch.  The Blueprint follows the paper's
   definitions and the roadmap's order, and refines each step into nodes whose
   mathematical statement, dependencies, sources, and intended Lean object can
-  be checked together.  In the usual layout, one chapter corresponds to one
-  Lean file; temporary shared facades are allowed during migration, but the
-  final implementation should expose chapter-level Lean entry points.
+  be checked together.  A chapter indexes several small Lean modules under
+  `KIP126/Def/`, `KIP126/External/`, and `KIP126/Challenge/`;
+  `KIP126/Def.lean`, `KIP126/Challenge.lean`, and `KIP126/Solution.lean`
+  are package entry points.
 - [`KIP126.lean`](KIP126.lean) and the modules under [`KIP126/`](KIP126/) are
   authoritative for interfaces and proofs that are actually implemented, as
-  well as their import graph.
+  well as their import graph.  `Def/` owns mathematical data and properties,
+  `External/` owns provenance-bearing inputs, `Challenge/` owns internal proof
+  targets, `Solution/` owns their matching proofs, and `Checks/` owns
+  compilation regressions.  The
+  [layout migration map](docs/DEF_CHALLENGE_LAYOUT_STATUS.md) records moved
+  source modules and remaining open milestones.
 - [`reference/source-inventory.json`](reference/source-inventory.json), the
   per-source status records under [`reference/`](reference/), and the Lean
   claim ledger own the catalogue and provenance of external inputs. They record
@@ -90,17 +99,21 @@ milestone.  That Core is deliberately small: it imports Mathlib's
 synonym, and adds only the category-level filtration data that Mathlib does not
 provide: decreasing filtrations of graded objects, associated graded quotients,
 filtered morphisms, and filtered chain complexes with their induced
-associated-graded differential.  It now also includes the generic
+associated-graded differential.  The canonical filtered-complex layer also
+constructs homology filtrations, cycle/boundary subobjects, quotient pages, and
+finite-page differentials with their square-zero law.  It now also includes the generic
 homological-image bridge and the filtered-complex triangulated/abelian
 spectral-object adapter; endpoint and convergence data remain explicit
 Blueprint interfaces.  The toolchain and Mathlib dependency are pinned to
 matching `4.32.2` releases.
 
-The Blueprint is substantially ahead of the Lean implementation.  Its entry
+The Blueprint remains ahead of the theorem proofs, while the source catalogue
+interfaces now cover the completed migration slices.  Its entry
 point is [blueprint/src/content.tex](blueprint/src/content.tex), with the
 paper-specific chapters under [blueprint/src/chapters](blueprint/src/chapters).
 It covers the paper's Sections 1--7, all 401 nonempty appendix rows and nine
-zero bands, the stable/spectral-sequence/Steenrod/synthetic background absent
+zero bands (the rows are now typed AST input records with executable catalogue
+regressions), the stable/spectral-sequence/Steenrod/synthetic background absent
 from Mathlib, explicit literature and computation provenance, and the full
 dependency cone from the compiled Core to the conditional Kervaire endpoints.
 All unimplemented nodes are conservatively marked `notready`; the Blueprint
@@ -176,9 +189,9 @@ python3 scripts/check_source_inventory.py
 python3 -m unittest discover -s scripts -p 'test_check_source_inventory.py'  # unit tests
 python3 -m unittest discover -s scripts -p 'test_source_inventory_projection.py'  # Lean integration tests
 python3 -m unittest discover -s scripts -p 'test_*.py'  # all tests
-lake build KIP126.External.ProvenanceRegression \
-  KIP126.External.SourceInventoryRegression \
-  KIP126.External.ClaimsRegression
+bash scripts/shared-main-cache.sh run lake build KIP126.Checks.External.Provenance \
+  KIP126.Checks.External.SourceInventory \
+  KIP126.Checks.External.Claims
 ```
 
 On a slow or cold checkout, increase the two Lean subprocess timeouts with

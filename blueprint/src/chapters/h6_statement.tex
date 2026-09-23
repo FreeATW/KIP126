@@ -1,0 +1,294 @@
+\chapter{Objects in the permanent $h_6^2$ statement}
+\label{chap:h6-statement}
+
+This chapter constructs the objects needed to state the permanent-cycle
+target.  The reduction to $d_{12}$ and the conditions used in its exclusion
+belong to the later proof, not to these definitions.  The ambient category
+of spectra is abstract.  Its mod--$2$ Eilenberg--Mac Lane object and the
+explicit Milnor cooperation coordinates below are foundational inputs.
+The current implementation still takes those coordinates as an argument.
+The next comparison stage keeps the abstract background and derives them
+from the ring structure, cooperations, and tensor compatibility of $H$;
+that derivation is not yet implemented.
+
+% SOURCE: PROJECT_BOUNDARY.md, Confirmed design decision 1; abstract foundation
+% and Milnor cooperation boundary explicitly confirmed for this implementation.
+\begin{definition}[Mod--2 Eilenberg--Mac Lane object and unit]
+  \label{def:h6-em-object}
+  \lean{KIP126.StableHomotopy.Cohomology.Mod2EilenbergMacLane}
+  \lean{KIP126.StableHomotopy.Cohomology.Mod2EilenbergMacLane.unit}
+  \uses{def:stable-homotopy-group,def:mathlib-f2}
+  \notready
+  Fix an object $H$ with an additive isomorphism
+  $\pi_0H\cong\mathbb F_2$ and $\pi_nH=0$ for $n\ne0$.
+  Define $u:S^0\to H$ to be the map corresponding to $1\in\mathbb F_2$.
+  The equation $\pi_nH=0$ means that every element of that group equals its
+  zero element; it does not mean that the group is empty.
+\end{definition}
+
+\begin{definition}[Ring structure and cooperation maps of the chosen object]
+  \label{def:h6-ring-cooperations}
+  \lean{KIP126.StableHomotopy.Cohomology.Mod2RingStructure}
+  \lean{KIP126.StableHomotopy.Cohomology.Mod2Cooperations}
+  \lean{KIP126.StableHomotopy.Cohomology.cooperationDiagonalMap}
+  \lean{KIP126.StableHomotopy.Cohomology.cooperationCounit}
+  \uses{def:h6-em-object,def:unital-multiplication-data}
+  \leanok
+  Equip the specified $H$ with an associative unital algebra-object
+  structure whose unit is the specified $u$. Define the graded cooperation
+  groups to be $\pi_n(H\wedge H)$. Inserting $u$ between the two factors
+  gives a map to $\pi_n(H\wedge(H\wedge H))$, and multiplication gives
+  the counit to $\pi_nH$. No K\"unneth identification or Milnor polynomial
+  coordinates are part of these definitions.
+\end{definition}
+
+% SOURCE: the Adams resolution in def:hf2-adams-tower, made explicit by
+% iterating the unit and its fiber; aimpaper/main.tex:253-263.
+\begin{definition}[Iterated-fiber Adams tower]
+  \label{def:h6-fiber-tower}
+  \lean{KIP126.Classical.Adams.fiber}
+  \lean{KIP126.Classical.Adams.fiberι}
+  \lean{KIP126.Classical.Adams.adamsUnit}
+  \lean{KIP126.Classical.Adams.adamsTower}
+  \lean{KIP126.Classical.Adams.adamsTowerStep}
+  \lean{KIP126.Classical.Adams.adamsTowerComposite}
+  \lean{KIP126.Classical.Adams.adamsTowerMapAt}
+  \lean{KIP126.Classical.Adams.adamsLayerAt}
+  \uses{def:h6-em-object,def:cofiber-triangle,def:stable-sphere-suspension}
+  \notready
+  For $X$, put $T_0=X$ and
+  \[
+    T_{s+1}=\operatorname{fib}(T_s\longrightarrow H\wedge T_s).
+  \]
+  The displayed map is the unit $u$ smashed with $T_s$, after the unit
+  isomorphism.  Define fibers by desuspending the chosen cofibers.
+  Compose the fiber inclusions to obtain $T_b\to T_a$ for $a\le b$,
+  extend the tower constantly to negative stages, and put
+  $Q_s=\operatorname{cofib}(T_{s+1}\to T_s)$.
+\end{definition}
+
+\begin{proposition}[The Adams unit on the coefficient object splits]
+  \label{prop:h6-unit-splits}
+  \lean{KIP126.StableHomotopy.Cohomology.adamsUnit_mul}
+  \lean{KIP126.StableHomotopy.Cohomology.cooperationDiagonal_counit_right}
+  \uses{def:h6-ring-cooperations,def:h6-fiber-tower}
+  \leanok
+  Multiplication $H\wedge H\to H$ retracts the map
+  $H\to H\wedge H$ used in the Adams tower. Multiplying the final two
+  factors also retracts the middle-unit insertion
+  $H\wedge H\to H\wedge(H\wedge H)$.
+\end{proposition}
+\begin{proof}
+  Apply the left unit identity of the algebra object, then tensor that
+  identity with $H$.
+  \leanok
+\end{proof}
+
+\begin{definition}[Quotient pages from the Adams tower]
+  \label{def:h6-tower-pages}
+  \lean{KIP126.Classical.Adams.adamsE1}
+  \lean{KIP126.Classical.Adams.adamsI}
+  \lean{KIP126.Classical.Adams.adamsJ}
+  \lean{KIP126.Classical.Adams.adamsK}
+  \lean{KIP126.Classical.Adams.adamsCycles}
+  \lean{KIP126.Classical.Adams.adamsBoundaries}
+  \lean{KIP126.Classical.Adams.adamsCycleBoundaries}
+  \lean{KIP126.Classical.Adams.adamsPage}
+  \uses{def:h6-fiber-tower,thm:stable-homotopy-long-exact}
+  \notready
+  Write $E_1^{s,t}=\pi_{t-s}Q_s$.  Let $j$ be induced by $T_s\to Q_s$,
+  let $k:E_1^{s,t}\to\pi_{t-s-1}T_{s+1}$ be the connecting map, and
+  write $i_{a,b}$ for the map on a fixed homotopy group induced by
+  $T_b\to T_a$.  For $r\ge1$ define
+  \[
+    Z_r^{s,t}=k^{-1}(\operatorname{im}i_{s+1,s+r}),\qquad
+    B_r^{s,t}=j(\ker i_{s-r+1,s}),\qquad
+    E_r^{s,t}=Z_r^{s,t}/(Z_r^{s,t}\cap B_r^{s,t}).
+  \]
+  These are actual subgroups and quotients of the homotopy groups of the
+  constructed tower.  The exact-couple identities imply $B_r\subseteq Z_r$.
+\end{definition}
+
+\begin{definition}[Page differential from a tower lift]
+  \label{def:h6-tower-differential}
+  \lean{KIP126.Classical.Adams.adamsCycleLift}
+  \lean{KIP126.Classical.Adams.adamsDifferentialValue}
+  \lean{KIP126.Classical.Adams.adamsDifferential}
+  \lean{KIP126.Classical.Adams.adamsPageComplex}
+  \uses{def:h6-tower-pages}
+  \notready
+  For $x\in Z_r^{s,t}$, choose $y\in\pi_{t-s-1}T_{s+r}$ with
+  $i_{s+1,s+r}(y)=k(x)$.  Define
+  \[
+    d_r([x])=[j(y)]\in E_r^{s+r,t+r-1}.
+  \]
+  Thus the map is specified on representatives before descending to the
+  quotient.  Its additivity, independence of the lift and representative,
+  and square-zero law are established in Proposition~\ref{prop:h6-tower-differential-laws}; they are not inputs selecting a map.
+\end{definition}
+
+\begin{proposition}[Well-definedness and square-zero of the tower differential]
+  \label{prop:h6-tower-differential-laws}
+  \lean{KIP126.Classical.Adams.adamsDifferentialValue_eq_of_lift}
+  \lean{KIP126.Classical.Adams.adamsDifferentialValue_add}
+  \lean{KIP126.Classical.Adams.adamsDifferentialValue_smul}
+  \lean{KIP126.Classical.Adams.adamsBoundaries_le_differential_ker}
+  \lean{KIP126.Classical.Adams.adamsPageD_comp}
+  \uses{def:h6-tower-differential}
+  \leanok
+  The differential is independent of the chosen lift, is additive and
+  integer-linear, vanishes on cycle boundaries, and satisfies $d_r^2=0$.
+\end{proposition}
+\begin{proof}
+  Two lifts differ by an element in the kernel of the tower composite,
+  so their layer images differ by a boundary. Use sums and scalar multiples
+  of lifts to establish linearity. Exactness gives $kj=0$; hence every
+  layer image has zero next differential, proving both boundary vanishing
+  and square-zero.
+  \leanok
+\end{proof}
+
+\begin{proposition}[Page passage for the constructed tower]
+  \label{prop:h6-tower-page-passage}
+  \lean{KIP126.Classical.Adams.adamsCycles_succ_le}
+  \lean{KIP126.Classical.Adams.adamsNextPageToHomology}
+  \lean{KIP126.Classical.Adams.adamsNextPageToHomology_bijective}
+  \lean{KIP126.Classical.Adams.adamsPageHomologyIso}
+  \uses{def:h6-tower-differential}
+  \notready
+  Sending an $(r+1)$-cycle to the homology class of its image in $E_r$
+  induces an isomorphism $E_{r+1}^{s,t}\cong H^{s,t}(E_r,d_r)$.
+\end{proposition}
+\begin{proof}
+  A lift one stage farther gives an $r$-cycle with zero differential.
+  The next-page boundaries become the current-page differential boundaries.
+  Conversely, exactness adjusts the lift of an $r$-cycle with zero
+  differential so that it lifts one stage farther.  The same exactness
+  calculation identifies the kernel with the next-page boundaries.
+  Invert this specified quotient map to obtain page passage in the
+  direction $H(E_r)\to E_{r+1}$.
+\end{proof}
+
+\begin{definition}[Constructed sphere Adams sequence]
+  \label{def:h6-constructed-sphere-sequence}
+  \lean{KIP126.Classical.Adams.adamsTowerSpectralSequence}
+  \lean{KIP126.Classical.Adams.mod2SphereAdams}
+  \uses{prop:h6-tower-page-passage,def:h6-em-object}
+  \notready
+  Specialize the tower to $X=S^0$ and display its quotient-page spectral
+  sequence from $E_2$, with differential bidegree $(r,r-1)$.
+  Its underlying abelian groups may be regarded as integer modules.
+  The Milnor coordinates below give the mod--$2$ identification; no
+  convergence-to-an-abutment assertion is required to state pagewise
+  nonzero permanence.
+\end{definition}
+
+% SOURCE: J. M. Boardman, Stable operations in generalized cohomology,
+% p. 208, (7.4), verified at
+% https://www.sas.rochester.edu/mth/sites/doug-ravenel/otherpapers/boardman-8.pdf
+\begin{definition}[Normalized Milnor cobar cochains]
+  \label{def:h6-milnor-cobar}
+  \lean{KIP126.Steenrod.Milnor.TensorPower}
+  \lean{KIP126.Steenrod.Milnor.weight}
+  \lean{KIP126.Steenrod.Milnor.coproductGenerator}
+  \lean{KIP126.Steenrod.Milnor.cochains}
+  \lean{KIP126.Steenrod.Milnor.differential}
+  \lean{KIP126.Steenrod.Milnor.cup}
+  \uses{def:mathlib-f2}
+  \notready
+  Set $\mathcal A_*=\mathbb F_2[\xi_1,\xi_2,\ldots]$, with
+  $|\xi_i|=2^i-1$, $\xi_0=1$, and
+  \[
+    \Delta\xi_n=\sum_{i=0}^n\xi_{n-i}^{2^i}\otimes\xi_i.
+  \]
+  Define $C^{s,t}$ as the internal-degree-$t$ polynomials in $s$ tensor
+  slots whose augmentation in every slot is zero.  The cobar differential
+  is the sum of the two end coaugmentations and the coproduct in each slot.
+  The product $C^{s,t}\otimes C^{s',t'}\to C^{s+s',t+t'}$ concatenates slots.
+\end{definition}
+
+\begin{proposition}[Polynomial multiplication and the two closed representatives]
+  \label{prop:h6-polynomial-cocycles}
+  \lean{KIP126.Steenrod.Milnor.cupPolynomial_mem}
+  \lean{KIP126.Steenrod.Milnor.h6Polynomial_mem}
+  \lean{KIP126.Steenrod.Milnor.h6Polynomial_differential}
+  \lean{KIP126.Steenrod.Milnor.h6SquarePolynomial_differential}
+  \uses{def:h6-milnor-cobar}
+  \leanok
+  Concatenation preserves normalization and adds internal degrees.
+  The polynomial $[\xi_1^{64}]$ is normalized of internal degree $64$.
+  Its polynomial cobar differential and that of
+  $[\xi_1^{64}\mid\xi_1^{64}]$ both vanish.
+\end{proposition}
+\begin{proof}
+  Disjoint slot renamings preserve the weight. Augmentation of any slot
+  annihilates the corresponding factor of a concatenation. Since
+  $\xi_1$ is primitive, the characteristic-two identity
+  $(a+b)^{64}=a^{64}+b^{64}$ gives the two differential calculations.
+  These polynomial statements do not depend on the still-open assertion
+  that the differential preserves all normalized cochains.
+  \leanok
+\end{proof}
+
+% SOURCE: explicit abstract-foundation boundary confirmed for this task.
+% This node is a supplied mathematical structure, not a proved comparison theorem.
+\begin{definition}[Milnor coordinates of the mod--2 foundation]
+  \label{def:h6-milnor-cooperations}
+  \lean{KIP126.Classical.Adams.MilnorCooperations}
+  \lean{KIP126.Classical.Adams.sphereFirstDifferential}
+  \uses{def:h6-tower-differential,def:h6-milnor-cobar}
+  \notready
+  The explicit Milnor cooperation input consists of additive isomorphisms
+  $\phi^{s,t}:E_1^{s,t}(S^0)\cong C^{s,t}$ for $s,t\ge0$, satisfying
+  $\phi^{s+1,t}d_1=d_{\mathrm{cobar}}\phi^{s,t}$.
+  Here $E_1$ and $d_1$ are those already constructed from the tower.
+  This is a foundational input; its existence is not inferred merely from
+  the homotopy groups of $H$.  It contains no later page, named $h$ class,
+  selected multiplication, or permanence assertion.
+\end{definition}
+
+% SOURCE: W. M. Singer, Rings of symmetric functions as modules over the
+% Steenrod algebra, AGT 8 (2008), p. 548, after (2-13), verified at
+% https://msp.org/agt/2008/8-1/agt-v8-n1-p17-p.pdf
+\begin{definition}[The constructed $h_6$ and its square]
+  \label{def:h6-constructed-square}
+  \lean{KIP126.Steenrod.Milnor.h6Cochain}
+  \lean{KIP126.Steenrod.Milnor.h6SquareCochain}
+  \lean{KIP126.Classical.Adams.Sphere.classOfMilnorCocycle}
+  \lean{KIP126.Classical.Adams.Sphere.h6}
+  \lean{KIP126.Classical.Adams.Sphere.h6Square}
+  \uses{def:h6-milnor-cooperations,def:h6-constructed-sphere-sequence}
+  \notready
+  Take the cocycle $[\xi_1^{64}]\in C^{1,64}$ and its concatenation square
+  $[\xi_1^{64}\mid\xi_1^{64}]\in C^{2,128}$.
+  Apply $\phi^{-1}$ to each, take its first-page homology class, and apply
+  the constructed page-passage isomorphism.  This defines respectively
+  $h_6\in E_2^{1,64}$ and $h_6^2\in E_2^{2,128}$.
+\end{definition}
+
+\begin{proposition}[Second-page multiplication and the square identity]
+  \label{prop:h6-e2-square-identity}
+  \uses{def:h6-constructed-square,def:h6-milnor-cobar,prop:h6-tower-page-passage}
+  \notready
+  The cobar differential satisfies square-zero and the Leibniz identity;
+  concatenation descends to homology and corresponds under a multiplicative
+  comparison to a second-page product adding both bidegrees. Under this product,
+  the class currently named $h_6^2$ equals the product of $h_6$ with itself.
+  Bilinearity and the two individual cocycle calculations above do not
+  establish this descent or this second-page identity. Neither the
+  second-page product nor the asserted identity has a Lean implementation yet.
+\end{proposition}
+
+\begin{definition}[Pagewise nonzero permanence]
+  \label{def:h6-pagewise-permanence}
+  \lean{KIP126.Core.SpectralSequence.nextPageClass}
+  \lean{KIP126.Core.SpectralSequence.PageTrajectory}
+  \lean{KIP126.Core.SpectralSequence.IsPermanent}
+  \uses{def:h6-constructed-sphere-sequence}
+  \notready
+  A class $x\in E_2^{s,t}$ is nonzero permanent if there are classes
+  $x_n\in E_{2+n}^{s,t}$ for every $n\ge0$, with $x_0=x$, such that
+  $d_{2+n}x_n=0$, the page-passage image of $[x_n]$ is $x_{n+1}$, and
+  $x_n\ne0$ for every $n$.  This definition uses the actual differentials
+  and homology quotients and makes no claim of convergence to an abutment.
+\end{definition}

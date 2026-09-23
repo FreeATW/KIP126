@@ -42,8 +42,8 @@ convention 不一致、定理强度不对齐，或把数学内容藏入公理/ty
 2. 每个重复概念选定唯一权威实现，不以平行 alias 掩盖接口分叉；
 3. 选中的成果已经迁入 KIP126 并在 Lean 4.32.2 / Mathlib v4.32.2 下构建，不依赖
    旧仓库本机路径；
-4. 迁入源码不新增 `sorry`、`admit` 或项目自定义 `axiom`；外部事实改写为显式条件
-   输入；
+4. 作为已完成成果迁入的证明及其依赖不含 `sorry`、`admit` 或项目自定义 `axiom`；
+   Challenge 按契约保留 `by sorry`，不计入证明完成证据；外部事实改写为显式条件输入；
 5. 任何定义相等、索引换算和 adapter 均有证明义务与回归测试，不允许弱化或改变
    aimpaper 的语义和定理强度；
 6. 形成可供第二阶段继续实现的、自足且可审计的 KIP126 包络面基线。
@@ -57,16 +57,18 @@ convention 不一致、定理强度不对齐，或把数学内容藏入公理/ty
 ### 模块划分口径
 
 Blueprint 使用平铺 chapter：`content.tex` 中没有 `\part` 或嵌套目录，只用注释标出
-“数学定义 → 外部输入 → 内部证明”三层。Lean 文件列出各章当前最接近的公共入口；
-同一现有入口暂时承载两个新章时，后续实现任务再按 chapter 边界拆 facade。
+“数学定义 → 外部输入 → 内部证明”三层。每章对应一组按数学概念划分的 Lean 模块，
+而不是单个源文件；`KIP126/Def.lean`、`KIP126/External.lean` 和
+`KIP126/Challenge.lean` 是这些模块的包入口。旧路径与新路径的逐项对应及开放节点
+见 [`DEF_CHALLENGE_LAYOUT_STATUS.md`](DEF_CHALLENGE_LAYOUT_STATUS.md)。
 章级 Blueprint 节点数量与完成度不在本文件汇总，以对应章节子 Wiki 的当前记录为准。
 
 - `content.tex` 只保留按依赖顺序的平铺 `\input` 清单与三层注释；没有 LaTeX
   `\part`。`blueprint/print` 和 `blueprint/web` 是生成物，不手工编辑；
   `blueprint/lean_decls` 也是被忽略的生成物，声明检查前由 `leanblueprint web`
   重新生成，不手工编辑或提交。
-- 章节不按代码行数均分，而按数学定义、外部黑盒和内部消费者的边界拆分。同一现有
-  Lean facade 暂时覆盖两个 chapter 不表示两章已经合并；实现层仍需最终形成一章一入口。
+- 章节不按代码行数均分，而按数学定义、外部黑盒和内部消费者的边界拆分。每个
+  公开声明只有一个权威实现；包入口只汇总 import，不复制声明。
 
 ### 依赖顺序
 
@@ -84,21 +86,24 @@ Blueprint 使用平铺 chapter：`content.tex` 中没有 `\part` 或嵌套目录
 
 每个模块进入下一依赖层前，必须满足：
 
-1. `lake build` 通过，新增源码无项目 `sorry`、`admit` 或自定义 `axiom`；
+1. 按 `AGENTS.md` 完成与变更对应的 Lean 检查；作为已完成成果的 Solution/Def
+   证明及其依赖无 `sorry`、`admit` 或项目自定义 `axiom`。Challenge 始终保留
+   `by sorry`；开发中的证明占位不计作模块完成；
 2. 相关 Blueprint 节点有准确 `\lean`、`\uses` 和状态标记，DAG 无未知依赖、环或
    无意孤立节点；
-3. `leanblueprint pdf`、`leanblueprint web` 和 `leanblueprint checkdecls` 通过；
+3. 按 `AGENTS.md` 的变更类型选择 Blueprint 检查：正文/依赖图运行 web，
+   声明引用变化再运行 checkdecls，纯打印变化运行 pdf；不对每个模块重复全量构建；
 4. 外部文献、Lin 输出和附录数据都以显式、类型正确的输入进入 Lean，不伪装成项目
    内部定理或全局公理；
 5. 生成物只由工具生成，不手工编辑。
 
 ### 当前执行前沿
 
-当前优先级是补完 Spectral-sequence machinery 并建立 Stable-homotopy objects 的
-最小接口；随后完成 Classical Adams/ESS 和 Synthetic 定义，使
-external-results statements 获得真实类型，再推进 comparison、数据、near-126 与
-几何端点。主 Wiki 负责更新章级完成状态和下一步；本文件只在阶段、模块边界、依赖
-顺序变化时更新。
+当前执行前沿已推进到稳定同伦/合成同伦输入包、附录 401 行 typed catalogue、BJM/BX
+选择传输接口以及 Theorem 6.1/6.12/7.3 的精确开放命题。下一步按依赖图补齐
+page-extension、near-126 coherence 和几何端点的真实证明，同时为每个外部输入补上
+具体实例与 evidence；这些开放目标继续保持 `notready`。Blueprint 记录节点状态和依赖，
+实现事实以 Lean 为准；本文件只在阶段、模块边界、依赖顺序变化时更新。
 
 ## 第三阶段：最终完整审计
 
