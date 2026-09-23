@@ -23,4 +23,3 @@ noncomputable def Filtration.completionFiltration {ω : Type w} {A : ω → C}
     exact kernelSubobject_comp_le _ _
 
 end KIP126.Core.SpectralSequence
-

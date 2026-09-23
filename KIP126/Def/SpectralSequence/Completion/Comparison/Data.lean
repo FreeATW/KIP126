@@ -37,4 +37,3 @@ noncomputable def Filtration.completionConeLeg {ω : Type w} {A : ω → C}
   exact step1 ≫ step2 ≫ step3
 
 end KIP126.Core.SpectralSequence
-
