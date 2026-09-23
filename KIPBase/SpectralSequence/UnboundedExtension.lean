@@ -145,7 +145,6 @@ private lemma imageSubobject_ofLE_bot_comp_eq_bot {X : C} (a : Subobject X)
     exact (cancel_mono a.arrow).mp (by simp [h1])
   simp [h, zero_comp, imageSubobject_zero]
 
-set_option maxHeartbeats 800000 in
 private theorem truncatedUC_cycleSubobject_zero_eq_top
     (cm : ConvergenceMorphism conv₁ conv₂) (s₀ : ℤ) (t : ω') (s : ℤ)
     (r : WithTop ℕ) :
@@ -169,7 +168,6 @@ private theorem truncatedUC_cycleSubobject_zero_eq_top
         ((truncatedUnderlyingComplex cm s₀ t).fil s 0) (FilteredComplex.fil_anti _ s 0)))
       <;> first | rfl | simp [h_d_zero, comp_zero, zero_comp]
 
-set_option maxHeartbeats 800000 in
 private theorem truncatedUC_boundarySubobject_one_eq_bot
     (cm : ConvergenceMorphism conv₁ conv₂) (s₀ : ℤ) (t : ω') (s : ℤ)
     (r : WithTop ℕ) :
@@ -227,7 +225,6 @@ private lemma imageSubobjectMap_of_kernel_cokernel_square
     ker_lift φ img_sq_comm
   exact ⟨imageSubobjectMap sq_img, imageSubobjectMap_arrow sq_img⟩
 
-set_option maxHeartbeats 102400000 in
 private theorem truncatedUC_cycleSubobject_one_preserved
     (cm : ConvergenceMorphism conv₁ conv₂)
     (_hbb₁ : F₁.IsBoundedBelow) (_hbb₂ : F₂.IsBoundedBelow)
@@ -373,7 +370,6 @@ private lemma factor_through_inf {X Y : C} {P Q : Subobject Y}
     (P ⊓ Q).Factors f := by
   rw [Subobject.inf_factors]; exact ⟨hP, hQ⟩
 
-set_option maxHeartbeats 51200000 in
 private theorem truncatedUC_boundarySubobject_zero_preserved
     (cm : ConvergenceMorphism conv₁ conv₂)
     (hbb₁ : F₁.IsBoundedBelow) (hbb₂ : F₂.IsBoundedBelow)

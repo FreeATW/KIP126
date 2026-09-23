@@ -64,6 +64,30 @@ def EssentialDifferentialRelation (E : SpectralSequence C ι) (r : ℤ) (k : ι)
   DifferentialRelation E r k x y ∧
     ¬ Subobject.Factors ((E.ssData (k + E.diffDeg r)).B (↑(r - E.r₀).toNat : WithTop ℕ)) y
 
+/-- 本质微分关系必由非零页微分给出。否则目标的页类为零，因而目标
+落入边缘子对象，与本质性矛盾。 -/
+theorem EssentialDifferentialRelation.d_ne_zero (E : SpectralSequence C ι)
+    (r : ℤ) (k : ι) {T : C}
+    {x : T ⟶ (E.ssData k).V}
+    {y : T ⟶ (E.ssData (k + E.diffDeg r)).V}
+    (h : EssentialDifferentialRelation E r k x y) : E.d r k ≠ 0 := by
+  intro hd
+  rcases h.1 with ⟨xZ, _hxZ, yZ, hyZ, hrel⟩
+  let D := E.ssData (k + E.diffDeg r)
+  let n : WithTop ℕ := ↑(r - E.r₀).toNat
+  let ιB := Subobject.ofLE (D.B n) (D.Z n) (D.B_le_Z n)
+  have hzero : yZ ≫ cokernel.π ιB = 0 := by
+    simpa only [D, n, ιB, SSData.pageπ, hd, comp_zero] using hrel.symm
+  let lift := Abelian.monoLift ιB yZ hzero
+  have hfac : lift ≫ (D.B n).arrow = y := by
+    calc
+      lift ≫ (D.B n).arrow = lift ≫ ιB ≫ (D.Z n).arrow := by
+        rw [Subobject.ofLE_arrow]
+      _ = yZ ≫ (D.Z n).arrow := by
+        rw [← Category.assoc, Abelian.monoLift_comp]
+      _ = y := hyZ
+  exact h.2 (by rw [← hfac]; exact Subobject.factors_comp_arrow lift)
+
 /-- 环境对象 `V` 中的元素与页 `E_r` 中的元素的**关联关系**：
     称 `x : T ⟶ V` 与页元素 `a : T ⟶ E_r` 关联，当且仅当
     存在提升 `xZ : T ⟶ Z_r` 使得 `xZ ≫ Z.arrow = x`（`x` 落在 `Z_r` 中）
@@ -100,6 +124,80 @@ theorem dr_apply_iff_rel (E : SpectralSequence C ι) (r : ℤ) (k : ι)
       yZ ≫ (E.ssData (k + E.diffDeg r)).pageπ (↑(r - E.r₀).toNat : WithTop ℕ),
       by rwa [Category.assoc], ⟨xZ, hxZ, rfl⟩, ⟨yZ, hyZ, rfl⟩⟩
 
+/-- 两个循环代表元在同一页上的类相同，则它们在环境对象中的差
+落入该页的边缘子对象。 -/
+theorem SSData.sub_factors_boundary_of_page_eq (D : SSData C)
+    (n : WithTop ℕ) {T : C}
+    (u v : T ⟶ Subobject.underlying.obj (D.Z n))
+    (h : u ≫ D.pageπ n = v ≫ D.pageπ n) :
+    Subobject.Factors (D.B n)
+      (u ≫ (D.Z n).arrow - v ≫ (D.Z n).arrow) := by
+  let i := Subobject.ofLE (D.B n) (D.Z n) (D.B_le_Z n)
+  have hz : (u - v) ≫ cokernel.π i = 0 := by
+    change (u - v) ≫ D.pageπ n = 0
+    rw [Preadditive.sub_comp, h, sub_self]
+  let b := Abelian.monoLift i (u - v) hz
+  have hb : b ≫ (D.B n).arrow =
+      u ≫ (D.Z n).arrow - v ≫ (D.Z n).arrow := by
+    calc
+      b ≫ (D.B n).arrow = b ≫ i ≫ (D.Z n).arrow := by
+        rw [Subobject.ofLE_arrow]
+      _ = (u - v) ≫ (D.Z n).arrow := by
+        rw [← Category.assoc, Abelian.monoLift_comp]
+      _ = u ≫ (D.Z n).arrow - v ≫ (D.Z n).arrow := by
+        rw [Preadditive.sub_comp]
+  rw [← hb]
+  exact Subobject.factors_comp_arrow b
+
+/-- 同一源元素的两条同页微分关系，其两个目标之差落入目标页的边缘。
+这里不需要源对象的投射性；投射性只用于随后把边缘提升回复形。 -/
+theorem DifferentialRelation.targets_sub_factors_boundary
+    (E : SpectralSequence C ι) (r : ℤ) (k : ι) {T : C}
+    {x : T ⟶ (E.ssData k).V}
+    {y₁ y₂ : T ⟶ (E.ssData (k + E.diffDeg r)).V}
+    (h₁ : DifferentialRelation E r k x y₁)
+    (h₂ : DifferentialRelation E r k x y₂) :
+    Subobject.Factors
+      ((E.ssData (k + E.diffDeg r)).B (↑(r - E.r₀).toNat : WithTop ℕ))
+      (y₁ - y₂) := by
+  rcases h₁ with ⟨xZ₁, hx₁, yZ₁, hy₁, hrel₁⟩
+  rcases h₂ with ⟨xZ₂, hx₂, yZ₂, hy₂, hrel₂⟩
+  have heq : xZ₁ = xZ₂ := by
+    apply (cancel_mono ((E.ssData k).Z (↑(r - E.r₀).toNat : WithTop ℕ)).arrow).mp
+    exact hx₁.trans hx₂.symm
+  subst xZ₂
+  have hpage : yZ₁ ≫
+      (E.ssData (k + E.diffDeg r)).pageπ (↑(r - E.r₀).toNat : WithTop ℕ) =
+      yZ₂ ≫
+      (E.ssData (k + E.diffDeg r)).pageπ (↑(r - E.r₀).toNat : WithTop ℕ) :=
+    hrel₁.symm.trans hrel₂
+  simpa only [hy₁, hy₂] using
+    (E.ssData (k + E.diffDeg r)).sub_factors_boundary_of_page_eq
+      (↑(r - E.r₀).toNat : WithTop ℕ) yZ₁ yZ₂ hpage
+
+/-- 非零页边缘首次出现的页数：若元素属于第 `n` 级边缘却不属于
+第零级，则它首次进入边缘塔时，前一级仍不包含它。 -/
+theorem SSData.first_boundary_page (D : SSData C) {T : C}
+    (v : T ⟶ D.V) (n : ℕ)
+    (hn : Subobject.Factors (D.B (↑n)) v)
+    (hzero : ¬ Subobject.Factors (D.B (↑(0 : ℕ))) v) :
+    ∃ m : ℕ, m < n ∧
+      Subobject.Factors (D.B (↑(m + 1))) v ∧
+      ¬ Subobject.Factors (D.B (↑m)) v := by
+  classical
+  let P : ℕ → Prop := fun j => Subobject.Factors (D.B (↑j)) v
+  have hex : ∃ j : ℕ, P j := ⟨n, hn⟩
+  let p := Nat.find hex
+  have hp : P p := Nat.find_spec hex
+  have hp0 : 0 < p := by
+    by_contra h
+    have h0 : p = 0 := by omega
+    exact hzero (by simpa only [P, h0] using hp)
+  have hple : p ≤ n := Nat.find_min' hex hn
+  refine ⟨p - 1, by omega, ?_, ?_⟩
+  · simpa only [show p - 1 + 1 = p by omega, P] using hp
+  · exact Nat.find_min hex (by omega)
+
 /-- 一条 `d_r` 关系被另一条**本质关系** crossing：
     存在源双次数 `k'` 上的广义元素 `x' y'`，它们之间有
     `d_m` 本质关系（`EssentialDifferentialRelation`），且其过滤次数满足
@@ -117,6 +215,31 @@ def RelationCrossedBy (E : SpectralSequence C ι)
     filtDeg k' = filtDeg k + a ∧
       EssentialDifferentialRelation E m k' x' y' ∧
       filtDeg (k' + E.diffDeg m) ≤ filtDeg k + r
+
+/-- 目标过滤次数恰等于原目标次数的 crossing 见证；它特别给出
+任意不超过该目标次数的范围性 crossing。 -/
+def RelationCrossedByAt (E : SpectralSequence C ι)
+    (filtDeg : ι → ℤ) (r : ℤ) (k : ι)
+    {T : C} (x : T ⟶ (E.ssData k).V)
+    (y : T ⟶ (E.ssData (k + E.diffDeg r)).V)
+    (_h : DifferentialRelation E r k x y) : Prop :=
+  ∃ (a : ℤ) (_ : 0 < a) (m : ℤ) (k' : ι)
+    (x' : T ⟶ (E.ssData k').V)
+    (y' : T ⟶ (E.ssData (k' + E.diffDeg m)).V),
+    filtDeg k' = filtDeg k + a ∧
+      EssentialDifferentialRelation E m k' x' y' ∧
+      filtDeg (k' + E.diffDeg m) = filtDeg k + r
+
+/-- 精确目标的 crossing 自动满足普通 crossing 的上界条件。 -/
+theorem RelationCrossedByAt.toCrossed (E : SpectralSequence C ι)
+    (filtDeg : ι → ℤ) (r : ℤ) (k : ι)
+    {T : C} {x : T ⟶ (E.ssData k).V}
+    {y : T ⟶ (E.ssData (k + E.diffDeg r)).V}
+    {h : DifferentialRelation E r k x y}
+    (hc : RelationCrossedByAt E filtDeg r k x y h) :
+    RelationCrossedBy E filtDeg r k x y h := by
+  rcases hc with ⟨a, ha, m, k', x', y', hs, he, ht⟩
+  exact ⟨a, ha, m, k', x', y', hs, he, le_of_eq ht⟩
 
 /-! ### Differential datum -/
 

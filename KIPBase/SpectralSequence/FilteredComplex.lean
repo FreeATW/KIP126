@@ -69,6 +69,69 @@ structure FilteredComplex.IsBounded (FC : FilteredComplex C) where
   /-- `F^s A^k = 0` for `s ≥ hi k` (bounded above). -/
   boundedAbove : ∀ k s, hi k ≤ s → FC.fil s k = ⊥
 
+/-- 有界递减过滤中的最大因子层：一个映射若已落入某过滤层，
+则要么为零，要么存在最高的过滤次数，且下一层不再因子。 -/
+theorem FilteredComplex.factor_max_or_zero
+    (FC : FilteredComplex C) (bnd : FC.IsBounded) (s k : ℤ)
+    {T : C} (v : T ⟶ FC.A k)
+    (hs : (FC.fil s k).Factors v) :
+      v = 0 ∨ ∃ p : ℤ, s ≤ p ∧ (FC.fil p k).Factors v ∧
+      ¬ (FC.fil (p + 1) k).Factors v := by
+  classical
+  by_cases hv : v = 0
+  · exact Or.inl hv
+  right
+  have hs_hi : s < bnd.hi k := by
+    by_contra h
+    have heq : FC.fil s k = ⊥ := bnd.boundedAbove k s (by omega)
+    have : v = 0 := (Subobject.bot_factors_iff_zero v).mp (heq ▸ hs)
+    exact hv this
+  let N : ℕ := (bnd.hi k - s).toNat
+  have hNpos : 0 < N := by
+    dsimp [N]
+    omega
+  have hNval : s + (N : ℤ) = bnd.hi k := by
+    dsimp [N]
+    omega
+  have hnotN : ¬ (FC.fil (s + (N : ℤ)) k).Factors v := by
+    rw [hNval, bnd.boundedAbove k (bnd.hi k) le_rfl]
+    exact hv ∘ (Subobject.bot_factors_iff_zero v).mp
+  let P : ℕ → Prop := fun j => ¬ (FC.fil (s + (j : ℤ)) k).Factors v
+  have hex : ∃ j : ℕ, P j := ⟨N, hnotN⟩
+  let q := Nat.find hex
+  have hq : P q := Nat.find_spec hex
+  have hqpos : 0 < q := by
+    by_contra hq0
+    have : q = 0 := by omega
+    exact hq (by simpa [P, this] using hs)
+  have hqmin : ∀ j < q, ¬ P j := by
+    intro j hj hP
+    have hle := Nat.find_min' hex hP
+    omega
+  refine ⟨s + (q - 1 : ℕ), ?_, ?_, ?_⟩
+  · omega
+  · apply Classical.byContradiction
+    intro h
+    exact hqmin (q - 1) (by omega) h
+  · have heq : s + (↑(q - 1) : ℤ) + 1 = s + (↑q : ℤ) := by omega
+    rw [heq]
+    exact hq
+
+/- 这里显式记录自然数后继对应的整数过滤次数等式。依赖对象的搬运必须
+   使用这条等式生成 `eqToHom`，不能依赖算术化简自动改变对象。 -/
+theorem FilteredComplex.transport_fil_nat_succ
+    (FC : FilteredComplex C) (t k : ℤ) (m : ℕ)
+    (heq : t + (m : ℤ) + 1 = t + ((m + 1 : ℕ) : ℤ)) {T : C}
+    (c : T ⟶ Subobject.underlying.obj (FC.fil (t + (m : ℤ) + 1) k)) :
+    ∃ c' : T ⟶ Subobject.underlying.obj
+        (FC.fil (t + ((m + 1 : ℕ) : ℤ)) k),
+      c' ≫ eqToHom (congrArg (fun s : ℤ =>
+        Subobject.underlying.obj (FC.fil s k)) heq).symm = c := by
+  let e := congrArg (fun s : ℤ => Subobject.underlying.obj (FC.fil s k)) heq
+  refine ⟨c ≫ eqToHom e, ?_⟩
+  dsimp [e]
+  rw [Category.assoc, eqToHom_trans, eqToHom_refl, Category.comp_id]
+
 /-! ### Associated graded -/
 
 /-- The associated graded `gr^s A^k = F^s A^k / F^{s+1} A^k`, defined as the
@@ -90,6 +153,104 @@ noncomputable def FilteredComplex.filDiff (FC : FilteredComplex C)
     (s k : ℤ) : Subobject.underlying.obj (FC.fil s k) ⟶
       Subobject.underlying.obj (FC.fil s (k - 1)) :=
   (FC.d_preserves_fil s k).choose
+
+/-- The restriction of the differential to a filtration level agrees with the
+ambient differential after the filtration inclusion. -/
+@[reassoc]
+theorem FilteredComplex.filDiff_comp_arrow (FC : FilteredComplex C)
+    (s k : ℤ) :
+    FC.filDiff s k ≫ (FC.fil s (k - 1)).arrow =
+      (FC.fil s k).arrow ≫ FC.d k :=
+  (FC.d_preserves_fil s k).choose_spec
+
+/-- 对每个 `k`，过滤关于 `s` 反单调：若 `a ≤ b`，则 `F^b ≤ F^a`。 -/
+theorem FilteredComplex.fil_anti_of_le (FC : FilteredComplex C) {a b : ℤ} (k : ℤ)
+    (hab : a ≤ b) : FC.fil b k ≤ FC.fil a k := by
+  suffices ∀ (n : ℕ), FC.fil (a + ↑n) k ≤ FC.fil a k by
+    obtain ⟨n, rfl⟩ := Int.le.dest hab
+    exact this n
+  intro n
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have key : FC.fil (a + ↑(n + 1)) k ≤ FC.fil (a + ↑n) k := by
+      have h1 : a + ↑(n + 1) = (a + ↑n) + 1 := by omega
+      rw [h1]
+      exact FC.fil_anti (a + ↑n) k
+    exact le_trans key ih
+
+/- 过滤层下包含态射在自然数后继搬运下保持不变；该引理专门供有限迭代
+   的边界修正使用。 -/
+theorem FilteredComplex.ofLE_transport_fil_nat_succ
+    (FC : FilteredComplex C) (t k : ℤ) (m : ℕ)
+    (heq : t + (m : ℤ) + 1 = t + ((m + 1 : ℕ) : ℤ))
+    {T : C} (c : T ⟶ Subobject.underlying.obj
+      (FC.fil (t + (m : ℤ) + 1) (k - 1))) :
+    c ≫ Subobject.ofLE (FC.fil (t + (m : ℤ) + 1) (k - 1))
+        (FC.fil t (k - 1)) (FC.fil_anti_of_le (k - 1) (by omega)) =
+      (c ≫ eqToHom (congrArg (fun s : ℤ =>
+        Subobject.underlying.obj (FC.fil s (k - 1))) heq)) ≫
+        Subobject.ofLE (FC.fil (t + ((m + 1 : ℕ) : ℤ)) (k - 1))
+          (FC.fil t (k - 1)) (FC.fil_anti_of_le (k - 1) (by omega)) := by
+  apply (cancel_mono (FC.fil t (k - 1)).arrow).mp
+  simp only [Category.assoc, Subobject.ofLE_arrow]
+  congr 1
+  exact (Subobject.arrow_congr _ _
+    (congrArg (fun s : ℤ => FC.fil s (k - 1)) heq)).symm
+
+/-- A filtered lift whose differential lands in `F^{s+r}` satisfies the
+kernel condition defining the `r`-cycle subobject. -/
+theorem FilteredComplex.filDiff_to_cokernel_eq_zero (FC : FilteredComplex C)
+    (s k r : ℤ) (hr : 0 ≤ r) {T : C}
+    {xl : T ⟶ Subobject.underlying.obj (FC.fil s k)}
+    {yl : T ⟶ Subobject.underlying.obj (FC.fil (s + r) (k - 1))}
+    (hd : xl ≫ FC.filDiff s k =
+      yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+        (FC.fil_anti_of_le (k - 1) (by omega))) :
+    xl ≫ (FC.fil s k).arrow ≫ FC.d k ≫
+      cokernel.π ((FC.fil (s + r) (k - 1)).arrow) = 0 := by
+  calc
+    xl ≫ (FC.fil s k).arrow ≫ FC.d k ≫
+        cokernel.π ((FC.fil (s + r) (k - 1)).arrow)
+      = (xl ≫ FC.filDiff s k) ≫ (FC.fil s (k - 1)).arrow ≫
+          cokernel.π ((FC.fil (s + r) (k - 1)).arrow) := by
+            simpa only [Category.assoc] using
+              (congrArg (fun t => xl ≫ t ≫
+                cokernel.π ((FC.fil (s + r) (k - 1)).arrow))
+                (FC.filDiff_comp_arrow s k)).symm
+    _ = yl ≫ (FC.fil (s + r) (k - 1)).arrow ≫
+          cokernel.π ((FC.fil (s + r) (k - 1)).arrow) := by
+            rw [hd]
+            simpa only [Category.assoc] using
+              congrArg (fun t => yl ≫ t ≫
+                cokernel.π ((FC.fil (s + r) (k - 1)).arrow))
+                (Subobject.ofLE_arrow (FC.fil_anti_of_le (k - 1) (by omega)))
+    _ = 0 := by rw [cokernel.condition, comp_zero]
+
+/-- In a filtered differential equation, the target lift is a cycle. -/
+theorem FilteredComplex.targetLift_filDiff_eq_zero (FC : FilteredComplex C)
+    (s k r : ℤ) (hr : 0 ≤ r) {T : C}
+    {xl : T ⟶ Subobject.underlying.obj (FC.fil s k)}
+    {yl : T ⟶ Subobject.underlying.obj (FC.fil (s + r) (k - 1))}
+    (hd : xl ≫ FC.filDiff s k =
+      yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+        (FC.fil_anti_of_le (k - 1) (by omega))) :
+    yl ≫ FC.filDiff (s + r) (k - 1) = 0 := by
+  apply (cancel_mono (FC.fil (s + r) (k - 1 - 1)).arrow).mp
+  rw [Category.assoc, FC.filDiff_comp_arrow]
+  have hyl : yl ≫ (FC.fil (s + r) (k - 1)).arrow ≫ FC.d (k - 1) =
+      (yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+        (FC.fil_anti_of_le (k - 1) (by omega))) ≫
+        (FC.fil s (k - 1)).arrow ≫ FC.d (k - 1) := by
+      simpa only [Category.assoc] using
+        (congrArg (fun t => yl ≫ t ≫ FC.d (k - 1))
+          (Subobject.ofLE_arrow (FC.fil_anti_of_le (k - 1) (by omega)))).symm
+  rw [hyl]
+  rw [← hd]
+  have hcomp := congrArg (fun t => xl ≫ t ≫ FC.d (k - 1))
+    (FC.filDiff_comp_arrow s k)
+  simp only [Category.assoc] at hcomp ⊢
+  rw [hcomp, ← Category.assoc, FC.d_comp_d, comp_zero, zero_comp]
 
 /-- The induced differential on the associated graded:
     `gr^s A^k → gr^s A^{k-1}`.
@@ -218,27 +379,10 @@ noncomputable def FilteredComplex.homologyFiltration (FC : FilteredComplex C) :
     have hlift2 : S.liftCycles I1.arrow h_zero_1 ≫ S.homologyπ =
         Subobject.ofLE I1 I0 hle ≫ (S.liftCycles I0.arrow h_zero_0 ≫ S.homologyπ) := by
       rw [← Category.assoc, hlift]
-    conv_lhs => rw [show S.liftCycles I1.arrow _ ≫ S.homologyπ =
-      Subobject.ofLE I1 I0 hle ≫ (S.liftCycles I0.arrow _ ≫ S.homologyπ) from hlift2]
+    change imageSubobject (S.liftCycles I1.arrow h_zero_1 ≫ S.homologyπ) ≤
+      imageSubobject (S.liftCycles I0.arrow h_zero_0 ≫ S.homologyπ)
+    rw [hlift2]
     exact imageSubobject_comp_le _ _
-
-/-! ### Filtration general antitonicity -/
-
-/-- The filtration is antitone in `s` for each `k`: if `a ≤ b` then `F^b ≤ F^a`. -/
-theorem FilteredComplex.fil_anti_of_le (FC : FilteredComplex C) {a b : ℤ} (k : ℤ)
-    (hab : a ≤ b) : FC.fil b k ≤ FC.fil a k := by
-  suffices ∀ (n : ℕ), FC.fil (a + ↑n) k ≤ FC.fil a k by
-    obtain ⟨n, rfl⟩ := Int.le.dest hab
-    exact this n
-  intro n
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    have key : FC.fil (a + ↑(n + 1)) k ≤ FC.fil (a + ↑n) k := by
-      have h1 : a + ↑(n + 1) = (a + ↑n) + 1 := by omega
-      rw [h1]
-      exact FC.fil_anti (a + ↑n) k
-    exact le_trans key ih
 
 /-! ### Degree transport helper -/
 
@@ -255,8 +399,7 @@ noncomputable def FilteredComplex.dToK (FC : FilteredComplex C)
     For r = ⊤, the condition is dx = 0 (i.e., x ∈ ker d). -/
 noncomputable def FilteredComplex.cycleSubobject (FC : FilteredComplex C)
     (s k : ℤ) (r : WithTop ℕ) : Subobject (FC.assocGraded s k) :=
-  let ι := Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k)
-  let πV := cokernel.π ι
+  let πV := FC.filToAssocGraded s k
   match r with
   | ⊤ =>
     let f := (FC.fil s k).arrow ≫ FC.d k
@@ -266,15 +409,81 @@ noncomputable def FilteredComplex.cycleSubobject (FC : FilteredComplex C)
       cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow)
     imageSubobject ((kernelSubobject f).arrow ≫ πV)
 
+/-- The cycle represented by a filtered lift whose differential lands in
+`F^{s+r}`. -/
+noncomputable def FilteredComplex.sourceCycleLift (FC : FilteredComplex C)
+    (r : ℤ) (hr : 0 ≤ r) (s k : ℤ) {T : C}
+    {xl : T ⟶ Subobject.underlying.obj (FC.fil s k)}
+    {yl : T ⟶ Subobject.underlying.obj (FC.fil (s + r) (k - 1))}
+    (hd : xl ≫ FC.filDiff s k =
+      yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+        (FC.fil_anti_of_le (k - 1) (by omega))) :
+    T ⟶ Subobject.underlying.obj (FC.cycleSubobject s k (↑r.toNat : WithTop ℕ)) := by
+  let f := (FC.fil s k).arrow ≫ FC.d k ≫
+    cokernel.π ((FC.fil (s + ↑r.toNat) (k - 1)).arrow)
+  have hzero : xl ≫ f = 0 := by
+    have hnat : (r.toNat : ℤ) = r := by omega
+    change xl ≫ (FC.fil s k).arrow ≫ FC.d k ≫
+      cokernel.π ((FC.fil (s + ↑r.toNat) (k - 1)).arrow) = 0
+    rw [hnat]
+    exact FC.filDiff_to_cokernel_eq_zero s k r hr hd
+  exact factorThruKernelSubobject f xl hzero ≫
+    factorThruImageSubobject ((kernelSubobject f).arrow ≫ FC.filToAssocGraded s k)
+
+theorem FilteredComplex.sourceCycleLift_arrow (FC : FilteredComplex C)
+    (r : ℤ) (hr : 0 ≤ r) (s k : ℤ) {T : C}
+    {xl : T ⟶ Subobject.underlying.obj (FC.fil s k)}
+    {yl : T ⟶ Subobject.underlying.obj (FC.fil (s + r) (k - 1))}
+    (hd : xl ≫ FC.filDiff s k =
+      yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+        (FC.fil_anti_of_le (k - 1) (by omega))) :
+    FC.sourceCycleLift r hr s k hd ≫
+      (FC.cycleSubobject s k (↑r.toNat : WithTop ℕ)).arrow =
+      xl ≫ FC.filToAssocGraded s k := by
+  let f := (FC.fil s k).arrow ≫ FC.d k ≫
+    cokernel.π ((FC.fil (s + ↑r.toNat) (k - 1)).arrow)
+  unfold FilteredComplex.sourceCycleLift
+  change (factorThruKernelSubobject f xl _ ≫
+    factorThruImageSubobject ((kernelSubobject f).arrow ≫ FC.filToAssocGraded s k)) ≫
+    (imageSubobject ((kernelSubobject f).arrow ≫ FC.filToAssocGraded s k)).arrow = _
+  rw [Category.assoc, imageSubobject_arrow_comp, ← Category.assoc,
+    factorThruKernelSubobject_comp_arrow]
+
+/-- The target of a filtered differential is a cycle on the target page. -/
+noncomputable def FilteredComplex.targetCycleLift (FC : FilteredComplex C)
+    (r : ℤ) (hr : 0 ≤ r) (s k : ℤ) {T : C}
+    {xl : T ⟶ Subobject.underlying.obj (FC.fil s k)}
+    {yl : T ⟶ Subobject.underlying.obj (FC.fil (s + r) (k - 1))}
+    (hd : xl ≫ FC.filDiff s k =
+      yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+        (FC.fil_anti_of_le (k - 1) (by omega))) :
+    T ⟶ Subobject.underlying.obj
+      (FC.cycleSubobject (s + r) (k - 1) (↑r.toNat : WithTop ℕ)) := by
+  apply FC.sourceCycleLift r hr (s + r) (k - 1) (xl := yl) (yl := 0)
+  simpa using FC.targetLift_filDiff_eq_zero s k r hr hd
+
+theorem FilteredComplex.targetCycleLift_arrow (FC : FilteredComplex C)
+    (r : ℤ) (hr : 0 ≤ r) (s k : ℤ) {T : C}
+    {xl : T ⟶ Subobject.underlying.obj (FC.fil s k)}
+    {yl : T ⟶ Subobject.underlying.obj (FC.fil (s + r) (k - 1))}
+    (hd : xl ≫ FC.filDiff s k =
+      yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+        (FC.fil_anti_of_le (k - 1) (by omega))) :
+    FC.targetCycleLift r hr s k hd ≫
+      (FC.cycleSubobject (s + r) (k - 1) (↑r.toNat : WithTop ℕ)).arrow =
+      yl ≫ FC.filToAssocGraded (s + r) (k - 1) := by
+  unfold FilteredComplex.targetCycleLift
+  simpa using FC.sourceCycleLift_arrow r hr (s + r) (k - 1)
+    (xl := yl) (yl := 0)
+    (by simpa using FC.targetLift_filDiff_eq_zero s k r hr hd)
+
 /-- The r-boundary subobject B_r of V = gr^s A^k.
     B_r = image in V of { dz | z ∈ F^{s-r} A^{k+1}, dz ∈ F^s A^k }.
     For r = ⊤, the source is all of A^{k+1}. For r = n, it is F^{s-n} A^{k+1}.
     We intersect the image of d with F^s, then project to V. -/
 noncomputable def FilteredComplex.boundarySubobject (FC : FilteredComplex C)
     (s k : ℤ) (r : WithTop ℕ) : Subobject (FC.assocGraded s k) :=
-  let ι := Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
-              (FC.fil_anti s k)
-  let πV := cokernel.π ι
+  let πV := FC.filToAssocGraded s k
   match r with
   | ⊤ =>
     let imgD := imageSubobject (FC.dToK k)
@@ -286,6 +495,49 @@ noncomputable def FilteredComplex.boundarySubobject (FC : FilteredComplex C)
     let I := imgD ⊓ FC.fil s k
     imageSubobject (Subobject.ofLE I (FC.fil s k) inf_le_right ≫ πV)
 
+/-- 页边缘中的广义元素可由更高源过滤层的复形元素实现。
+目标复形元素 `b` 同时记录其微分确实落在目标过滤层。 -/
+theorem FilteredComplex.lift_boundary (FC : FilteredComplex C)
+    (s k : ℤ) (n : ℕ) {T : C} [Projective T]
+    {v : T ⟶ FC.assocGraded s k}
+    (hv : Subobject.Factors (FC.boundarySubobject s k (↑n)) v) :
+    ∃ (a : T ⟶ Subobject.underlying.obj (FC.fil (s - ↑n + 1) (k + 1)))
+      (b : T ⟶ Subobject.underlying.obj (FC.fil s k)),
+      a ≫ (FC.fil (s - ↑n + 1) (k + 1)).arrow ≫ FC.dToK k =
+        b ≫ (FC.fil s k).arrow ∧
+      b ≫ FC.filToAssocGraded s k = v := by
+  let h := (FC.fil (s - ↑n + 1) (k + 1)).arrow ≫ FC.dToK k
+  let J := imageSubobject h
+  let I := J ⊓ FC.fil s k
+  let i := Subobject.ofLE I (FC.fil s k) inf_le_right
+  let j := Subobject.ofLE I J inf_le_left
+  let g := i ≫ FC.filToAssocGraded s k
+  have hfac : Subobject.Factors (imageSubobject g) v := by
+    simpa [FilteredComplex.boundarySubobject, h, J, I, i, g] using hv
+  let vB := Subobject.factorThru (imageSubobject g) v hfac
+  let bI := Projective.factorThru vB (factorThruImageSubobject g)
+  let bJ := bI ≫ j
+  let a := Projective.factorThru bJ (factorThruImageSubobject h)
+  let b := bI ≫ i
+  refine ⟨a, b, ?_, ?_⟩
+  · calc
+      a ≫ (FC.fil (s - ↑n + 1) (k + 1)).arrow ≫ FC.dToK k =
+          a ≫ h := by rfl
+      _ = (a ≫ factorThruImageSubobject h) ≫ J.arrow := by
+        rw [Category.assoc, imageSubobject_arrow_comp]
+      _ = bJ ≫ J.arrow := by rw [Projective.factorThru_comp]
+      _ = bI ≫ I.arrow := by
+        simp only [bJ, j, Category.assoc, Subobject.ofLE_arrow]
+      _ = b ≫ (FC.fil s k).arrow := by
+        simp only [b, i, Category.assoc, Subobject.ofLE_arrow]
+  · calc
+      b ≫ FC.filToAssocGraded s k = bI ≫ g := by
+        simp only [b, g, Category.assoc]
+      _ = (bI ≫ factorThruImageSubobject g) ≫ (imageSubobject g).arrow := by
+        rw [Category.assoc, imageSubobject_arrow_comp]
+      _ = vB ≫ (imageSubobject g).arrow := by
+        rw [Projective.factorThru_comp]
+      _ = v := Subobject.factorThru_arrow _ _ _
 /-! ### SSData from a filtered complex -/
 
 /-- `dToK k ≫ d k = 0`: the transported differential squares to zero. -/
@@ -300,7 +552,6 @@ theorem FilteredComplex.dToK_comp_d (FC : FilteredComplex C) (k : ℤ) :
     from by simp [heq]]
   rw [← Category.assoc, FC.d_comp_d, zero_comp]
 
-set_option maxHeartbeats 800000 in
 -- Large case split on WithTop ℕ with deep subobject reasoning
 /-- B r ≤ Z r for the filtered complex: boundaries are cycles. -/
 theorem FilteredComplex.B_le_Z_aux (FC : FilteredComplex C) (s k : ℤ)
@@ -378,7 +629,6 @@ theorem FilteredComplex.B_le_Z_aux (FC : FilteredComplex C) (s k : ℤ)
       _ ≤ imageSubobject ((kernelSubobject f).arrow ≫ πV) :=
           imageSubobject_comp_le _ _
 
-set_option maxHeartbeats 800000 in
 -- Complex SSData construction with multiple WithTop ℕ case analyses
 /-- Constructs `SSData C` from a filtered complex at bidegree `(s, k)`.
     - `V` is the associated graded `gr^s A^k = F^s / F^{s+1}`.
@@ -523,11 +773,17 @@ noncomputable def FilteredComplex.toSSData (FC : FilteredComplex C)
     -- Step 3: imageSubobject (iso ≫ epi) = imageSubobject epi
     rw [imageSubobject_iso_comp]
     -- Step 4: imageSubobject of epi (cokernel.π) is ⊤
-    haveI : Epi (image.ι (cokernel.π (Subobject.ofLE (FC.fil (s + 1) k)
-        (FC.fil s k) (FC.fil_anti s k)))) := epi_image_of_epi _
-    haveI : IsIso (image.ι (cokernel.π (Subobject.ofLE (FC.fil (s + 1) k)
-        (FC.fil s k) (FC.fil_anti s k)))) := isIso_of_mono_of_epi _
-    exact Subobject.mk_eq_top_of_isIso _
+    let π := cokernel.π (Subobject.ofLE (FC.fil (s + 1) k)
+      (FC.fil s k) (FC.fil_anti s k))
+    haveI : Epi (image.ι π) := epi_image_of_epi _
+    haveI : IsIso (image.ι π) := isIso_of_mono_of_epi _
+    haveI : IsIso (imageSubobject π).arrow := by
+      have h : IsIso ((imageSubobjectIso π).hom ≫ image.ι π) := inferInstance
+      rw [imageSubobject_arrow] at h
+      exact h
+    apply (Subobject.isIso_arrow_iff_eq_top _).mp
+    change IsIso (imageSubobject π).arrow
+    infer_instance
   B_le_Z := fun r => FC.B_le_Z_aux s k r
   Z_top_greatest := fun X hX => by
     -- Pick N large enough that FC.fil (s + ↑N) (k - 1) = ⊥ (Hausdorff)
@@ -673,7 +929,92 @@ private theorem FilteredComplex.eqToHom_arrow_dToK (FC : FilteredComplex C)
   rw [FC.eqToHom_arrow_dToK_gen s (k - 1) k (by omega)]
   simp
 
-set_option maxHeartbeats 800000 in
+/-- 目标次数为 `k-1` 的页边缘，可由 `F^{s+1} A^k` 中的元素实现。
+此版本已把 `dToK` 的次数搬运转换为原复形微分 `d k`。 -/
+theorem FilteredComplex.lift_boundary_at_differential (FC : FilteredComplex C)
+    (s k : ℤ) (n : ℕ) {T : C} [Projective T]
+    {v : T ⟶ FC.assocGraded (s + ↑n) (k - 1)}
+    (hv : Subobject.Factors (FC.boundarySubobject (s + ↑n) (k - 1) (↑n)) v) :
+    ∃ (a : T ⟶ Subobject.underlying.obj (FC.fil (s + 1) k))
+      (b : T ⟶ Subobject.underlying.obj (FC.fil (s + ↑n) (k - 1))),
+      a ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k =
+        b ≫ (FC.fil (s + ↑n) (k - 1)).arrow ∧
+      b ≫ FC.filToAssocGraded (s + ↑n) (k - 1) = v := by
+  have htmp := FC.lift_boundary (s + ↑n) (k - 1) n hv
+  rw [show s + ↑n - ↑n + 1 = s + 1 by omega] at htmp
+  obtain ⟨a₀, b₀, hdb₀, hbb₀⟩ := htmp
+  let e : Subobject.underlying.obj (FC.fil (s + 1) k) =
+      Subobject.underlying.obj (FC.fil (s + 1) (k - 1 + 1)) := by
+    rw [show k - 1 + 1 = k by omega]
+  let a₁ := a₀ ≫ eqToHom e.symm
+  have he : eqToHom e ≫
+      ((FC.fil (s + 1) (k - 1 + 1)).arrow ≫ FC.dToK (k - 1)) =
+      (FC.fil (s + 1) k).arrow ≫ FC.d k :=
+    FC.eqToHom_arrow_dToK (s + 1) k
+  have hc : (a₀ ≫ eqToHom e.symm) ≫ eqToHom e = a₀ := by
+    rw [Category.assoc, eqToHom_trans, eqToHom_refl, Category.comp_id]
+  refine ⟨a₁, b₀, ?_, hbb₀⟩
+  calc
+    a₁ ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k =
+        a₁ ≫ (eqToHom e ≫
+          ((FC.fil (s + 1) (k - 1 + 1)).arrow ≫ FC.dToK (k - 1))) := by
+          rw [he]
+    _ = a₀ ≫ (FC.fil (s + 1) (k - 1 + 1)).arrow ≫ FC.dToK (k - 1) := by
+      simp only [a₁, ← Category.assoc]
+      rw [hc]
+    _ = b₀ ≫ (FC.fil (s + ↑n) (k - 1)).arrow := hdb₀
+
+/-- 第零页的边缘没有非零广义元素：`d` 保持过滤，因此来自
+`F^{s+1}` 的微分在 `gr^s` 中为零。 -/
+theorem FilteredComplex.boundary_zero_apply (FC : FilteredComplex C)
+    (s k : ℤ) {T : C} [Projective T]
+    {v : T ⟶ FC.assocGraded s (k - 1)}
+    (hv : Subobject.Factors (FC.boundarySubobject s (k - 1) 0) v) :
+    v = 0 := by
+  have htmp := FC.lift_boundary s (k - 1) 0 hv
+  rw [show s - (↑(0 : ℕ) : ℤ) + 1 = s + 1 by omega] at htmp
+  obtain ⟨a₀, b, hdb₀, hbb⟩ := htmp
+  let e : Subobject.underlying.obj (FC.fil (s + 1) k) =
+      Subobject.underlying.obj (FC.fil (s + 1) (k - 1 + 1)) := by
+    rw [show k - 1 + 1 = k by omega]
+  let a := a₀ ≫ eqToHom e.symm
+  have he : eqToHom e ≫
+      ((FC.fil (s + 1) (k - 1 + 1)).arrow ≫ FC.dToK (k - 1)) =
+      (FC.fil (s + 1) k).arrow ≫ FC.d k :=
+    FC.eqToHom_arrow_dToK (s + 1) k
+  have hc : (a₀ ≫ eqToHom e.symm) ≫ eqToHom e = a₀ := by
+    rw [Category.assoc, eqToHom_trans, eqToHom_refl, Category.comp_id]
+  have hdb : a ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k =
+      b ≫ (FC.fil s (k - 1)).arrow := by
+    calc
+      a ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k =
+          a ≫ (eqToHom e ≫
+            ((FC.fil (s + 1) (k - 1 + 1)).arrow ≫ FC.dToK (k - 1))) := by
+            rw [he]
+      _ = a₀ ≫ (FC.fil (s + 1) (k - 1 + 1)).arrow ≫ FC.dToK (k - 1) := by
+        simp only [a, ← Category.assoc]
+        rw [hc]
+      _ = b ≫ (FC.fil s (k - 1)).arrow := hdb₀
+  let j := Subobject.ofLE (FC.fil (s + 1) (k - 1))
+    (FC.fil s (k - 1)) (FC.fil_anti s (k - 1))
+  let c := a ≫ FC.filDiff (s + 1) k
+  have hbc : b = c ≫ j := by
+    apply (cancel_mono (FC.fil s (k - 1)).arrow).mp
+    calc
+      b ≫ (FC.fil s (k - 1)).arrow =
+          a ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k := hdb.symm
+      _ = c ≫ (FC.fil (s + 1) (k - 1)).arrow := by
+        simp only [c, Category.assoc, FC.filDiff_comp_arrow]
+      _ = (c ≫ j) ≫ (FC.fil s (k - 1)).arrow := by
+        simp only [Category.assoc, j, Subobject.ofLE_arrow]
+  calc
+    v = b ≫ FC.filToAssocGraded s (k - 1) := hbb.symm
+    _ = c ≫ j ≫ FC.filToAssocGraded s (k - 1) := by
+      simp only [hbc, Category.assoc]
+    _ = 0 := by
+      simp only [FilteredComplex.filToAssocGraded, j,
+        Category.assoc, cokernel.condition, comp_zero]
+
 -- Large proof with many kernel/cokernel factoring steps for the induced page differential
 /-- The induced differential on pages: `d_r : E_r^{s,k} → E_r^{s+r,k-1}`.
     This maps Z_r-cycles modulo B_r-boundaries at (s,k) to the same at (s+r,k-1),
@@ -689,17 +1030,17 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
     (FC.toSSData bnd s k).page ↑n ⟶ (FC.toSSData bnd (s + ↑n) (k - 1)).page ↑n := by
   -- === Source side abbreviations ===
   set ι_s := Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k) with hι_s_def
-  set πV := cokernel.π ι_s with hπV_def
-  set f_n := (FC.fil s k).arrow ≫ FC.d k ≫
-    cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow) with hf_n_def
-  set kerZ := kernelSubobject f_n with hkerZ_def
+  let πV := FC.filToAssocGraded s k
+  let f_n := (FC.fil s k).arrow ≫ FC.d k ≫
+    cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow)
+  let kerZ := kernelSubobject f_n
   -- === Target side abbreviations ===
   set ι_t := Subobject.ofLE (FC.fil (s + ↑n + 1) (k - 1)) (FC.fil (s + ↑n) (k - 1))
     (FC.fil_anti (s + ↑n) (k - 1)) with hι_t_def
-  set πV' := cokernel.π ι_t with hπV'_def
-  set f_n' := (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) ≫
-    cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow) with hf_n'_def
-  set kerZ' := kernelSubobject f_n' with hkerZ'_def
+  let πV' := FC.filToAssocGraded (s + ↑n) (k - 1)
+  let f_n' := (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) ≫
+    cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow)
+  let kerZ' := kernelSubobject f_n'
   -- Page types
   -- Source page = cokernel(ofLE(B_n_s, Z_n_s, _)) where Z_n_s = imageSubobject(kerZ.arrow ≫ πV)
   -- Target page = cokernel(ofLE(B_n_t, Z_n_t, _)) where Z_n_t = imageSubobject(kerZ'.arrow ≫ πV')
@@ -936,8 +1277,12 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
     have h_factor_B : kernel.ι p ≫ to_Z_n_t =
         γ ≫ Subobject.ofLE B_n_t Z_n_t hB_le_Z := by
       apply (inferInstance : Mono Z_n_t.arrow).right_cancellation
-      simp only [Category.assoc]
-      rw [Subobject.ofLE_arrow, hγ_spec]
+      calc
+        (kernel.ι p ≫ to_Z_n_t) ≫ Z_n_t.arrow =
+            kernel.ι p ≫ to_Z_n_t ≫ Z_n_t.arrow := Category.assoc _ _ _
+        _ = γ ≫ B_n_t.arrow := hγ_spec.symm
+        _ = (γ ≫ Subobject.ofLE B_n_t Z_n_t hB_le_Z) ≫ Z_n_t.arrow := by
+          rw [Category.assoc, Subobject.ofLE_arrow]
     -- cokernel condition: ofLE(B, Z) ≫ pageπ' = 0
     have h_cok : Subobject.ofLE B_n_t Z_n_t hB_le_Z ≫ pageπ' = 0 := by
       rw [hpageπ'_def]
@@ -950,7 +1295,8 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
     rw [hψ_def]
     calc kernel.ι p ≫ to_Z_n_t ≫ pageπ'
         = (kernel.ι p ≫ to_Z_n_t) ≫ pageπ' := (Category.assoc _ _ _).symm
-      _ = (γ ≫ Subobject.ofLE B_n_t Z_n_t hB_le_Z) ≫ pageπ' := by rw [h_factor_B]
+      _ = (γ ≫ Subobject.ofLE B_n_t Z_n_t hB_le_Z) ≫ pageπ' := by
+        rw [← h_factor_B]
       _ = γ ≫ (Subobject.ofLE B_n_t Z_n_t hB_le_Z ≫ pageπ') := Category.assoc _ _ _
       _ = γ ≫ 0 := by rw [h_cok]
       _ = 0 := comp_zero
@@ -967,10 +1313,13 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
       (FC.B_le_Z_aux s k ↑n) ≫ h_on_Zn = 0 := by
     -- Strategy: cancel the epi from the boundary's preimage, then show ψ kills it via d²=0.
     -- === Source boundary setup ===
-    set imgD_s := imageSubobject ((FC.fil (s - ↑n + 1) (k + 1)).arrow ≫ FC.dToK k)
-      with himgD_s_def
-    set I_s := imgD_s ⊓ FC.fil s k with hI_s_def
-    set oI_s := Subobject.ofLE I_s (FC.fil s k) inf_le_right with hoI_s_def
+    let imgD_s := imageSubobject ((FC.fil (s - ↑n + 1) (k + 1)).arrow ≫ FC.dToK k)
+    let I_s := imgD_s ⊓ FC.fil s k
+    let oI_s := Subobject.ofLE I_s (FC.fil s k) inf_le_right
+    have h_B_eq : FC.boundarySubobject s k ↑n = imageSubobject (oI_s ≫ πV) := by
+      simp [FilteredComplex.boundarySubobject, imgD_s, I_s, oI_s, πV]
+    have h_Z_eq : FC.cycleSubobject s k ↑n = imageSubobject (kerZ.arrow ≫ πV) := by
+      simp [FilteredComplex.cycleSubobject, kerZ, f_n, πV]
     -- B_n_s = imageSubobject(oI_s ≫ πV) (definitionally)
     -- Z_n_s = imageSubobject(kerZ.arrow ≫ πV) (definitionally)
     -- === Step 1: oI_s ≫ f_n = 0 (boundary elements satisfy the cycle condition) ===
@@ -1004,18 +1353,26 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
         (imageSubobject (kerZ.arrow ≫ πV)).arrow = kerZ.arrow ≫ πV
       exact imageSubobject_arrow_comp (kerZ.arrow ≫ πV)
     -- === Step 4: Cancel epi to reduce to σ_s ≫ ψ = 0 ===
-    -- factorThruImageSubobject(oI_s ≫ πV) is epi
-    set q := factorThruImageSubobject (oI_s ≫ πV) with hq_def
+    -- Transport the image epi to the actual boundary subobject.  The two
+    -- subobjects are equal by `h_B_eq`, but their chosen representatives
+    -- need not be definitionally equal.
+    set q := factorThruImageSubobject (oI_s ≫ πV) ≫
+      eqToHom (congrArg (fun X : Subobject (FC.assocGraded s k) =>
+        Subobject.underlying.obj X) h_B_eq.symm) with hq_def
     haveI : Epi q := inferInstance
+    have hq_arrow : q ≫ (FC.boundarySubobject s k ↑n).arrow = oI_s ≫ πV := by
+      rw [hq_def, Category.assoc,
+        Subobject.arrow_congr (imageSubobject (oI_s ≫ πV))
+          (FC.boundarySubobject s k ↑n) h_B_eq.symm]
+      exact imageSubobject_arrow_comp (oI_s ≫ πV)
     -- q ≫ ofLE(B_n, Z_n) ≫ Z_n.arrow = oI_s ≫ πV = σ_s ≫ kerZ.arrow ≫ πV = σ_s ≫ p ≫ Z_n.arrow
     have hq_ofLE_spec : q ≫ Subobject.ofLE (FC.boundarySubobject s k ↑n)
         (FC.cycleSubobject s k ↑n) (FC.B_le_Z_aux s k ↑n) ≫
         (FC.cycleSubobject s k ↑n).arrow = oI_s ≫ πV := by
       -- q ≫ ofLE ≫ Z_n.arrow = q ≫ B_n.arrow (by ofLE_arrow)
       -- = oI_s ≫ πV (by imageSubobject_arrow_comp)
-      simp only [Subobject.ofLE_arrow]
-      show q ≫ (FC.boundarySubobject s k ↑n).arrow = oI_s ≫ πV
-      exact imageSubobject_arrow_comp (oI_s ≫ πV)
+      rw [Category.assoc, Subobject.ofLE_arrow]
+      simpa only [hq_def, Category.assoc] using hq_arrow
     -- σ_s ≫ p ≫ Z_n.arrow = oI_s ≫ πV (same as q ≫ ofLE ≫ Z_n.arrow)
     have hσ_p_spec : σ_s ≫ p ≫ (FC.cycleSubobject s k ↑n).arrow = oI_s ≫ πV := by
       simp only [hp_spec]
@@ -1028,9 +1385,8 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
       -- Goal: (q ≫ ofLE) ≫ Z_n.arrow = (σ_s ≫ p) ≫ Z_n.arrow
       simp only [Category.assoc, Subobject.ofLE_arrow]
       -- Now both sides should reduce to oI_s ≫ πV
-      rw [hσ_p_spec]
-      show q ≫ (FC.boundarySubobject s k ↑n).arrow = oI_s ≫ πV
-      exact imageSubobject_arrow_comp (oI_s ≫ πV)
+      rw [Category.assoc, hσ_p_spec]
+      simpa only [hq_def, Category.assoc] using hq_arrow
     -- === Step 5: σ_s ≫ lift_n = 0 (key: d² = 0) ===
     have hσ_lift_zero : σ_s ≫ lift_n = 0 := by
       apply (inferInstance : Mono (FC.fil (s + ↑n) (k - 1)).arrow).right_cancellation
@@ -1089,7 +1445,74 @@ noncomputable def FilteredComplex.pageDifferential (FC : FilteredComplex C)
   -- Final: cokernel.desc gives source page → target page
   exact cokernel.desc _ h_on_Zn h_B_zero
 
-set_option maxHeartbeats 800000 in
+/-- 页微分在一个核代表元上的计算式：若过滤层中的微分由 `v` 表示，
+则源页代表元的微分等于 `v` 的目标页类。 -/
+private theorem FilteredComplex.pageDifferential_on_kernel (FC : FilteredComplex C)
+    (bnd : FC.IsBounded) (s k : ℤ) (n : ℕ) :
+    let f := (FC.fil s k).arrow ≫ FC.d k ≫
+      cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow)
+    let g := (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) ≫
+      cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow)
+    let K := kernelSubobject f
+    let K' := kernelSubobject g
+    ∀ {T : C} (u : T ⟶ Subobject.underlying.obj K)
+      (v : T ⟶ Subobject.underlying.obj (FC.fil (s + ↑n) (k - 1)))
+      (hv : u ≫ K.arrow ≫ (FC.fil s k).arrow ≫ FC.d k =
+        v ≫ (FC.fil (s + ↑n) (k - 1)).arrow)
+      (hvg : v ≫ g = 0),
+      (u ≫ factorThruImageSubobject (K.arrow ≫ FC.filToAssocGraded s k)) ≫
+          (FC.toSSData bnd s k).pageπ (↑n) ≫ FC.pageDifferential bnd s k n =
+        (factorThruKernelSubobject g v hvg ≫
+          factorThruImageSubobject (K'.arrow ≫
+            FC.filToAssocGraded (s + ↑n) (k - 1))) ≫
+          (FC.toSSData bnd (s + ↑n) (k - 1)).pageπ (↑n) := by
+  dsimp only
+  intro T u v hv hvg
+  unfold FilteredComplex.pageDifferential
+  simp only [SSData.pageπ, SSData.page, Category.assoc,
+    cokernel.π_desc, Abelian.comp_epiDesc]
+  let f := (FC.fil s k).arrow ≫ FC.d k ≫
+    cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow)
+  let g := (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) ≫
+    cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow)
+  let K := kernelSubobject f
+  let K' := kernelSubobject g
+  have hfactor : (K.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) ≫
+      cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow) = 0 := by
+    simpa only [Category.assoc] using kernelSubobject_arrow_comp f
+  let lift_n := Abelian.monoLift (FC.fil (s + ↑n) (k - 1)).arrow
+    (K.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) hfactor
+  have hcycle : lift_n ≫ g = 0 := by
+    calc
+      lift_n ≫ g =
+          ((lift_n ≫ (FC.fil (s + ↑n) (k - 1)).arrow) ≫ FC.d (k - 1)) ≫
+            cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow) := by
+              simp only [g, Category.assoc]
+      _ = ((K.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) ≫ FC.d (k - 1)) ≫
+            cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow) := by
+              rw [Abelian.monoLift_comp]
+      _ = 0 := by
+        simp only [Category.assoc, FC.d_comp_d, comp_zero, zero_comp]
+  have hlift : u ≫ lift_n = v := by
+    apply (cancel_mono (FC.fil (s + ↑n) (k - 1)).arrow).mp
+    rw [Category.assoc, Abelian.monoLift_comp]
+    exact hv
+  have hker : u ≫ factorThruKernelSubobject g lift_n hcycle =
+      factorThruKernelSubobject g v hvg := by
+    apply (cancel_mono K'.arrow).mp
+    calc
+      (u ≫ factorThruKernelSubobject g lift_n hcycle) ≫ K'.arrow =
+          u ≫ lift_n := by
+            rw [Category.assoc, factorThruKernelSubobject_comp_arrow]
+      _ = v := hlift
+      _ = factorThruKernelSubobject g v hvg ≫ K'.arrow := by
+        rw [factorThruKernelSubobject_comp_arrow]
+  simpa only [Category.assoc, SSData.pageπ, SSData.page] using
+    congrArg (fun z : T ⟶ Subobject.underlying.obj K' =>
+      z ≫ factorThruImageSubobject (K'.arrow ≫
+        FC.filToAssocGraded (s + ↑n) (k - 1)) ≫
+        (FC.toSSData bnd (s + ↑n) (k - 1)).pageπ (↑n)) hker
+
 -- Heavy unification through epi/mono factoring of kernel and image subobjects
 /-- The kernel of `Abelian.epiDesc p g hg` (where `p` is epi) is the image of
     `(kernelSubobject g).arrow ≫ p`. This is the epi analogue of
@@ -1154,7 +1577,6 @@ private theorem kernelSubobject_epiDesc' {C' : Type*} [Category C'] [Abelian C']
         imageSubobject_arrow_comp ((kernelSubobject g).arrow ≫ p),
         Category.assoc, Abelian.comp_epiDesc, kernelSubobject_arrow_comp]
 
-set_option maxHeartbeats 800000 in
 -- Heavy unification through cokernel desc and kernel subobject factoring
 private theorem kernelSubobject_cokernel_desc' {C' : Type*} [Category C'] [Abelian C']
     {A' B' D' : C'} (f : A' ⟶ B') (g : B' ⟶ D') (w : f ≫ g = 0) :
@@ -1224,7 +1646,6 @@ private theorem kernelSubobject_cokernel_desc' {C' : Type*} [Category C'] [Abeli
         imageSubobject_arrow_comp ((kernelSubobject g).arrow ≫ cokernel.π f),
         Category.assoc, cokernel.π_desc, kernelSubobject_arrow_comp]
 
-set_option maxHeartbeats 6400000 in
 -- Long proof: d² = 0 requires nested kernel/image factoring across three filtration levels
 theorem FilteredComplex.pageDifferential_comp (FC : FilteredComplex C)
     (bnd : FC.IsBounded) (s k : ℤ) (n : ℕ) :
@@ -1310,7 +1731,6 @@ theorem FilteredComplex.pageDifferential_comp (FC : FilteredComplex C)
   -- Use erw [Category.assoc] twice to fully right-associate, then d_comp_d k
   erw [Category.assoc, Category.assoc, FC.d_comp_d k, comp_zero, comp_zero]
 
-set_option maxHeartbeats 3200000 in
 -- Multi-step proof: Z_{n+1} ↪ Z_n maps to kernel of page differential via index shifting
 /-- The ≥ direction of Z_succ: image(ofLE(Z_{n+1}, Z_n) ≫ pageπ n) ≤ kernel(pageDifferential).
     Elements of Z_{n+1} (deeper cycle condition: dx ∈ F^{s+n+1}) map to zero under pageDiff
@@ -1346,7 +1766,7 @@ theorem pageDifferential_Z_succ_ge (FC : FilteredComplex C)
     cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow)
   set kerZ := kernelSubobject f_n
   set ι_s := Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k)
-  set πV := cokernel.π ι_s
+  set πV := FC.filToAssocGraded s k
   set p := factorThruImageSubobject (kerZ.arrow ≫ πV)
   haveI : Epi p := inferInstance
   set f_n1 := (FC.fil s k).arrow ≫ FC.d k ≫
@@ -1411,7 +1831,7 @@ theorem pageDifferential_Z_succ_ge (FC : FilteredComplex C)
   -- Goal: β ≫ ψ = 0 where ψ = (to_Z_n_t) ≫ pageπ'
   set ι_t := Subobject.ofLE (FC.fil (s + ↑n + 1) (k - 1)) (FC.fil (s + ↑n) (k - 1))
     (FC.fil_anti (s + ↑n) (k - 1))
-  set πV' := cokernel.π ι_t
+  set πV' := FC.filToAssocGraded (s + ↑n) (k - 1)
   -- Suffices: β ≫ to_Z_n_t = 0, then β ≫ ψ = (β ≫ to_Z_n_t) ≫ pageπ' = 0 ≫ pageπ' = 0
   suffices h : β ≫ _ = (0 : _ ⟶ Subobject.underlying.obj
     (FC.cycleSubobject (s + ↑n) (k - 1) ↑n)) by
@@ -1546,7 +1966,9 @@ theorem pageDifferential_Z_succ_ge (FC : FilteredComplex C)
     exact Subobject.ofLE_comp_ofLE (FC.fil (s + ↑(n + 1)) (k - 1))
       (FC.fil (s + ↑n + 1) (k - 1)) (FC.fil (s + ↑n) (k - 1))
       h_le_ι_source (FC.fil_anti (s + ↑n) (k - 1))
-  rw [h_factored, Category.assoc, cokernel.condition, comp_zero]
+  rw [h_factored]
+  change (_ ≫ ι_t) ≫ cokernel.π ι_t = 0
+  rw [Category.assoc, cokernel.condition, comp_zero]
 
 open CategoryTheory.Abelian in
 /-- `imageSubobject (e ≫ f) = imageSubobject f` when `e` is epi (in an abelian category). -/
@@ -1569,7 +1991,79 @@ private lemma imageSubobject_le_of_epi_factor {C' : Type*} [Category C'] [Abelia
   rw [← imageSubobject_epi_comp' e f, hfac]
   exact imageSubobject_comp_le h g
 
-set_option maxHeartbeats 6400000 in
+private theorem comp_comp_congr' {C' : Type*} [Category C']
+    {X Y Z W : C'} {f g : X ⟶ Y} (h : f = g)
+    (u : Y ⟶ Z) (v : Z ⟶ W) : f ≫ u ≫ v = g ≫ u ≫ v := by
+  rw [h]
+
+private theorem eq_of_eq_common' {α : Sort*} {x y z : α}
+    (hx : x = z) (hy : y = z) : x = y :=
+  hx.trans hy.symm
+
+private theorem kernelSubobject_cokernel_epiDesc_eq' {C' : Type*}
+    [Category C'] [Abelian C'] {W X Y Z : C'}
+    (f : W ⟶ Y) (p : X ⟶ Y) [Epi p] (g : X ⟶ Z)
+    (hg : kernel.ι p ≫ g = 0)
+    (hf : f ≫ Abelian.epiDesc p g hg = 0) :
+    kernelSubobject (cokernel.desc f (Abelian.epiDesc p g hg) hf) =
+      imageSubobject ((kernelSubobject g).arrow ≫ p ≫ cokernel.π f) := by
+  rw [kernelSubobject_cokernel_desc', kernelSubobject_epiDesc']
+  let q := (kernelSubobject g).arrow ≫ p
+  haveI : Epi (factorThruImageSubobject q) := inferInstance
+  calc
+    imageSubobject ((imageSubobject q).arrow ≫ cokernel.π f) =
+        imageSubobject (factorThruImageSubobject q ≫
+          ((imageSubobject q).arrow ≫ cokernel.π f)) :=
+            (imageSubobject_epi_comp' (factorThruImageSubobject q)
+              ((imageSubobject q).arrow ≫ cokernel.π f)).symm
+    _ = imageSubobject (q ≫ cokernel.π f) := by
+          rw [← Category.assoc, imageSubobject_arrow_comp]
+    _ = imageSubobject ((kernelSubobject g).arrow ≫ p ≫ cokernel.π f) := by
+          simp only [q, Category.assoc]
+
+private theorem factors_of_cokernel_π_eq_zero {C' : Type*}
+    [Category C'] [Abelian C'] {V T : C'}
+    (B Z : Subobject V) (hBZ : B ≤ Z)
+    (x : T ⟶ Subobject.underlying.obj Z)
+    (hx : x ≫ cokernel.π (Subobject.ofLE B Z hBZ) = 0) :
+    B.Factors (x ≫ Z.arrow) := by
+  let ι := Subobject.ofLE B Z hBZ
+  let lift := Abelian.monoLift ι x hx
+  have hlift : lift ≫ ι = x := Abelian.monoLift_comp _ _ _
+  have hfactor : lift ≫ B.arrow = x ≫ Z.arrow := by
+    calc
+      lift ≫ B.arrow = lift ≫ (ι ≫ Z.arrow) := by
+        rw [Subobject.ofLE_arrow]
+      _ = (lift ≫ ι) ≫ Z.arrow := (Category.assoc _ _ _).symm
+      _ = x ≫ Z.arrow := by rw [hlift]
+  rw [← hfactor]
+  exact Subobject.factors_comp_arrow lift
+
+private theorem correction_kills_cokernel' {C' : Type*}
+    [Category C'] [Abelian C'] {P K X F A D Fn Fn1 Q : C'}
+    (e : P ⟶ K) (κ : K ⟶ X) (j : X ⟶ F)
+    (a : F ⟶ A) (d : A ⟶ D) (c : D ⟶ Q)
+    (lift : X ⟶ Fn) (i : Fn ⟶ D)
+    (b : P ⟶ Fn) (γ : P ⟶ Fn1) (ι : Fn1 ⟶ Fn) (σ : P ⟶ F)
+    (hlift : j ≫ a ≫ d = lift ≫ i)
+    (hdecomp : e ≫ κ ≫ lift = b + γ ≫ ι)
+    (hkill : ι ≫ i ≫ c = 0)
+    (hσ : σ ≫ a ≫ d ≫ c = b ≫ i ≫ c) :
+    (e ≫ κ ≫ j - σ) ≫ (a ≫ d ≫ c) = 0 := by
+  rw [Preadditive.sub_comp, sub_eq_zero]
+  suffices hleft : (e ≫ κ ≫ j) ≫ (a ≫ d ≫ c) = b ≫ i ≫ c by
+    exact hleft.trans hσ.symm
+  calc
+    (e ≫ κ ≫ j) ≫ (a ≫ d ≫ c) = (e ≫ κ ≫ (j ≫ a ≫ d)) ≫ c := by
+      simp only [Category.assoc]
+    _ = (e ≫ κ ≫ (lift ≫ i)) ≫ c := by rw [hlift]
+    _ = (e ≫ κ ≫ lift) ≫ i ≫ c := by simp only [Category.assoc]
+    _ = (b + γ ≫ ι) ≫ i ≫ c := by rw [hdecomp]
+    _ = b ≫ i ≫ c + γ ≫ ι ≫ i ≫ c := by
+      simp only [Preadditive.add_comp, Category.assoc]
+    _ = b ≫ i ≫ c + γ ≫ 0 := by rw [hkill]
+    _ = b ≫ i ≫ c := by simp only [comp_zero, add_zero]
+
 -- Long proof: kernel of page differential ≤ Z_{n+1} via pullback and epi lifting arguments
 /-- The ≤ direction of Z_succ: kernel(pageDifferential) ≤ image(ofLE(Z_{n+1}, Z_n) ≫ pageπ n).
     Every element in the kernel of the page differential lies in the image of the deeper
@@ -1584,26 +2078,26 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
         ((FC.toSSData bnd s k).Z_anti (by exact_mod_cast Nat.le_succ n)) ≫
       (FC.toSSData bnd s k).pageπ ↑n) := by
   -- Reconstruct the internal abbreviations of pageDifferential
-  set ι_s := Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k) with hι_s_def
-  set πV := cokernel.π ι_s with hπV_def
-  set f_n := (FC.fil s k).arrow ≫ FC.d k ≫
-    cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow) with hf_n_def
-  set kerZ := kernelSubobject f_n with hkerZ_def
-  set ι_t := Subobject.ofLE (FC.fil (s + ↑n + 1) (k - 1)) (FC.fil (s + ↑n) (k - 1))
-    (FC.fil_anti (s + ↑n) (k - 1)) with hι_t_def
-  set πV' := cokernel.π ι_t with hπV'_def
+  let ι_s := Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k)
+  let πV := FC.filToAssocGraded s k
+  let f_n := (FC.fil s k).arrow ≫ FC.d k ≫
+    cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow)
+  let kerZ := kernelSubobject f_n
+  let ι_t := Subobject.ofLE (FC.fil (s + ↑n + 1) (k - 1)) (FC.fil (s + ↑n) (k - 1))
+    (FC.fil_anti (s + ↑n) (k - 1))
+  let πV' := FC.filToAssocGraded (s + ↑n) (k - 1)
   set f_n' := (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) ≫
     cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow) with hf_n'_def
-  set kerZ' := kernelSubobject f_n' with hkerZ'_def
-  set p := factorThruImageSubobject (kerZ.arrow ≫ πV) with hp_def
+  let kerZ' := kernelSubobject f_n'
+  let p := factorThruImageSubobject (kerZ.arrow ≫ πV)
   haveI hp_epi : Epi p := inferInstance
   -- Reconstruct lift_n, lift_to_kerZ', to_Z_n_t, ψ
   have h_ker_fn : kerZ.arrow ≫ f_n = 0 := kernelSubobject_arrow_comp f_n
   have h_factor_zero : (kerZ.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) ≫
       cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow) = 0 := by
     simp only [Category.assoc] at h_ker_fn ⊢; exact h_ker_fn
-  set lift_n := Abelian.monoLift (FC.fil (s + ↑n) (k - 1)).arrow
-    (kerZ.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) h_factor_zero with hlift_n_def
+  let lift_n := Abelian.monoLift (FC.fil (s + ↑n) (k - 1)).arrow
+    (kerZ.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) h_factor_zero
   have h_lift_spec : lift_n ≫ (FC.fil (s + ↑n) (k - 1)).arrow =
       kerZ.arrow ≫ (FC.fil s k).arrow ≫ FC.d k := Abelian.monoLift_comp _ _ _
   have h_lift_in_kerZ' : lift_n ≫ f_n' = 0 := by
@@ -1617,70 +2111,26 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
           rw [show (kerZ.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) ≫ FC.d (k - 1) =
             kerZ.arrow ≫ (FC.fil s k).arrow ≫ (FC.d k ≫ FC.d (k - 1)) from by
             simp only [Category.assoc], FC.d_comp_d k]; simp only [comp_zero, zero_comp]
-  set lift_to_kerZ' := factorThruKernelSubobject f_n' lift_n h_lift_in_kerZ'
-    with hlift_to_kerZ'_def
+  let lift_to_kerZ' := factorThruKernelSubobject f_n' lift_n h_lift_in_kerZ'
   have h_ltk_spec : lift_to_kerZ' ≫ kerZ'.arrow = lift_n :=
     factorThruKernelSubobject_comp_arrow f_n' lift_n h_lift_in_kerZ'
-  set to_Z_n_t := lift_to_kerZ' ≫ factorThruImageSubobject (kerZ'.arrow ≫ πV')
-    with hto_Z_n_t_def
-  set pageπ_t := (FC.toSSData bnd (s + ↑n) (k - 1)).pageπ ↑n with hpageπ_t_def
+  let to_Z_n_t := lift_to_kerZ' ≫ factorThruImageSubobject (kerZ'.arrow ≫ πV')
+  let pageπ_t := (FC.toSSData bnd (s + ↑n) (k - 1)).pageπ ↑n
   set ψ := to_Z_n_t ≫ pageπ_t with hψ_def
   -- Phase A: Establish kernelSubobject(pageDiff) = imageSubobject((ker ψ).arrow ≫ p ≫ pageπ)
   -- Use erw in a have block to contain the pollution
   have h_ker_le : kernelSubobject (FC.pageDifferential bnd s k n) ≤
       imageSubobject ((kernelSubobject ψ).arrow ≫ p ≫ (FC.toSSData bnd s k).pageπ ↑n) := by
-    erw [kernelSubobject_cokernel_desc']
-    erw [kernelSubobject_epiDesc']
-    -- Goal: imageSubobject(imageSubobject(f).arrow ≫ pageπ) ≤ imageSubobject(f ≫ pageπ)
-    -- where f = (ker ψ_internal).arrow ≫ p_internal.
-    -- These are equal by imageSubobject_epi_comp', so use le_of_eq.
-    -- First get: imageSubobject(factorThru ≫ img.arrow ≫ pageπ) = imageSubobject(img.arrow ≫ pageπ)
-    -- and factorThru ≫ img.arrow ≫ pageπ = (factorThru ≫ img.arrow) ≫ pageπ = f ≫ pageπ
-    -- Use: factorThruImageSubobject(f) is epi, and
-    -- imageSubobject_epi_comp'(factorThru, img.arrow ≫ g) gives
-    -- imageSubobject(factorThru ≫ img.arrow ≫ g) = imageSubobject(img.arrow ≫ g)
-    -- And factorThru ≫ img.arrow = f (imageSubobject_arrow_comp), so
-    -- imageSubobject(f ≫ g) = imageSubobject(img.arrow ≫ g)
-    -- After erw, the LHS has imageSubobject(img.arrow ≫ g), and the RHS has
-    -- imageSubobject(f ≫ g). They're equal, so any ≤ or ≥ holds.
-    -- Use the Subobject.le_of_comm approach to avoid rw in polluted context.
-    -- imageSubobject(img.arrow ≫ g) ≤ imageSubobject(f ≫ g) because
-    -- imageSubobject(f ≫ g) ≤ imageSubobject(img.arrow ≫ g) [from comp_le applied to factorThru]
-    -- Wait, imageSubobject(factorThru ≫ (img.arrow ≫ g)) ≤ imageSubobject(img.arrow ≫ g) [comp_le]
-    -- and imageSubobject(factorThru ≫ (img.arrow ≫ g)) = imageSubobject(img.arrow ≫ g) [epi_comp]
-    -- So both directions hold. For the direction we need:
-    -- imageSubobject(img.arrow ≫ g) ≤ imageSubobject(f ≫ g)
-    -- = imageSubobject(factorThru ≫ img.arrow ≫ g) [by imageSubobject_arrow_comp on f]
-    -- = imageSubobject(img.arrow ≫ g) [by epi_comp]
-    -- So it's le_refl. But we can't express this directly due to erw pollution.
-    -- Instead, use that mono.arrow ≫ g generates a smaller image: img.arrow is mono
-    -- so imageSubobject(img.arrow ≫ g) ≤ imageSubobject(g) [comp_le]
-    -- Hmm, that's weaker than what we need.
-    -- OK, just try: after the three erw's, does the goal close?
-    -- Approach: do all three erw's and hope it results in ≤ le_refl
-    erw [← imageSubobject_epi_comp'
-      (factorThruImageSubobject ((kernelSubobject ψ).arrow ≫ p))
-      ((imageSubobject ((kernelSubobject ψ).arrow ≫ p)).arrow ≫
-        (FC.toSSData bnd s k).pageπ ↑n)]
-    -- Goal: imageSubobject(factorThru ≫ img.arrow ≫ pageπ) ≤ imageSubobject(f ≫ pageπ)
-    -- factorThru ≫ img.arrow ≫ pageπ is parsed as factorThru ≫ (img.arrow ≫ pageπ)
-    -- We need: factorThru ≫ (img.arrow ≫ pageπ) = (factorThru ≫ img.arrow) ≫ pageπ = f ≫ pageπ
-    erw [show factorThruImageSubobject ((kernelSubobject ψ).arrow ≫ p) ≫
-      (imageSubobject ((kernelSubobject ψ).arrow ≫ p)).arrow ≫
-      (FC.toSSData bnd s k).pageπ ↑n =
-      (factorThruImageSubobject ((kernelSubobject ψ).arrow ≫ p) ≫
-      (imageSubobject ((kernelSubobject ψ).arrow ≫ p)).arrow) ≫
-      (FC.toSSData bnd s k).pageπ ↑n from (Category.assoc _ _ _).symm,
-      imageSubobject_arrow_comp ((kernelSubobject ψ).arrow ≫ p),
-      Category.assoc]
+    erw [kernelSubobject_cokernel_epiDesc_eq']
+    exact le_refl _
   -- Phase B: Show imageSubobject((ker ψ).arrow ≫ p ≫ pageπ) ≤ imageSubobject(ofLE ≫ pageπ)
   apply le_trans h_ker_le
   -- Goal: imageSubobject((ker ψ).arrow ≫ p ≫ pageπ) ≤ imageSubobject(ofLE ≫ pageπ)
 
   -- === Setup: kerZ1 (deeper cycles), β : kerZ1 → kerZ, p1, h_factor ===
-  set f_n1 := (FC.fil s k).arrow ≫ FC.d k ≫
-    cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) with hf_n1_def
-  set kerZ1 := kernelSubobject f_n1 with hkerZ1_def
+  let f_n1 := (FC.fil s k).arrow ≫ FC.d k ≫
+    cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow)
+  let kerZ1 := kernelSubobject f_n1
   have hkerZ1_le : kerZ1 ≤ kerZ := by
     apply le_kernelSubobject
     have hfil : FC.fil (s + ↑(n + 1)) (k - 1) ≤ FC.fil (s + ↑n) (k - 1) :=
@@ -1703,12 +2153,25 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
             Subobject.ofLE _ _ hfil ≫ (FC.fil (s + ↑n) (k - 1)).arrow
             from (Subobject.ofLE_arrow hfil).symm]; simp only [Category.assoc]
       _ = 0 := by simp only [Category.assoc, cokernel.condition, comp_zero]
-  set β := Subobject.ofLE kerZ1 kerZ hkerZ1_le with hβ_def
-  set p1 := factorThruImageSubobject (kerZ1.arrow ≫ πV) with hp1_def
+  let β := Subobject.ofLE kerZ1 kerZ hkerZ1_le
+  let p1 := factorThruImageSubobject (kerZ1.arrow ≫ πV)
   haveI hp1_epi : Epi p1 := inferInstance
+  have h_Zn_eq : (FC.toSSData bnd s k).Z ↑n = imageSubobject (kerZ.arrow ≫ πV) := by
+    subst kerZ
+    subst f_n
+    subst πV
+    rfl
+  have h_Zn1_eq : (FC.toSSData bnd s k).Z ↑(n + 1) =
+      imageSubobject (kerZ1.arrow ≫ πV) := by
+    subst kerZ1
+    subst f_n1
+    subst πV
+    rfl
   have h_factor : p1 ≫ Subobject.ofLE ((FC.toSSData bnd s k).Z ↑(n + 1))
       ((FC.toSSData bnd s k).Z ↑n)
       ((FC.toSSData bnd s k).Z_anti (by exact_mod_cast Nat.le_succ n)) = β ≫ p := by
+    cases h_Zn1_eq
+    cases h_Zn_eq
     apply (inferInstance : Mono ((FC.toSSData bnd s k).Z ↑n).arrow).right_cancellation
     simp only [Category.assoc, p1, p, β]
     rw [Subobject.ofLE_arrow]
@@ -1721,8 +2184,8 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
   have h_to_Z_kills : ((kernelSubobject ψ).arrow ≫ to_Z_n_t) ≫ pageπ_t = 0 := by
     simp only [Category.assoc]; rw [← hψ_def]; exact kernelSubobject_arrow_comp ψ
   -- B_n_t and Z_n_t at the target
-  set B_n_t := FC.boundarySubobject (s + ↑n) (k - 1) ↑n with hB_n_t_def
-  set Z_n_t := FC.cycleSubobject (s + ↑n) (k - 1) ↑n with hZ_n_t_def
+  let B_n_t := FC.boundarySubobject (s + ↑n) (k - 1) ↑n
+  let Z_n_t := FC.cycleSubobject (s + ↑n) (k - 1) ↑n
   have hB_le_Z := FC.B_le_Z_aux (s + ↑n) (k - 1) ↑n
   -- to_Z_n_t ≫ Z_n_t.arrow = lift_n ≫ πV'
   have h_to_Z_comp : to_Z_n_t ≫ Z_n_t.arrow = lift_n ≫ πV' := by
@@ -1738,70 +2201,23 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
   -- Factor (ker ψ).arrow ≫ lift_n ≫ πV' through B_n_t using exactness + ψ = 0
   have h_bnd_factors : B_n_t.Factors ((kernelSubobject ψ).arrow ≫ lift_n ≫ πV') := by
     rw [h_lift_πV'_eq]
-    -- Factor (ker ψ).arrow ≫ to_Z_n_t through ofLE(B_n_t, Z_n_t) using h_to_Z_kills
-    set γ₁ := factorThruKernelSubobject pageπ_t
-      ((kernelSubobject ψ).arrow ≫ to_Z_n_t) h_to_Z_kills
-    -- γ₁ ≫ (ker pageπ_t).arrow = (ker ψ).arrow ≫ to_Z_n_t
-    have hγ₁_spec : γ₁ ≫ (kernelSubobject pageπ_t).arrow =
-        (kernelSubobject ψ).arrow ≫ to_Z_n_t :=
-      factorThruKernelSubobject_comp_arrow _ _ _
-    -- By exact_cokernel, imageSubobject(ofLE(B,Z)) = kernelSubobject(pageπ_t)
-    have h_exact : (ShortComplex.mk (Subobject.ofLE B_n_t Z_n_t hB_le_Z) pageπ_t
-        (by simp only [hpageπ_t_def]; exact cokernel.condition _)).Exact :=
-      ShortComplex.exact_of_g_is_cokernel _
-        (by simp only [hpageπ_t_def]; exact cokernelIsCokernel _)
-    rw [ShortComplex.exact_iff_image_eq_kernel] at h_exact
-    change imageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z) = kernelSubobject pageπ_t at h_exact
-    -- h_exact : imageSubobject(ofLE(B,Z)) = kernelSubobject(pageπ_t)
-    -- Since ofLE(B,Z) is mono, factorThruImage(ofLE(B,Z)) is an iso
-    haveI : Mono (Subobject.ofLE B_n_t Z_n_t hB_le_Z) := inferInstance
-    haveI h_fti_epi : Epi (factorThruImageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z)) :=
-      inferInstance
-    haveI h_fti_mono : Mono (factorThruImageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z)) :=
-      mono_of_mono_fac (imageSubobject_arrow_comp _)
-    haveI : IsIso (factorThruImageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z)) :=
-      isIso_of_mono_of_epi _
-    -- (ker pageπ_t).arrow ≫ Z.arrow factors through B.arrow
-    have h_ker_Z_fac : B_n_t.Factors ((kernelSubobject pageπ_t).arrow ≫ Z_n_t.arrow) := by
-      rw [show (kernelSubobject pageπ_t).arrow =
-        eqToHom (congr_arg Subobject.underlying.obj h_exact.symm) ≫
-        (imageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z)).arrow from
-        (Subobject.arrow_congr _ _ h_exact.symm).symm, Category.assoc]
-      apply Subobject.factors_of_factors_right
-      -- B_n_t.Factors(image(ofLE(B,Z)).arrow ≫ Z.arrow)
-      have h_arrow_eq : (imageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z)).arrow ≫
-          Z_n_t.arrow =
-        inv (factorThruImageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z)) ≫
-          B_n_t.arrow := by
-        rw [← cancel_epi (factorThruImageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z))]
-        -- Goal: factorThruImage ≫ image.arrow ≫ Z.arrow = B_n_t.arrow
-        rw [show factorThruImageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z) ≫
-          (imageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z)).arrow ≫ Z_n_t.arrow =
-          (factorThruImageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z) ≫
-          (imageSubobject (Subobject.ofLE B_n_t Z_n_t hB_le_Z)).arrow) ≫ Z_n_t.arrow
-          from (Category.assoc _ _ _).symm,
-          imageSubobject_arrow_comp, Subobject.ofLE_arrow,
-          IsIso.hom_inv_id_assoc]
-      rw [h_arrow_eq]
-      exact Subobject.factors_comp_arrow _
-    -- Combine: ((ker ψ).arrow ≫ to_Z_n_t) ≫ Z_n_t.arrow = γ₁ ≫ (ker pageπ_t).arrow ≫ Z_n_t.arrow
-    -- which factors through B_n_t
-    rw [show ((kernelSubobject ψ).arrow ≫ to_Z_n_t) ≫ Z_n_t.arrow =
-      (γ₁ ≫ (kernelSubobject pageπ_t).arrow) ≫ Z_n_t.arrow from by rw [hγ₁_spec],
-      Category.assoc]
-    exact Subobject.factors_of_factors_right _ h_ker_Z_fac
+    let x := (kernelSubobject ψ).arrow ≫ to_Z_n_t
+    let ι := Subobject.ofLE B_n_t Z_n_t hB_le_Z
+    have hx : x ≫ cokernel.π ι = 0 := by
+      change x ≫ cokernel.π ι = 0 at h_to_Z_kills
+      exact h_to_Z_kills
+    exact factors_of_cokernel_π_eq_zero B_n_t Z_n_t hB_le_Z x hx
   -- α : the factoring morphism (ker ψ) → B_n_t
-  set α := B_n_t.factorThru _ h_bnd_factors with hα_def
+  let α := B_n_t.factorThru _ h_bnd_factors
   have hα_spec : α ≫ B_n_t.arrow = (kernelSubobject ψ).arrow ≫ lift_n ≫ πV' :=
     Subobject.factorThru_arrow _ _ _
   -- imgD_bnd, I_bnd, oI_bnd: the d-image subobject and its intersection with the filtration
-  set imgD_bnd := imageSubobject ((FC.fil (s + ↑n - ↑n + 1) ((k - 1) + 1)).arrow ≫
-    FC.dToK (k - 1)) with himgD_bnd_def
-  set I_bnd := imgD_bnd ⊓ FC.fil (s + ↑n) (k - 1) with hI_bnd_def
-  set oI_bnd := Subobject.ofLE I_bnd (FC.fil (s + ↑n) (k - 1)) inf_le_right
-    with hoI_bnd_def
+  let imgD_bnd := imageSubobject ((FC.fil (s + ↑n - ↑n + 1) ((k - 1) + 1)).arrow ≫
+    FC.dToK (k - 1))
+  let I_bnd := imgD_bnd ⊓ FC.fil (s + ↑n) (k - 1)
+  let oI_bnd := Subobject.ofLE I_bnd (FC.fil (s + ↑n) (k - 1)) inf_le_right
   -- factorB : I_bnd → B_n_t is epi
-  set factorB := factorThruImageSubobject (oI_bnd ≫ πV') with hfactorB_def
+  let factorB := factorThruImageSubobject (oI_bnd ≫ πV')
   haveI hfactorB_epi : Epi factorB := inferInstance
   have hfactorB_spec : factorB ≫ B_n_t.arrow = oI_bnd ≫ πV' := by
     change factorThruImageSubobject (oI_bnd ≫ πV') ≫
@@ -1824,11 +2240,11 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
   -- PB2: pullback of factorD (epi) against pb1_fst ≫ oI_to_imgD
   set imgD_src := (FC.fil (s + ↑n - ↑n + 1) ((k - 1) + 1)).arrow ≫ FC.dToK (k - 1)
     with himgD_src_def
-  set factorD := factorThruImageSubobject imgD_src with hfactorD_def
+  let factorD := factorThruImageSubobject imgD_src
   haveI hfactorD_epi : Epi factorD := inferInstance
   have hfactorD_spec : factorD ≫ imgD_bnd.arrow = imgD_src :=
     imageSubobject_arrow_comp imgD_src
-  set oI_to_imgD := Subobject.ofLE I_bnd imgD_bnd inf_le_left with hoI_to_imgD_def
+  let oI_to_imgD := Subobject.ofLE I_bnd imgD_bnd inf_le_left
   set pb2_fst := Limits.pullback.fst factorD (pb1_fst ≫ oI_to_imgD)
   set pb2_snd := Limits.pullback.snd factorD (pb1_fst ≫ oI_to_imgD)
   have hpb2_cond : pb2_fst ≫ factorD = pb2_snd ≫ (pb1_fst ≫ oI_to_imgD) :=
@@ -1850,7 +2266,6 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
   -- w factors through kerZ1
   set w := e ≫ (kernelSubobject ψ).arrow ≫ kerZ.arrow - σ with hw_def
   have hw_kills : w ≫ f_n1 = 0 := by
-    rw [hw_def, Preadditive.sub_comp, sub_eq_zero]
     -- Goal: (e ≫ (ker ψ).arrow ≫ kerZ.arrow) ≫ f_n1 = σ ≫ f_n1
     -- Strategy: show both sides equal pb2_snd ≫ pb1_fst ≫ I_bnd.arrow ≫ cokernel.π(...)
     --
@@ -1866,9 +2281,9 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
       rw [Preadditive.sub_comp]; simp only [Category.assoc]
       rw [h_e_lift_πV', sub_self]
     -- (3) monoLift decomposes the difference
-    set γ_diff := Abelian.monoLift ι_t
+    let γ_diff := Abelian.monoLift ι_t
         (e ≫ (kernelSubobject ψ).arrow ≫ lift_n - pb2_snd ≫ pb1_fst ≫ oI_bnd)
-        (show _ ≫ cokernel.π ι_t = 0 from h_diff_kills) with hγ_diff_def
+        (show _ ≫ cokernel.π ι_t = 0 from h_diff_kills)
     have hγ_spec : γ_diff ≫ ι_t =
         e ≫ (kernelSubobject ψ).arrow ≫ lift_n - pb2_snd ≫ pb1_fst ≫ oI_bnd :=
       Abelian.monoLift_comp ι_t
@@ -1948,80 +2363,35 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
             simp only [Category.assoc]
         _ = pb2_snd ≫ pb1_fst ≫ I_bnd.arrow := by
             congr 1; congr 1; exact Subobject.ofLE_arrow inf_le_left
-    -- === LHS: (e ≫ (ker ψ).arrow ≫ kerZ.arrow) ≫ f_n1 ===
-    have h_lhs : (e ≫ (kernelSubobject ψ).arrow ≫ kerZ.arrow) ≫ f_n1 =
-        pb2_snd ≫ pb1_fst ≫ I_bnd.arrow ≫
-        cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) := by
-      -- Expand and right-associate
-      rw [hf_n1_def]; simp only [Category.assoc]
-      -- Step 1: Replace kerZ.arrow ≫ F^s.arrow ≫ d k with lift_n ≫ F^{s+n}.arrow
-      conv_lhs =>
-        rw [show (kernelSubobject ψ).arrow ≫ kerZ.arrow ≫ (FC.fil s k).arrow ≫ FC.d k ≫
-              cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) =
-            (kernelSubobject ψ).arrow ≫ (kerZ.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) ≫
-              cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) from by
-            simp only [Category.assoc]]
-        rw [← h_lift_spec]
-      simp only [Category.assoc]
-      -- Goal: e ≫ (ker ψ).arrow ≫ lift_n ≫ F^{s+n}.arrow ≫ cokernel.π = pb2_snd ≫ ...
-      -- Step 2-5: Use calc with explicit left-association
-      set F_sn := (FC.fil (s + ↑n) (k - 1)).arrow with hF_sn_def
-      set cok := cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) with hcok_def
-      calc e ≫ (kernelSubobject ψ).arrow ≫ lift_n ≫ F_sn ≫ cok
-          = (e ≫ (kernelSubobject ψ).arrow ≫ lift_n) ≫ F_sn ≫ cok := by
-            simp only [Category.assoc]
-        _ = (pb2_snd ≫ pb1_fst ≫ oI_bnd + γ_diff ≫ ι_t) ≫ F_sn ≫ cok := by
-            rw [h_decomp]
-        _ = (pb2_snd ≫ pb1_fst ≫ oI_bnd) ≫ F_sn ≫ cok +
-            (γ_diff ≫ ι_t) ≫ F_sn ≫ cok := by
-            rw [Preadditive.add_comp]
-        _ = pb2_snd ≫ pb1_fst ≫ oI_bnd ≫ F_sn ≫ cok +
-            γ_diff ≫ ι_t ≫ F_sn ≫ cok := by
-            simp only [Category.assoc]
-        _ = pb2_snd ≫ pb1_fst ≫ oI_bnd ≫ F_sn ≫ cok + γ_diff ≫ 0 := by
-            rw [h_ι_t_kills]
-        _ = pb2_snd ≫ pb1_fst ≫ oI_bnd ≫ F_sn ≫ cok + 0 := by
-            rw [comp_zero]
-        _ = pb2_snd ≫ pb1_fst ≫ oI_bnd ≫ F_sn ≫ cok := by
-            rw [add_zero]
-        _ = pb2_snd ≫ pb1_fst ≫ (oI_bnd ≫ F_sn) ≫ cok := by
-            simp only [Category.assoc]
-        _ = pb2_snd ≫ pb1_fst ≫ I_bnd.arrow ≫ cok := by
-            rw [h_oI_arrow]
     -- === RHS: σ ≫ f_n1 ===
     have h_rhs : σ ≫ f_n1 =
         pb2_snd ≫ pb1_fst ≫ I_bnd.arrow ≫
         cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) := by
-      rw [hf_n1_def]
-      -- σ ≫ F^s.arrow ≫ d(k) ≫ cokernel.π = pb2_fst ≫ eqH ≫ F^{s+1}.arrow ≫ d(k) ≫ cokernel.π
-      conv_lhs =>
-        rw [show σ ≫ (FC.fil s k).arrow ≫ FC.d k ≫
-              cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) =
-            (σ ≫ (FC.fil s k).arrow) ≫ FC.d k ≫
-              cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) from by
-            simp only [Category.assoc]]
-        rw [h_σ_arrow]
-      simp only [Category.assoc]
-      -- pb2_fst ≫ eqH ≫ F^{s+1}.arrow ≫ d(k) ≫ cokernel.π
-      conv_lhs =>
-        rw [show pb2_fst ≫ eqH ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k ≫
-              cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) =
-            (pb2_fst ≫ (eqH ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k)) ≫
-              cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) from by
-            simp only [Category.assoc]]
-        rw [show pb2_fst ≫ (eqH ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k) =
-            (pb2_fst ≫ (eqH ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k)) from rfl]
-      conv_lhs =>
-        rw [show (pb2_fst ≫ (eqH ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k)) ≫
-              cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) =
-            pb2_fst ≫ (eqH ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k) ≫
-              cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) from by
-            simp only [Category.assoc]]
-      rw [h_eqH_d]
-      simp only [← Category.assoc]; rw [h_pb2_imgD]; simp only [Category.assoc]
-    rw [h_lhs, h_rhs]
+      let cok' := cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow)
+      have h₁ := comp_comp_congr' h_σ_arrow (FC.d k) cok'
+      have h₂ := congrArg (fun t => pb2_fst ≫ t ≫ cok') h_eqH_d
+      have h₃ := congrArg (fun t => t ≫ cok') h_pb2_imgD
+      simp only [Category.assoc] at h₁ h₂ h₃
+      simpa only [f_n1, Category.assoc] using h₁.trans (h₂.trans h₃)
+    have hσ : σ ≫ (FC.fil s k).arrow ≫ FC.d k ≫
+        cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) =
+        (pb2_snd ≫ pb1_fst ≫ oI_bnd) ≫
+          (FC.fil (s + ↑n) (k - 1)).arrow ≫
+          cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow) := by
+      have hbound := congrArg (fun t => pb2_snd ≫ pb1_fst ≫ t ≫
+        cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow)) h_oI_arrow
+      simpa only [f_n1, Category.assoc] using h_rhs.trans hbound.symm
+    change (e ≫ (kernelSubobject ψ).arrow ≫ kerZ.arrow - σ) ≫
+      ((FC.fil s k).arrow ≫ FC.d k ≫
+        cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow)) = 0
+    exact correction_kills_cokernel' e (kernelSubobject ψ).arrow kerZ.arrow
+      (FC.fil s k).arrow (FC.d k)
+      (cokernel.π ((FC.fil (s + ↑(n + 1)) (k - 1)).arrow))
+      lift_n (FC.fil (s + ↑n) (k - 1)).arrow
+      (pb2_snd ≫ pb1_fst ≫ oI_bnd) γ_diff ι_t σ
+      h_lift_spec.symm h_decomp h_ι_t_kills hσ
   -- w_fac : PB2 → kerZ1
-  set w_fac := factorThruKernelSubobject f_n1 w hw_kills with hw_fac_def
+  let w_fac := factorThruKernelSubobject f_n1 w hw_kills
   have hw_fac_spec : w_fac ≫ kerZ1.arrow = w :=
     factorThruKernelSubobject_comp_arrow _ _ _
   -- Key equation: w_fac ≫ β ≫ p = e ≫ (ker ψ).arrow ≫ p (by mono cancellation)
@@ -2069,7 +2439,6 @@ theorem pageDifferential_Z_succ_le (FC : FilteredComplex C)
   exact imageSubobject_comp_le _ _
 
 
-set_option maxHeartbeats 6400000 in
 -- Long proof: image of page differential = B_{n+1}/B_n via pullback and boundary factoring
 /-- The image of the page differential `d_n` at `(s,k)` equals `B_{n+1}/B_n` at the target
     `(s+n, k-1)`. This is the content of the `B_succ` field for the spectral sequence. -/
@@ -2085,13 +2454,13 @@ theorem FilteredComplex.pageDifferential_B_succ (FC : FilteredComplex C)
         (FC.toSSData bnd (s + ↑n) (k - 1)).pageπ ↑n) := by
   -- === Reconstruct the internal abbreviations of pageDifferential ===
   set ι_s := Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k) with hι_s_def
-  set πV := cokernel.π ι_s with hπV_def
+  set πV := FC.filToAssocGraded s k with hπV_def
   set f_n := (FC.fil s k).arrow ≫ FC.d k ≫
     cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow) with hf_n_def
   set kerZ := kernelSubobject f_n with hkerZ_def
   set ι_t := Subobject.ofLE (FC.fil (s + ↑n + 1) (k - 1)) (FC.fil (s + ↑n) (k - 1))
     (FC.fil_anti (s + ↑n) (k - 1)) with hι_t_def
-  set πV' := cokernel.π ι_t with hπV'_def
+  set πV' := FC.filToAssocGraded (s + ↑n) (k - 1) with hπV'_def
   set f_n' := (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) ≫
     cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow) with hf_n'_def
   set kerZ' := kernelSubobject f_n' with hkerZ'_def
@@ -2564,7 +2933,6 @@ theorem FilteredComplex.pageDifferential_B_succ (FC : FilteredComplex C)
       simp only [Category.assoc]]
     exact imageSubobject_comp_le _ _
 
-set_option maxHeartbeats 6400000 in
 -- Assembling the data fields requires heavy unification of subobject and
 -- page computations
 /-- 第一步（纯数据）：由滤复形组装预谱序列 `PreSS C (ℤ × ℤ)`。
@@ -2590,7 +2958,6 @@ noncomputable def FilteredComplex.toPreSS (FC : FilteredComplex C)
         eqToHom (by simp [sub_zero, Int.toNat_of_nonneg hr]; ring_nf)
     else 0
 
-set_option maxHeartbeats 6400000 in
 -- Assembling the proof fields requires heavy unification of subobject and
 -- page computations
 /-- 第二步（证明）：调用 Basic 中的构造函数 `SpectralSequence.ofPreSS`，
@@ -2635,6 +3002,27 @@ noncomputable def FilteredComplex.toSpectralSequence (FC : FilteredComplex C)
       --       imageSubobject(ofLE(B_{n+1}, Z_n, _) ≫ pageπ n) at target (s+↑n, k-1)
       exact FC.pageDifferential_B_succ bnd s k n)
 
+/-- 过滤复形谱序列的负页微分按构造为零。 -/
+theorem FilteredComplex.d_eq_zero_of_neg (FC : FilteredComplex C)
+    (bnd : FC.IsBounded) (r : ℤ) (hr : r < 0) (index : ℤ × ℤ) :
+    (FC.toSpectralSequence bnd).d r index = 0 := by
+  rcases index with ⟨s, k⟩
+  change (FC.toPreSS bnd).d r ⟨s, k⟩ = 0
+  dsimp only [FilteredComplex.toPreSS]
+  simp only [dif_neg (by omega : ¬ 0 ≤ r)]
+
+/-- 过滤复形谱序列中的本质微分关系只能发生在非负页。 -/
+theorem FilteredComplex.essentialRelation_nonneg (FC : FilteredComplex C)
+    (bnd : FC.IsBounded) (r : ℤ) (index : ℤ × ℤ) {T : C}
+    {x : T ⟶ ((FC.toSpectralSequence bnd).ssData index).V}
+    {y : T ⟶ ((FC.toSpectralSequence bnd).ssData
+      (index + (FC.toSpectralSequence bnd).diffDeg r)).V}
+    (h : EssentialDifferentialRelation (FC.toSpectralSequence bnd) r index x y) :
+    0 ≤ r := by
+  by_contra hn
+  exact (h.d_ne_zero (FC.toSpectralSequence bnd) r index)
+    (FC.d_eq_zero_of_neg bnd r (by omega) index)
+
 /-! ### Lift 关系：过滤复形元素与其 gr 投影
 
 `X` 为过滤复形，`E = X.toSpectralSequence` 为其谱序列。
@@ -2659,7 +3047,110 @@ theorem FilteredComplex.isLift_sub_factors (FC : FilteredComplex C) {T : C}
     {x : T ⟶ FC.assocGraded s k}
     (h₁ : FC.IsLift s k xl1 x) (h₂ : FC.IsLift s k xl2 x) :
     Subobject.Factors (FC.fil (s + 1) k) ((xl1 - xl2) ≫ (FC.fil s k).arrow) := by
-  sorry
+  have hzero : (xl1 - xl2) ≫ FC.filToAssocGraded s k = 0 := by
+    rw [Preadditive.sub_comp, h₁, h₂, sub_self]
+  have hzero' : (xl1 - xl2) ≫
+      cokernel.π (Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+        (FC.fil_anti s k)) = 0 := by
+    change (xl1 - xl2) ≫ FC.filToAssocGraded s k = 0
+    exact hzero
+  let lift : T ⟶ Subobject.underlying.obj (FC.fil (s + 1) k) :=
+    Abelian.monoLift
+      (Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k))
+      (xl1 - xl2) hzero'
+  have hlift : lift ≫
+      Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k) = xl1 - xl2 := by
+    exact Abelian.monoLift_comp _ _ _
+  have hfac : (xl1 - xl2) ≫ (FC.fil s k).arrow =
+      lift ≫ (FC.fil (s + 1) k).arrow := by
+    rw [← hlift, Category.assoc, Subobject.ofLE_arrow]
+  rw [hfac]
+  exact Subobject.factors_comp_arrow lift
+
+/-- 同一关联分次类的两个过滤提升之差，可在下一过滤层内取代表元。 -/
+theorem FilteredComplex.isLift_sub_lift (FC : FilteredComplex C) {T : C}
+    (s k : ℤ) {xl1 xl2 : T ⟶ Subobject.underlying.obj (FC.fil s k)}
+    {x : T ⟶ FC.assocGraded s k}
+    (h₁ : FC.IsLift s k xl1 x) (h₂ : FC.IsLift s k xl2 x) :
+    ∃ v : T ⟶ Subobject.underlying.obj (FC.fil (s + 1) k),
+      v ≫ Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+        (FC.fil_anti s k) = xl1 - xl2 := by
+  have hzero : (xl1 - xl2) ≫ FC.filToAssocGraded s k = 0 := by
+    rw [Preadditive.sub_comp, h₁, h₂, sub_self]
+  refine ⟨Abelian.monoLift
+    (Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+      (FC.fil_anti s k)) (xl1 - xl2) hzero, ?_⟩
+  exact Abelian.monoLift_comp _ _ _
+
+/-- 过滤层中代表零关联分次类的元素可提升到下一层。 -/
+theorem FilteredComplex.lift_zero_deeper (FC : FilteredComplex C)
+    (s k : ℤ) {T : C}
+    (yl : T ⟶ Subobject.underlying.obj (FC.fil s k))
+    (hy : FC.IsLift s k yl 0) :
+    ∃ yd : T ⟶ Subobject.underlying.obj (FC.fil (s + 1) k),
+      yd ≫ Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+        (FC.fil_anti s k) = yl := by
+  have hz : yl ≫ cokernel.π
+      (Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+        (FC.fil_anti s k)) = 0 := hy
+  refine ⟨Abelian.monoLift
+    (Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+      (FC.fil_anti s k)) yl hz, ?_⟩
+  exact Abelian.monoLift_comp _ _ _
+
+/- 若一个映射恰在过滤次数 `s` 终止分解，则它在相应关联分次中的类非零。 -/
+theorem FilteredComplex.assocGraded_ne_zero_of_maximal
+    (FC : FilteredComplex C) (s k : ℤ) {T : C}
+    (b : T ⟶ Subobject.underlying.obj (FC.fil s k))
+    (hmax : ¬ (FC.fil (s + 1) k).Factors (b ≫ (FC.fil s k).arrow)) :
+    b ≫ FC.filToAssocGraded s k ≠ 0 := by
+  intro hzero
+  obtain ⟨c, hc⟩ := FC.lift_zero_deeper s k b hzero
+  apply hmax
+  have hbc : b ≫ (FC.fil s k).arrow =
+      c ≫ (FC.fil (s + 1) k).arrow := by
+    rw [← hc, Category.assoc, Subobject.ofLE_arrow]
+  rw [hbc]
+  exact Subobject.factors_comp_arrow c
+
+/- 两个同一过滤层代表元之差由下一层代表时，下一层微分经包含态射
+   等于原两个微分之差。这是统一检测反证中构造 crossing 的代数桥梁。 -/
+theorem FilteredComplex.filDiff_of_sub_lift
+    (FC : FilteredComplex C) (s k : ℤ) {T : C}
+    (xl₁ xl₂ : T ⟶ Subobject.underlying.obj (FC.fil s k))
+    (v : T ⟶ Subobject.underlying.obj (FC.fil (s + 1) k))
+    (hv : v ≫ Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+      (FC.fil_anti s k) = xl₁ - xl₂) :
+    v ≫ FC.filDiff (s + 1) k ≫
+        Subobject.ofLE (FC.fil (s + 1) (k - 1)) (FC.fil s (k - 1))
+          (FC.fil_anti_of_le (k - 1) (by omega)) =
+      xl₁ ≫ FC.filDiff s k - xl₂ ≫ FC.filDiff s k := by
+  apply (cancel_mono (FC.fil s (k - 1)).arrow).mp
+  simp only [Category.assoc, Subobject.ofLE_arrow,
+    FC.filDiff_comp_arrow]
+  have hvD :
+      (v ≫ Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+        (FC.fil_anti s k)) ≫ (FC.fil s k).arrow ≫ FC.d k =
+      (xl₁ - xl₂) ≫ (FC.fil s k).arrow ≫ FC.d k :=
+    congrArg (fun q : T ⟶ Subobject.underlying.obj (FC.fil s k) =>
+      q ≫ (FC.fil s k).arrow ≫ FC.d k) hv
+  have hleft : v ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k =
+      (xl₁ - xl₂) ≫ (FC.fil s k).arrow ≫ FC.d k := by
+    calc
+      v ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k =
+          (v ≫ Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+            (FC.fil_anti s k)) ≫ (FC.fil s k).arrow ≫ FC.d k := by
+              have hinc :
+                  Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k)
+                    (FC.fil_anti s k) ≫ (FC.fil s k).arrow =
+                    (FC.fil (s + 1) k).arrow :=
+                Subobject.ofLE_arrow (FC.fil_anti s k)
+              rw [Category.assoc, ← hinc]
+              simp only [Category.assoc]
+      _ = (xl₁ - xl₂) ≫ (FC.fil s k).arrow ≫ FC.d k := hvD
+  rw [hleft, Preadditive.sub_comp]
+  rw [Preadditive.sub_comp]
+  simp only [Category.assoc, FC.filDiff_comp_arrow]
 
 /-- **d_r 关系的复形实现（正方向）**：
     设 `x y` 是谱序列环境对象中的元素，`xl yl` 是它们在复形
@@ -2677,7 +3168,134 @@ theorem FilteredComplex.differentialRelation_of_lift (FC : FilteredComplex C)
       yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
         (FC.fil_anti_of_le (k - 1) (by omega))) :
     DifferentialRelation (FC.toSpectralSequence bnd) r ⟨s, k⟩ x y := by
-  sorry
+  obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hr
+  let f_n := (FC.fil s k).arrow ≫ FC.d k ≫
+    cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow)
+  let g_n := (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) ≫
+    cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow)
+  let K := kernelSubobject f_n
+  let K' := kernelSubobject g_n
+  have hxl : xl ≫ f_n = 0 := by
+    simpa only [f_n, Category.assoc] using
+      FC.filDiff_to_cokernel_eq_zero s k (↑n) (Int.natCast_nonneg n) hd
+  let u := factorThruKernelSubobject f_n xl hxl
+  have hyl : yl ≫ g_n = 0 := by
+    have hcyc := FC.targetLift_filDiff_eq_zero s k (↑n)
+      (Int.natCast_nonneg n) hd
+    have hraw : yl ≫ (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) = 0 := by
+      calc
+        yl ≫ (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) =
+            yl ≫ FC.filDiff (s + ↑n) (k - 1) ≫
+              (FC.fil (s + ↑n) (k - 1 - 1)).arrow := by
+                rw [FC.filDiff_comp_arrow]
+        _ = 0 := by
+          rw [← Category.assoc, hcyc, zero_comp]
+    simpa only [g_n, Category.assoc, zero_comp] using
+      congrArg (fun f => f ≫
+        cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow)) hraw
+  let vK := factorThruKernelSubobject g_n yl hyl
+  have hv : u ≫ K.arrow ≫ (FC.fil s k).arrow ≫ FC.d k =
+      yl ≫ (FC.fil (s + ↑n) (k - 1)).arrow := by
+    calc
+      u ≫ K.arrow ≫ (FC.fil s k).arrow ≫ FC.d k =
+          xl ≫ (FC.fil s k).arrow ≫ FC.d k := by
+            simpa only [Category.assoc] using
+              congrArg (fun f => f ≫ (FC.fil s k).arrow ≫ FC.d k)
+                (factorThruKernelSubobject_comp_arrow f_n xl hxl)
+      _ =
+          xl ≫ FC.filDiff s k ≫ (FC.fil s (k - 1)).arrow := by
+            rw [FC.filDiff_comp_arrow]
+      _ = yl ≫ Subobject.ofLE (FC.fil (s + ↑n) (k - 1))
+            (FC.fil s (k - 1)) (FC.fil_anti_of_le (k - 1) (by omega)) ≫
+            (FC.fil s (k - 1)).arrow := by
+              simpa only [Category.assoc] using
+                congrArg (fun f => f ≫ (FC.fil s (k - 1)).arrow) hd
+      _ = yl ≫ (FC.fil (s + ↑n) (k - 1)).arrow := by
+            rw [Subobject.ofLE_arrow]
+  unfold DifferentialRelation
+  dsimp only [FilteredComplex.toSpectralSequence, SpectralSequence.ofPreSS,
+    FilteredComplex.toPreSS, sub_zero, Int.toNat_natCast]
+  refine ⟨u ≫ factorThruImageSubobject (K.arrow ≫ FC.filToAssocGraded s k),
+    ?_, vK ≫ factorThruImageSubobject
+      (K'.arrow ≫ FC.filToAssocGraded (s + ↑n) (k - 1)), ?_, ?_⟩
+  · change (u ≫ factorThruImageSubobject (K.arrow ≫ FC.filToAssocGraded s k)) ≫
+      (imageSubobject (K.arrow ≫ FC.filToAssocGraded s k)).arrow = x
+    rw [Category.assoc, imageSubobject_arrow_comp,
+      ← Category.assoc, factorThruKernelSubobject_comp_arrow]
+    exact hx
+  · change (vK ≫ factorThruImageSubobject
+      (K'.arrow ≫ FC.filToAssocGraded (s + ↑n) (k - 1))) ≫
+      (imageSubobject (K'.arrow ≫ FC.filToAssocGraded (s + ↑n) (k - 1))).arrow = y
+    rw [Category.assoc, imageSubobject_arrow_comp,
+      ← Category.assoc, factorThruKernelSubobject_comp_arrow]
+    exact hy
+  · simp only [dif_pos (Int.natCast_nonneg n),
+      eqToHom_refl, Category.id_comp, Category.comp_id]
+    exact FC.pageDifferential_on_kernel bnd s k n u yl hv hyl
+
+/-- 微分关系的两端可提升到过滤层；源提升的实际微分另记为 `yd`。
+此时不要求 `yd` 与指定目标提升相同，二者的差将在页边缘中修正。 -/
+theorem FilteredComplex.lift_endpoints_of_differentialRelation
+    (FC : FilteredComplex C) (bnd : FC.IsBounded)
+    (r : ℤ) (hr : 0 ≤ r) (s k : ℤ) {T : C} [Projective T]
+    {x : T ⟶ FC.assocGraded s k}
+    {y : T ⟶ FC.assocGraded (s + r) (k - 1)}
+    (h : DifferentialRelation (FC.toSpectralSequence bnd) r ⟨s, k⟩ x y) :
+    ∃ (xl : T ⟶ Subobject.underlying.obj (FC.fil s k))
+      (yl yd : T ⟶ Subobject.underlying.obj (FC.fil (s + r) (k - 1))),
+      FC.IsLift s k xl x ∧ FC.IsLift (s + r) (k - 1) yl y ∧
+        xl ≫ FC.filDiff s k =
+          yd ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+            (FC.fil_anti_of_le (k - 1) (by omega)) := by
+  obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hr
+  dsimp only [FilteredComplex.toSpectralSequence, SpectralSequence.ofPreSS,
+    FilteredComplex.toPreSS, sub_zero, Int.toNat_natCast] at h
+  rcases h with ⟨xZ, hxZ, yZ, hyZ, _⟩
+  change xZ ≫ (FC.cycleSubobject s k (↑n)).arrow = x at hxZ
+  change yZ ≫ (FC.cycleSubobject (s + ↑n) (k - 1) (↑n)).arrow = y at hyZ
+  let f := (FC.fil s k).arrow ≫ FC.d k ≫
+    cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow)
+  let g := (FC.fil (s + ↑n) (k - 1)).arrow ≫ FC.d (k - 1) ≫
+    cokernel.π ((FC.fil (s + ↑n + ↑n) (k - 1 - 1)).arrow)
+  let K := kernelSubobject f
+  let K' := kernelSubobject g
+  let p := factorThruImageSubobject (K.arrow ≫ FC.filToAssocGraded s k)
+  let q := factorThruImageSubobject
+    (K'.arrow ≫ FC.filToAssocGraded (s + ↑n) (k - 1))
+  let u := Projective.factorThru xZ p
+  let v := Projective.factorThru yZ q
+  have hdK : (K.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) ≫
+      cokernel.π ((FC.fil (s + ↑n) (k - 1)).arrow) = 0 := by
+    simpa only [f, Category.assoc] using kernelSubobject_arrow_comp f
+  let dLift := Abelian.monoLift (FC.fil (s + ↑n) (k - 1)).arrow
+    (K.arrow ≫ (FC.fil s k).arrow ≫ FC.d k) hdK
+  refine ⟨u ≫ K.arrow, v ≫ K'.arrow, u ≫ dLift, ?_, ?_, ?_⟩
+  · change (u ≫ K.arrow) ≫ FC.filToAssocGraded s k = x
+    calc
+      (u ≫ K.arrow) ≫ FC.filToAssocGraded s k =
+          u ≫ (K.arrow ≫ FC.filToAssocGraded s k) := Category.assoc _ _ _
+      _ = (u ≫ p) ≫
+          (imageSubobject (K.arrow ≫ FC.filToAssocGraded s k)).arrow := by
+            rw [Category.assoc, imageSubobject_arrow_comp]
+      _ = xZ ≫ (FC.cycleSubobject s k (↑n)).arrow := by
+            rw [Projective.factorThru_comp]
+            rfl
+      _ = x := hxZ
+  · change (v ≫ K'.arrow) ≫ FC.filToAssocGraded (s + ↑n) (k - 1) = y
+    calc
+      (v ≫ K'.arrow) ≫ FC.filToAssocGraded (s + ↑n) (k - 1) =
+          v ≫ (K'.arrow ≫ FC.filToAssocGraded (s + ↑n) (k - 1)) :=
+            Category.assoc _ _ _
+      _ = (v ≫ q) ≫ (imageSubobject
+          (K'.arrow ≫ FC.filToAssocGraded (s + ↑n) (k - 1))).arrow := by
+            rw [Category.assoc, imageSubobject_arrow_comp]
+      _ = yZ ≫ (FC.cycleSubobject (s + ↑n) (k - 1) (↑n)).arrow := by
+            rw [Projective.factorThru_comp]
+            rfl
+      _ = y := hyZ
+  · apply (cancel_mono (FC.fil s (k - 1)).arrow).mp
+    simp only [Category.assoc, FC.filDiff_comp_arrow,
+      Subobject.ofLE_arrow, dLift, Abelian.monoLift_comp]
 
 /-- **d_r 关系的复形提升（反方向，需 T 投射）**：
     设 `T` 为投射对象，`x y` 是谱序列环境对象中的元素，
@@ -2695,28 +3313,432 @@ theorem FilteredComplex.lift_of_differentialRelation (FC : FilteredComplex C)
         xl ≫ FC.filDiff s k =
           yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
             (FC.fil_anti_of_le (k - 1) (by omega)) := by
-  sorry
+  obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hr
+  obtain ⟨xl, yl, yd, hx, hy, hd⟩ :=
+    FC.lift_endpoints_of_differentialRelation bnd (↑n) (Int.natCast_nonneg n) s k h
+  let y₀ := yd ≫ FC.filToAssocGraded (s + ↑n) (k - 1)
+  have h₀ : DifferentialRelation (FC.toSpectralSequence bnd)
+      (↑n) ⟨s, k⟩ x y₀ :=
+    FC.differentialRelation_of_lift bnd (↑n) (Int.natCast_nonneg n)
+      s k hx rfl hd
+  have hboundary := DifferentialRelation.targets_sub_factors_boundary
+    (FC.toSpectralSequence bnd) (↑n) ⟨s, k⟩ h₀ h
+  change Subobject.Factors
+    (FC.boundarySubobject (s + ↑n) (k - 1) (↑n)) (y₀ - y) at hboundary
+  obtain ⟨a, b, hdb', hbb⟩ :=
+    FC.lift_boundary_at_differential s k n hboundary
+  let i := Subobject.ofLE (FC.fil (s + 1) k) (FC.fil s k) (FC.fil_anti s k)
+  let j := Subobject.ofLE (FC.fil (s + ↑n) (k - 1))
+    (FC.fil s (k - 1)) (FC.fil_anti_of_le (k - 1) (by omega))
+  let xl' := xl - a ≫ i
+  let yl' := yd - b
+  have ha : (a ≫ i) ≫ FC.filDiff s k = b ≫ j := by
+    apply (cancel_mono (FC.fil s (k - 1)).arrow).mp
+    calc
+      ((a ≫ i) ≫ FC.filDiff s k) ≫ (FC.fil s (k - 1)).arrow =
+          a ≫ (FC.fil (s + 1) k).arrow ≫ FC.d k := by
+            rw [Category.assoc, FC.filDiff_comp_arrow]
+            simpa only [Category.assoc] using
+              congrArg (fun f => f ≫ FC.d k)
+                (by simp only [i, Category.assoc, Subobject.ofLE_arrow] :
+                  (a ≫ i) ≫ (FC.fil s k).arrow =
+                    a ≫ (FC.fil (s + 1) k).arrow)
+      _ = b ≫ (FC.fil (s + ↑n) (k - 1)).arrow := hdb'
+      _ = (b ≫ j) ≫ (FC.fil s (k - 1)).arrow := by
+        simp only [Category.assoc, j, Subobject.ofLE_arrow]
+  refine ⟨xl', yl', ?_, ?_, ?_⟩
+  · change xl' ≫ FC.filToAssocGraded s k = x
+    have hzero : (a ≫ i) ≫ FC.filToAssocGraded s k = 0 := by
+      simp only [Category.assoc, i, FilteredComplex.filToAssocGraded,
+        cokernel.condition, comp_zero]
+    change xl ≫ FC.filToAssocGraded s k = x at hx
+    simpa only [xl', Preadditive.sub_comp, hzero, sub_zero] using hx
+  · change yl' ≫ FC.filToAssocGraded (s + ↑n) (k - 1) = y
+    simp only [yl', Preadditive.sub_comp, hbb, y₀]
+    abel
+  · simp only [xl', yl', Preadditive.sub_comp, hd, ha, j]
 
-/-- **两个 d_r 关系的差产生 crossing（主定理）**：
-    设 `T` 投射，`x` 与 `y₁` 有 `d_r` 关系、`x` 与 `y₂` 有 `d_r` 关系
-    （同一源 `x`，两个不同的目标），`xl` 为 `x` 在 `F^s` 中的 lift。
-    取 `y₁ y₂` 的 lift `yl1 yl2` 使复形微分 `d(xl) = ylᵢ`
-    （由 `lift_of_differentialRelation`），则差 `yl1 - yl2 = 0`，
-    其在更高过滤层的分解给出更短微分，从而原来的 `d_r` 关系被 cross。
-    证明：两次 `lift_of_differentialRelation` 得 `yl1 yl2` 均为 `d(xl)`，
-    故相等；差的关系在更短页上由 `isLift_sub_factors` 的过滤提升给出，
-    若非本质（像落入边界）则递归由更短本质微分收束，
-    两种情况均给出 crossing 见证。 -/
+/-- 实际过滤微分在目标页尚非边缘时，诱导一条本质关系。
+显式对象搬运避免展开整个谱序列结构来推断广义元素的类型。 -/
+theorem FilteredComplex.essentialRelation_of_filtered_lift
+    (FC : FilteredComplex C) (bnd : FC.IsBounded)
+    (t p k : ℤ) (m : ℕ) (ht : t + ↑m = p) {T : C}
+    (a : T ⟶ Subobject.underlying.obj (FC.fil t k))
+    (b : T ⟶ Subobject.underlying.obj (FC.fil p (k - 1)))
+    (hdb : a ≫ (FC.fil t k).arrow ≫ FC.d k =
+      b ≫ (FC.fil p (k - 1)).arrow)
+    (hn : ¬ Subobject.Factors (FC.boundarySubobject p (k - 1) (↑m))
+      (b ≫ FC.filToAssocGraded p (k - 1))) :
+    EssentialDifferentialRelation (FC.toSpectralSequence bnd)
+        (↑m) ⟨t, k⟩
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData ⟨t, k⟩).V =
+            FC.assocGraded t k) from rfl)) (a ≫ FC.filToAssocGraded t k))
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData
+            (⟨t, k⟩ + (FC.toSpectralSequence bnd).diffDeg (↑m))).V =
+            FC.assocGraded p (k - 1)) by
+              rw [← ht]
+              rfl)) (b ≫ FC.filToAssocGraded p (k - 1))) := by
+  subst p
+  let j := Subobject.ofLE (FC.fil (t + ↑m) (k - 1))
+    (FC.fil t (k - 1)) (FC.fil_anti_of_le (k - 1) (by omega))
+  have hd : a ≫ FC.filDiff t k = b ≫ j := by
+    apply (cancel_mono (FC.fil t (k - 1)).arrow).mp
+    calc
+      (a ≫ FC.filDiff t k) ≫ (FC.fil t (k - 1)).arrow =
+          a ≫ (FC.fil t k).arrow ≫ FC.d k := by
+            simp only [Category.assoc, FC.filDiff_comp_arrow]
+      _ = b ≫ (FC.fil (t + ↑m) (k - 1)).arrow := hdb
+      _ = (b ≫ j) ≫ (FC.fil t (k - 1)).arrow := by
+        simp only [Category.assoc, j, Subobject.ofLE_arrow]
+  constructor
+  · exact FC.differentialRelation_of_lift bnd (↑m) (Int.natCast_nonneg m)
+      t k (by rfl) (by rfl) hd
+  · change ¬ Subobject.Factors
+      (FC.boundarySubobject (t + ↑m) (k - 1) (↑m))
+        (b ≫ FC.filToAssocGraded (t + ↑m) (k - 1))
+    exact hn
+
+/- 非零页边界来自更高源过滤层的本质微分，且目标过滤次数保持不变。
+   逐次降低微分页数，故有限步后必到达非边界目标。 -/
+theorem FilteredComplex.essential_ancestor_of_nonzero_boundary
+    (FC : FilteredComplex C) (bnd : FC.IsBounded) (k : ℤ)
+    (m : ℕ) (t p : ℤ) (ht : t + (m : ℤ) = p)
+    {T : C} [Projective T]
+    (v : T ⟶ FC.assocGraded p (k - 1)) (hv : v ≠ 0)
+    (hb : (FC.boundarySubobject p (k - 1) (↑m)).Factors v) :
+    ∃ (u : ℤ) (j : ℕ) (huj : u + (j : ℤ) = p)
+      (x' : T ⟶ FC.assocGraded u k),
+      t < u ∧ EssentialDifferentialRelation (FC.toSpectralSequence bnd)
+        (↑j) ⟨u, k⟩
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData ⟨u, k⟩).V =
+            FC.assocGraded u k) from rfl)) x')
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData
+            (⟨u, k⟩ + (FC.toSpectralSequence bnd).diffDeg (↑j))).V =
+            FC.assocGraded p (k - 1)) by rw [← huj]; rfl)) v) := by
+  induction m generalizing t p with
+  | zero =>
+    cases ht
+    have hvzero : v = 0 := by
+      simpa only [Int.cast_zero, add_zero] using
+        (FC.boundary_zero_apply (t + (0 : ℤ)) k hb)
+    exact (hv hvzero).elim
+  | succ n ih =>
+    cases ht
+    obtain ⟨a, b, hdb, hbb⟩ :=
+      FC.lift_boundary_at_differential t k (n + 1) hb
+    have ht' : (t + 1) + (n : ℤ) = t + ((n + 1 : ℕ) : ℤ) := by omega
+    by_cases hbn : (FC.boundarySubobject (t + ((n + 1 : ℕ) : ℤ))
+        (k - 1) (↑n)).Factors v
+    · obtain ⟨u, j, huj, x', htu, hess⟩ :=
+        ih (t + 1) (t + ((n + 1 : ℕ) : ℤ)) ht' v hv hbn
+      exact ⟨u, j, huj, x', by omega, hess⟩
+    · have hnot : ¬ (FC.boundarySubobject (t + ((n + 1 : ℕ) : ℤ))
+          (k - 1) (↑n)).Factors
+          (b ≫ FC.filToAssocGraded (t + ((n + 1 : ℕ) : ℤ)) (k - 1)) := by
+        rwa [hbb]
+      have hess := FC.essentialRelation_of_filtered_lift
+        bnd (t + 1) (t + ((n + 1 : ℕ) : ℤ)) k n ht' a b hdb hnot
+      rw [hbb] at hess
+      exact ⟨t + 1, n, ht', a ≫ FC.filToAssocGraded (t + 1) k,
+        by omega, hess⟩
+
+/-- 最大过滤层且非边界时，过滤微分给出较短本质关系；这是首次层
+构造 crossing 的直接接口。 -/
+theorem FilteredComplex.essentialRelation_of_maximal_lift
+    (FC : FilteredComplex C) (bnd : FC.IsBounded)
+    (t : ℤ) (k : ℤ) (m : ℕ) {T : C}
+    (a : T ⟶ Subobject.underlying.obj (FC.fil t k))
+    (b : T ⟶ Subobject.underlying.obj (FC.fil (t + m) (k - 1)))
+    (hdb : a ≫ (FC.fil t k).arrow ≫ FC.d k =
+      b ≫ (FC.fil (t + m) (k - 1)).arrow)
+    (hn : ¬ Subobject.Factors
+      (FC.boundarySubobject (t + m) (k - 1) (↑m))
+      (b ≫ FC.filToAssocGraded (t + m) (k - 1))) :
+    EssentialDifferentialRelation (FC.toSpectralSequence bnd)
+        (↑m) ⟨t, k⟩
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData ⟨t, k⟩).V =
+            FC.assocGraded t k) from rfl)) (a ≫ FC.filToAssocGraded t k))
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData
+            (⟨t, k⟩ + (FC.toSpectralSequence bnd).diffDeg (↑m))).V =
+            FC.assocGraded (t + m) (k - 1)) by rfl))
+              (b ≫ FC.filToAssocGraded (t + m) (k - 1))) :=
+  FC.essentialRelation_of_filtered_lift bnd t (t + m) k m rfl a b hdb hn
+
+/-- 边界修正：若最大层目标类是边界，则从更高源过滤层减去一个
+边界代表，得到同一源关联分次类的代表，其微分落入目标下一层。 -/
+theorem FilteredComplex.boundary_correction_lift
+    (FC : FilteredComplex C) (t k : ℤ) (m : ℕ) {T : C} [Projective T]
+    (a : T ⟶ Subobject.underlying.obj (FC.fil t k))
+    (b : T ⟶ Subobject.underlying.obj (FC.fil (t + m) (k - 1)))
+    (hdb : a ≫ (FC.fil t k).arrow ≫ FC.d k =
+      b ≫ (FC.fil (t + m) (k - 1)).arrow)
+    (hb : Subobject.Factors
+      (FC.boundarySubobject (t + m) (k - 1) (↑m))
+      (b ≫ FC.filToAssocGraded (t + m) (k - 1))) :
+    ∃ (a' : T ⟶ Subobject.underlying.obj (FC.fil t k))
+      (c : T ⟶ Subobject.underlying.obj (FC.fil (t + m + 1) (k - 1))),
+      FC.IsLift t k a' (a ≫ FC.filToAssocGraded t k) ∧
+      a' ≫ FC.filDiff t k =
+        c ≫ Subobject.ofLE (FC.fil (t + m + 1) (k - 1)) (FC.fil t (k - 1))
+          (FC.fil_anti_of_le (k - 1) (by omega)) := by
+  obtain ⟨u, v, huv, hv⟩ := FC.lift_boundary_at_differential t k m hb
+  have ha : FC.IsLift (t + m) (k - 1) b
+      (b ≫ FC.filToAssocGraded (t + m) (k - 1)) := rfl
+  have hv' : FC.IsLift (t + m) (k - 1) v
+      (b ≫ FC.filToAssocGraded (t + m) (k - 1)) := hv
+  obtain ⟨c, hc⟩ := FC.isLift_sub_lift (t + m) (k - 1) ha hv'
+  let i := Subobject.ofLE (FC.fil (t + 1) k) (FC.fil t k) (FC.fil_anti t k)
+  let j := Subobject.ofLE (FC.fil (t + m) (k - 1))
+    (FC.fil t (k - 1)) (FC.fil_anti_of_le (k - 1) (by omega))
+  let a' := a - u ≫ i
+  have hdu : (u ≫ i) ≫ FC.filDiff t k = v ≫ j := by
+    apply (cancel_mono (FC.fil t (k - 1)).arrow).mp
+    calc
+      ((u ≫ i) ≫ FC.filDiff t k) ≫ (FC.fil t (k - 1)).arrow =
+          u ≫ (FC.fil (t + 1) k).arrow ≫ FC.d k := by
+            simp [Category.assoc, i, FC.filDiff_comp_arrow]
+      _ = v ≫ (FC.fil (t + m) (k - 1)).arrow := huv
+      _ = (v ≫ j) ≫ (FC.fil t (k - 1)).arrow := by
+            simp only [Category.assoc, j, Subobject.ofLE_arrow]
+  have hdu_ambient : (u ≫ i) ≫ (FC.fil t k).arrow ≫ FC.d k =
+      v ≫ (FC.fil (t + m) (k - 1)).arrow := by
+    calc
+      (u ≫ i) ≫ (FC.fil t k).arrow ≫ FC.d k =
+          ((u ≫ i) ≫ FC.filDiff t k) ≫
+            (FC.fil t (k - 1)).arrow := by
+              simp only [Category.assoc, FC.filDiff_comp_arrow]
+      _ = (v ≫ j) ≫ (FC.fil t (k - 1)).arrow := by rw [hdu]
+      _ = v ≫ (FC.fil (t + m) (k - 1)).arrow := by
+        simp only [Category.assoc, j, Subobject.ofLE_arrow]
+  have hdiff : a' ≫ (FC.fil t k).arrow ≫ FC.d k =
+      c ≫ (FC.fil (t + m + 1) (k - 1)).arrow := by
+    dsimp [a']
+    rw [Preadditive.sub_comp, hdb, hdu_ambient]
+    rw [← Preadditive.sub_comp, ← hc, Category.assoc, Subobject.ofLE_arrow]
+  refine ⟨a', c, ?_, ?_⟩
+  · change a' ≫ FC.filToAssocGraded t k = a ≫ FC.filToAssocGraded t k
+    dsimp [a']
+    rw [Preadditive.sub_comp]
+    simp only [Category.assoc, i, FilteredComplex.filToAssocGraded,
+      cokernel.condition, comp_zero, sub_zero]
+  · apply (cancel_mono (FC.fil t (k - 1)).arrow).mp
+    simpa only [Category.assoc, FC.filDiff_comp_arrow,
+      Subobject.ofLE_arrow] using hdiff
+
+/-- 单步首次层分支：最大层目标要么给出本质关系，要么可作边界修正并
+把目标过滤次数提高一层。有限迭代时由 `factor_max_or_zero` 控制终止。 -/
+theorem FilteredComplex.essential_or_boundary_correction
+    (FC : FilteredComplex C) (bnd : FC.IsBounded)
+    (t k : ℤ) (m : ℕ) {T : C} [Projective T]
+    (a : T ⟶ Subobject.underlying.obj (FC.fil t k))
+    (b : T ⟶ Subobject.underlying.obj (FC.fil (t + m) (k - 1)))
+    (hdb : a ≫ (FC.fil t k).arrow ≫ FC.d k =
+      b ≫ (FC.fil (t + m) (k - 1)).arrow) :
+    EssentialDifferentialRelation (FC.toSpectralSequence bnd)
+        (↑m) ⟨t, k⟩
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData ⟨t, k⟩).V =
+            FC.assocGraded t k) from rfl)) (a ≫ FC.filToAssocGraded t k))
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData
+            (⟨t, k⟩ + (FC.toSpectralSequence bnd).diffDeg (↑m))).V =
+            FC.assocGraded (t + m) (k - 1)) by rfl))
+              (b ≫ FC.filToAssocGraded (t + m) (k - 1))) ∨
+    (∃ (a' : T ⟶ Subobject.underlying.obj (FC.fil t k))
+      (c : T ⟶ Subobject.underlying.obj (FC.fil (t + m + 1) (k - 1))),
+      FC.IsLift t k a' (a ≫ FC.filToAssocGraded t k) ∧
+      a' ≫ FC.filDiff t k =
+        c ≫ Subobject.ofLE (FC.fil (t + m + 1) (k - 1)) (FC.fil t (k - 1))
+          (FC.fil_anti_of_le (k - 1) (by omega))) := by
+  by_cases hn : ¬ Subobject.Factors
+      (FC.boundarySubobject (t + m) (k - 1) (↑m))
+      (b ≫ FC.filToAssocGraded (t + m) (k - 1))
+  · exact Or.inl (FC.essentialRelation_of_maximal_lift bnd t k m a b hdb hn)
+  · exact Or.inr (FC.boundary_correction_lift t k m a b hdb
+      (Classical.not_not.mp hn))
+
+/-- 有界性使单步分支有限终止：最终得到某个本质关系，或实际微分为零。
+    递归主体中的对象搬运与包含态射自然性均显式展开。 -/
+theorem FilteredComplex.iterated_essential_or_zero
+    (FC : FilteredComplex C) (bnd : FC.IsBounded)
+    (t k : ℤ) (m : ℕ) {T : C} [Projective T]
+    (a : T ⟶ Subobject.underlying.obj (FC.fil t k))
+    (b : T ⟶ Subobject.underlying.obj (FC.fil (t + m) (k - 1)))
+    (hdb : a ≫ (FC.fil t k).arrow ≫ FC.d k =
+      b ≫ (FC.fil (t + m) (k - 1)).arrow) :
+    (∃ (m' : ℕ)
+      (y' : T ⟶ FC.assocGraded (t + m') (k - 1)),
+      EssentialDifferentialRelation (FC.toSpectralSequence bnd)
+        (↑m') ⟨t, k⟩
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData ⟨t, k⟩).V =
+            FC.assocGraded t k) from rfl)) (a ≫ FC.filToAssocGraded t k))
+        (Eq.mpr (congrArg (fun X : C => T ⟶ X)
+          (show (((FC.toSpectralSequence bnd).ssData
+            (⟨t, k⟩ + (FC.toSpectralSequence bnd).diffDeg (↑m'))).V =
+            FC.assocGraded (t + m') (k - 1)) by rfl)) y')) ∨
+    ∃ a' : T ⟶ Subobject.underlying.obj (FC.fil t k),
+      FC.IsLift t k a' (a ≫ FC.filToAssocGraded t k) ∧
+        a' ≫ FC.filDiff t k = 0 := by
+  classical
+  generalize hN : (bnd.hi (k - 1) - (t + m)).toNat = N
+  induction N using Nat.strong_induction_on generalizing m a b with
+  | h N ih =>
+    by_cases htop : bnd.hi (k - 1) ≤ t + m
+    · right
+      refine ⟨a, rfl, ?_⟩
+      have hbot : FC.fil (t + m) (k - 1) = ⊥ :=
+        bnd.boundedAbove (k - 1) (t + m) htop
+      have hzero' : (FC.fil (t + m) (k - 1)).arrow = 0 := by
+        rw [hbot, Subobject.bot_arrow]
+      have hzero : b ≫ (FC.fil (t + m) (k - 1)).arrow = 0 := by
+        rw [hzero', comp_zero]
+      apply (cancel_mono (FC.fil t (k - 1)).arrow).mp
+      simp only [Category.assoc, FC.filDiff_comp_arrow]
+      rw [hdb, hzero, zero_comp]
+    · rcases FC.essential_or_boundary_correction bnd t k m a b hdb with hess | hcorr
+      · exact Or.inl ⟨m, b ≫ FC.filToAssocGraded (t + m) (k - 1), hess⟩
+      · rcases hcorr with ⟨a', c, ha', hdc⟩
+        have hmnext : t + (m : ℤ) + 1 = t + ((m + 1 : ℕ) : ℤ) := by omega
+        obtain ⟨c', hc'⟩ := FC.transport_fil_nat_succ t (k - 1) m hmnext c
+        have hc'' : c' = c ≫ eqToHom (congrArg (fun s : ℤ =>
+            Subobject.underlying.obj (FC.fil s (k - 1))) hmnext) := by
+          rw [← hc', Category.assoc, eqToHom_trans, eqToHom_refl, Category.comp_id]
+        have hdc' : a' ≫ FC.filDiff t k =
+            c' ≫ Subobject.ofLE
+              (FC.fil (t + ((m + 1 : ℕ) : ℤ)) (k - 1)) (FC.fil t (k - 1))
+              (FC.fil_anti_of_le (k - 1) (by omega)) := by
+          rw [hc'', ← FC.ofLE_transport_fil_nat_succ t k m hmnext c]
+          exact hdc
+        have hNlt : (bnd.hi (k - 1) -
+            (t + ((m + 1 : ℕ) : ℤ))).toNat < N := by
+          rw [← hN]
+          omega
+        have hdb' : a' ≫ (FC.fil t k).arrow ≫ FC.d k =
+            c' ≫ (FC.fil (t + ((m + 1 : ℕ) : ℤ)) (k - 1)).arrow := by
+          calc
+            a' ≫ (FC.fil t k).arrow ≫ FC.d k =
+                (a' ≫ FC.filDiff t k) ≫ (FC.fil t (k - 1)).arrow := by
+                  simp only [Category.assoc, FC.filDiff_comp_arrow]
+            _ = (c' ≫ Subobject.ofLE
+              (FC.fil (t + ((m + 1 : ℕ) : ℤ)) (k - 1)) (FC.fil t (k - 1))
+              (FC.fil_anti_of_le (k - 1) (by omega))) ≫
+                (FC.fil t (k - 1)).arrow := by rw [hdc']
+            _ = c' ≫ (FC.fil (t + ((m + 1 : ℕ) : ℤ)) (k - 1)).arrow := by
+              simp only [Category.assoc, Subobject.ofLE_arrow]
+        rcases ih ((bnd.hi (k - 1) -
+          (t + ((m + 1 : ℕ) : ℤ))).toNat) hNlt (m + 1) a' c' hdb' rfl with
+          ⟨m', y', hess'⟩ | ⟨a'', ha'', hz⟩
+        · change a' ≫ FC.filToAssocGraded t k =
+            a ≫ FC.filToAssocGraded t k at ha'
+          rw [ha'] at hess'
+          exact Or.inl ⟨m', y', hess'⟩
+        · exact Or.inr ⟨a'', ha''.trans ha', hz⟩
+
+/-- **两个不同目标的微分关系产生 crossing**：
+    两次反向提升一般得到不同的源代表元，不能直接断言它们的微分相等。
+    目标差首次进入边缘塔的页数给出本质短微分，其目标过滤次数
+    恰等于原关系的目标过滤次数。 -/
+theorem FilteredComplex.differentialRelation_crossed_of_two_exact
+    (FC : FilteredComplex C) (bnd : FC.IsBounded) (r : ℤ) (s k : ℤ) {T : C}
+    [Projective T]
+    {x : T ⟶ FC.assocGraded s k}
+    {y₁ y₂ : T ⟶ FC.assocGraded (s + r) (k - 1)}
+    (h₁ : DifferentialRelation (FC.toSpectralSequence bnd) r ⟨s, k⟩ x y₁)
+    (h₂ : DifferentialRelation (FC.toSpectralSequence bnd) r ⟨s, k⟩ x y₂)
+    (hne : y₁ ≠ y₂) :
+    RelationCrossedByAt (FC.toSpectralSequence bnd)
+      (fun p => p.1) r ⟨s, k⟩ x y₁ h₁ := by
+  have hdiff : y₁ - y₂ ≠ 0 := sub_ne_zero.mpr hne
+  have hboundary := DifferentialRelation.targets_sub_factors_boundary
+    (FC.toSpectralSequence bnd) r ⟨s, k⟩ h₁ h₂
+  by_cases hr : 0 ≤ r
+  · obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hr
+    change Subobject.Factors
+      (FC.boundarySubobject (s + ↑n) (k - 1) (↑n)) (y₁ - y₂) at hboundary
+    have hzero : ¬ Subobject.Factors
+        (FC.boundarySubobject (s + ↑n) (k - 1) 0) (y₁ - y₂) := by
+      intro hfac
+      have hz : y₁ - y₂ = 0 :=
+        FC.boundary_zero_apply (s + ↑n) k (T := T) (v := y₁ - y₂) hfac
+      exact hdiff hz
+    change Subobject.Factors
+      ((FC.toSSData bnd (s + ↑n) (k - 1)).B (↑n)) (y₁ - y₂) at hboundary
+    change ¬ Subobject.Factors
+      ((FC.toSSData bnd (s + ↑n) (k - 1)).B 0) (y₁ - y₂) at hzero
+    have hfirst := (FC.toSSData bnd (s + ↑n) (k - 1)).first_boundary_page
+      (y₁ - y₂) n hboundary hzero
+    obtain ⟨m, hm_lt, hm_fac, hm_not⟩ := hfirst
+    change Subobject.Factors
+      (FC.boundarySubobject (s + ↑n) (k - 1) (↑(m + 1))) (y₁ - y₂) at hm_fac
+    change ¬ Subobject.Factors
+      (FC.boundarySubobject (s + ↑n) (k - 1) (↑m)) (y₁ - y₂) at hm_not
+    obtain ⟨a, b, hdb, hbb⟩ :=
+      FC.lift_boundary (s + ↑n) (k - 1) (m + 1) hm_fac
+    let p : ℤ := s + ↑n
+    let t : ℤ := p - ↑(m + 1) + 1
+    let e : Subobject.underlying.obj (FC.fil t k) =
+        Subobject.underlying.obj (FC.fil t (k - 1 + 1)) := by
+      rw [show k - 1 + 1 = k by omega]
+    let aK := a ≫ eqToHom e.symm
+    have he : eqToHom e ≫
+        ((FC.fil t (k - 1 + 1)).arrow ≫ FC.dToK (k - 1)) =
+        (FC.fil t k).arrow ≫ FC.d k :=
+      FC.eqToHom_arrow_dToK t k
+    have hc : (a ≫ eqToHom e.symm) ≫ eqToHom e = a := by
+      rw [Category.assoc, eqToHom_trans, eqToHom_refl, Category.comp_id]
+    have hdbK : aK ≫ (FC.fil t k).arrow ≫ FC.d k =
+        b ≫ (FC.fil p (k - 1)).arrow := by
+      calc
+        aK ≫ (FC.fil t k).arrow ≫ FC.d k =
+            aK ≫ (eqToHom e ≫
+              ((FC.fil t (k - 1 + 1)).arrow ≫ FC.dToK (k - 1))) := by
+              rw [he]
+        _ = a ≫ (FC.fil t (k - 1 + 1)).arrow ≫ FC.dToK (k - 1) := by
+          simp only [aK, ← Category.assoc]
+          rw [hc]
+        _ = b ≫ (FC.fil p (k - 1)).arrow := hdb
+    have ht : t + ↑m = p := by dsimp [t, p]; omega
+    have hnot : ¬ Subobject.Factors (FC.boundarySubobject p (k - 1) (↑m))
+        (b ≫ FC.filToAssocGraded p (k - 1)) := by
+      rw [hbb]
+      exact hm_not
+    have hessential :=
+      FC.essentialRelation_of_filtered_lift bnd t p k m ht aK b hdbK hnot
+    refine ⟨t - s, by dsimp [t, p]; omega,
+      (↑m), ⟨t, k⟩, _, _, ?_, hessential, ?_⟩
+    · dsimp [t, p]
+      ring
+    · change t + ↑m = s + ↑n
+      omega
+  · have hneg : r < 0 := by omega
+    have hzeroNat : (r - (FC.toSpectralSequence bnd).r₀).toNat = 0 := by
+      change (r - 0).toNat = 0
+      omega
+    rw [hzeroNat] at hboundary
+    change Subobject.Factors
+      (FC.boundarySubobject (s + r) (k - 1) 0) (y₁ - y₂) at hboundary
+    exact False.elim (hdiff (FC.boundary_zero_apply (s + r) k hboundary))
+
+/-- 不同目标给出普通意义下的 crossing。 -/
 theorem FilteredComplex.differentialRelation_crossed_of_two
     (FC : FilteredComplex C) (bnd : FC.IsBounded) (r : ℤ) (s k : ℤ) {T : C}
     [Projective T]
     {x : T ⟶ FC.assocGraded s k}
     {y₁ y₂ : T ⟶ FC.assocGraded (s + r) (k - 1)}
     (h₁ : DifferentialRelation (FC.toSpectralSequence bnd) r ⟨s, k⟩ x y₁)
-    (h₂ : DifferentialRelation (FC.toSpectralSequence bnd) r ⟨s, k⟩ x y₂) :
+    (h₂ : DifferentialRelation (FC.toSpectralSequence bnd) r ⟨s, k⟩ x y₂)
+    (hne : y₁ ≠ y₂) :
     RelationCrossedBy (FC.toSpectralSequence bnd)
-      (fun p => p.1) r ⟨s, k⟩ x y₁ h₁ := by
-  sorry
+      (fun p => p.1) r ⟨s, k⟩ x y₁ h₁ :=
+  RelationCrossedByAt.toCrossed _ _ _ _
+    (FC.differentialRelation_crossed_of_two_exact bnd r s k h₁ h₂ hne)
 
 /-- **主定理的逆否命题**：
     若 `d_r` 关系 `d_r x y₁` 不被任何本质关系 cross，
@@ -2740,7 +3762,48 @@ theorem FilteredComplex.lift_rel_of_not_crossed
       yl ≫ Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
         (FC.fil_anti_of_le (k - 1) (by omega))) :
     FC.IsLift (s + r) (k - 1) yl y₁ := by
-  sorry
+  let y₂ := yl ≫ FC.filToAssocGraded (s + r) (k - 1)
+  have h₂ : DifferentialRelation (FC.toSpectralSequence bnd)
+      r ⟨s, k⟩ x y₂ :=
+    FC.differentialRelation_of_lift bnd r hr s k hx rfl hd
+  have heq : y₁ = y₂ := by
+    by_contra hne
+    exact hnc (FC.differentialRelation_crossed_of_two bnd r s k h₁ h₂ hne)
+  exact heq.symm
+
+/-- 零页关系的一个可用代表元：若零关系无 crossing，则可选取源提升，
+使其实际微分落入目标过滤层再深一层。 -/
+theorem FilteredComplex.zero_relation_deeper_lift
+    (FC : FilteredComplex C) (bnd : FC.IsBounded)
+    (r : ℤ) (hr : 0 ≤ r) (s k : ℤ) {T : C} [Projective T]
+    {x : T ⟶ FC.assocGraded s k}
+    (hrel : DifferentialRelation (FC.toSpectralSequence bnd) r ⟨s, k⟩ x 0)
+    (hnc : ¬ RelationCrossedBy (FC.toSpectralSequence bnd)
+      (fun p => p.1) r ⟨s, k⟩ x 0 hrel) :
+    ∃ (xl : T ⟶ Subobject.underlying.obj (FC.fil s k))
+      (yd : T ⟶ Subobject.underlying.obj (FC.fil (s + r + 1) (k - 1))),
+      FC.IsLift s k xl x ∧
+      xl ≫ FC.filDiff s k =
+        yd ≫ Subobject.ofLE (FC.fil (s + r + 1) (k - 1)) (FC.fil s (k - 1))
+          (FC.fil_anti_of_le (k - 1) (by omega)) := by
+  obtain ⟨xl, yl, yd, hx, hy, hd⟩ :=
+    FC.lift_endpoints_of_differentialRelation bnd r hr s k hrel
+  have hy' : FC.IsLift (s + r) (k - 1) yd 0 :=
+    FC.lift_rel_of_not_crossed bnd r hr s k hrel hnc hx yd hd
+  obtain ⟨yd', hdeeper⟩ := FC.lift_zero_deeper (s + r) (k - 1) yd hy'
+  refine ⟨xl, yd', hx, ?_⟩
+  have hfac :
+      Subobject.ofLE (FC.fil (s + r + 1) (k - 1)) (FC.fil s (k - 1))
+          (FC.fil_anti_of_le (k - 1) (by omega)) =
+        Subobject.ofLE (FC.fil (s + r + 1) (k - 1)) (FC.fil (s + r) (k - 1))
+          (FC.fil_anti_of_le (k - 1) (by omega)) ≫
+        Subobject.ofLE (FC.fil (s + r) (k - 1)) (FC.fil s (k - 1))
+          (FC.fil_anti_of_le (k - 1) (by omega)) := by
+    apply (cancel_mono (FC.fil s (k - 1)).arrow).mp
+    simp only [Category.assoc, Subobject.ofLE_arrow]
+  rw [hfac]
+  rw [← hdeeper] at hd
+  simpa only [Category.assoc] using hd
 
 /-! ### Weak convergence -/
 

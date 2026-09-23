@@ -208,7 +208,6 @@ private lemma Filtration.completionψ_naturality {ω : Type w} {A : ω → C}
     ← Category.assoc, fil.completionψ_factorization,
     fil.completionProj'_general hbb k (show s₀ + 1 ≤ s₁ + 1 by omega)]
 
-set_option maxHeartbeats 8000000 in
 private noncomputable def Filtration.completionConeLeg {ω : Type w} {A : ω → C}
     (fil : Filtration A) (hbb : fil.IsBoundedBelow) (k : ω) (T : C)
     (f : ∀ s₀ : ℤ, T ⟶ (fil.completionFiltration hbb).truncatedObj s₀ k) (n : ℕᵒᵖ) :
@@ -221,7 +220,6 @@ private noncomputable def Filtration.completionConeLeg {ω : Type w} {A : ω →
     fil.truncationTransition (show s ≤ s + 1 by omega) k
   exact step1 ≫ step2 ≫ step3
 
-set_option maxHeartbeats 8000000 in
 private lemma Filtration.completionConeLeg_naturality {ω : Type w} {A : ω → C}
     (fil : Filtration A) (hbb : fil.IsBoundedBelow) (k : ω) (T : C)
     (f : ∀ s₀ : ℤ, T ⟶ (fil.completionFiltration hbb).truncatedObj s₀ k)
@@ -260,7 +258,6 @@ private lemma Filtration.completionConeLeg_naturality {ω : Type w} {A : ω → 
   slice_rhs 1 2 => rw [hc]
   simp only [Category.assoc]
 
-set_option maxHeartbeats 4000000 in
 private noncomputable def Filtration.completionLift {ω : Type w} {A : ω → C}
     (fil : Filtration A) (hbb : fil.IsBoundedBelow) (k : ω) (T : C)
     (f : ∀ s₀ : ℤ, T ⟶ (fil.completionFiltration hbb).truncatedObj s₀ k)
@@ -278,7 +275,6 @@ private noncomputable def Filtration.completionLift {ω : Type w} {A : ω → C}
     }
   }
 
-set_option maxHeartbeats 8000000 in
 private lemma Filtration.completionLift_proj {ω : Type w} {A : ω → C}
     (fil : Filtration A) (hbb : fil.IsBoundedBelow) (k : ω) (T : C)
     (f : ∀ s₀ : ℤ, T ⟶ (fil.completionFiltration hbb).truncatedObj s₀ k)
@@ -320,7 +316,6 @@ private lemma Filtration.completionLift_proj {ω : Type w} {A : ω → C}
   rw [← Category.assoc, hcompat _ _
     (show s₀ ≤ hbb.lo k + ↑(s₀ + 1 - hbb.lo k).toNat by omega)]
 
-set_option maxHeartbeats 32000000 in
 private lemma Filtration.completionLift_unique {ω : Type w} {A : ω → C}
     (fil : Filtration A) (hbb : fil.IsBoundedBelow) (k : ω) (T : C)
     (f : ∀ s₀ : ℤ, T ⟶ (fil.completionFiltration hbb).truncatedObj s₀ k)
