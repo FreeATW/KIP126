@@ -164,15 +164,51 @@ noncomputable def homotopyGroupFunctor (n : ℤ) :
     ext x
     simp [inducedMap, Category.assoc]
 
-/-- Exactness at the shifted `X` term in the long exact homotopy-group
-sequence.  A concrete stable model supplies the remaining exactness witness
-while this canonical target records its type. -/
+/-- Exactness at the shifted `X` term, transferred through the shift equivalence
+from exactness of the distinguished triangle. -/
 theorem lesHomotopyExactH :
     ∀ {C : Type u} [StableHomotopyCategory.{u, v} C]
       (T : HoCofiberSequence (C := C)) (n : ℤ),
       ∀ (x : HomotopyGroup (n - 1) T.X),
         (inducedMap T.f (n - 1)) x = 0 ↔
           ∃ z : HomotopyGroup n T.Z, (connectingHomomorphism T n) z = x := by
-  sorry
+  intro C _ T n x
+  let F := shiftFunctor C (-1 : ℤ)
+  let a : (shiftFunctor C (n - 1)).obj SphereSpectrum ≅
+      F.obj ((shiftFunctor C n).obj SphereSpectrum) :=
+    (shiftFunctorAdd' C n (-1) (n - 1) (by omega)).app SphereSpectrum
+  let b := shiftFunctorCompIsoId C (1 : ℤ) (-1) (by omega)
+  let bX : F.obj ((shiftFunctor C (1 : ℤ)).obj T.X) ≅ T.X := b.app T.X
+  let bY : F.obj ((shiftFunctor C (1 : ℤ)).obj T.Y) ≅ T.Y := b.app T.Y
+  have hc (z : HomotopyGroup n T.Z) :
+      connectingHomomorphism T n z = a.hom ≫ F.map (z ≫ T.h) ≫ bX.hom := by
+    change a.hom ≫ 𝟙 _ ≫ F.map (z ≫ T.h) ≫ 𝟙 _ ≫ bX.hom ≫ 𝟙 _ = _
+    simp only [Category.id_comp, Category.comp_id]
+  have hb : bX.inv ≫ F.map ((shiftFunctor C (1 : ℤ)).map T.f) =
+      T.f ≫ bY.inv := (b.inv.naturality T.f).symm
+  constructor
+  · intro hx
+    change x ≫ T.f = 0 at hx
+    let w := F.preimage (a.inv ≫ x ≫ bX.inv)
+    have hw : F.map w = a.inv ≫ x ≫ bX.inv := F.map_preimage _
+    have hwf : w ≫ (shiftFunctor C (1 : ℤ)).map T.f = 0 := by
+      apply F.map_injective
+      rw [Functor.map_comp, hw, Functor.map_zero]
+      simp only [Category.assoc, hb, ← Category.assoc x T.f, hx,
+        Limits.zero_comp, Limits.comp_zero]
+    obtain ⟨z, hz⟩ := Triangle.coyoneda_exact₁ _ T.distinguished w hwf
+    change HomotopyGroup n T.Z at z
+    change w = z ≫ T.h at hz
+    refine ⟨z, ?_⟩
+    rw [hc, ← hz, hw]
+    simp
+  · rintro ⟨z, rfl⟩
+    change connectingHomomorphism T n z ≫ T.f = 0
+    rw [hc]
+    have hb' : bX.hom ≫ T.f =
+        F.map ((shiftFunctor C (1 : ℤ)).map T.f) ≫ bY.hom :=
+      (b.hom.naturality T.f).symm
+    simp only [Category.assoc, hb', ← F.map_comp_assoc,
+      T.hf_shift_zero, Limits.comp_zero, F.map_zero, Limits.zero_comp]
 
 end KIP126.StableHomotopy

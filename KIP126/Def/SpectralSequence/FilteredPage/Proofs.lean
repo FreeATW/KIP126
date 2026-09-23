@@ -1,4 +1,5 @@
 import KIP126.Def.SpectralSequence.FilteredPage.Data
+import KIP126.Def.SpectralSequence.Basic.Data
 
 /-!
 # Order laws for filtered-complex pages
@@ -282,19 +283,14 @@ noncomputable def Subobject.cokernelDescOfLE {V : C}
     (P Q R : Subobject V) (hPQ : P ≤ Q) (hQR : Q ≤ R)
     (hPR : P ≤ R := le_trans hPQ hQR) :
     cokernel (Subobject.ofLE P R hPR) ⟶ cokernel (Subobject.ofLE Q R hQR) :=
-  cokernel.desc _ (cokernel.π (Subobject.ofLE Q R hQR)) (by
-    have hfactor : Subobject.ofLE P R hPR =
-        Subobject.ofLE P Q hPQ ≫ Subobject.ofLE Q R hQR :=
-      (Subobject.ofLE_comp_ofLE P Q R hPQ hQR).symm
-    rw [hfactor, Category.assoc, cokernel.condition, comp_zero])
+  Subobject.cokernelDesc_ofLE P Q R hPQ hQR hPR
 
 /-- The map induced by `P ≤ Q ≤ R`: `Q/P ⟶ R/P`. -/
 noncomputable def Subobject.cokernelMapOfLE {V : C}
     (P Q R : Subobject V) (hPQ : P ≤ Q) (hQR : Q ≤ R)
     (hPR : P ≤ R := le_trans hPQ hQR) :
     cokernel (Subobject.ofLE P Q hPQ) ⟶ cokernel (Subobject.ofLE P R hPR) :=
-  cokernel.desc _ (Subobject.ofLE Q R hQR ≫ cokernel.π (Subobject.ofLE P R hPR)) (by
-    rw [← Category.assoc, Subobject.ofLE_comp_ofLE, cokernel.condition])
+  Subobject.cokernelMap_ofLE P Q R hPQ hQR hPR
 
 /-- The third-isomorphism identification `(R/P)/(Q/P) ≅ R/Q`. -/
 noncomputable def Subobject.thirdQuotientIso {V : C}
@@ -302,32 +298,6 @@ noncomputable def Subobject.thirdQuotientIso {V : C}
     (hPR : P ≤ R := le_trans hPQ hQR) :
     cokernel (Subobject.cokernelMapOfLE P Q R hPQ hQR hPR) ≅
       cokernel (Subobject.ofLE Q R hQR) :=
-  { hom := cokernel.desc _ (Subobject.cokernelDescOfLE P Q R hPQ hQR hPR) (by
-      ext
-      simp only [Subobject.cokernelMapOfLE, Subobject.cokernelDescOfLE,
-        cokernel.π_desc_assoc, comp_zero]
-      rw [Category.assoc, cokernel.π_desc, cokernel.condition])
-    inv := cokernel.desc _ (cokernel.π (Subobject.ofLE P R hPR) ≫
-        cokernel.π (Subobject.cokernelMapOfLE P Q R hPQ hQR hPR)) (by
-      set f := Subobject.cokernelMapOfLE P Q R hPQ hQR hPR
-      have h1 : cokernel.π (Subobject.ofLE P Q hPQ) ≫ f =
-          Subobject.ofLE Q R hQR ≫ cokernel.π (Subobject.ofLE P R hPR) :=
-        cokernel.π_desc _ _ _
-      calc Subobject.ofLE Q R hQR ≫ cokernel.π (Subobject.ofLE P R hPR) ≫ cokernel.π f
-          = (Subobject.ofLE Q R hQR ≫ cokernel.π (Subobject.ofLE P R hPR)) ≫
-              cokernel.π f := by rw [Category.assoc]
-        _ = (cokernel.π (Subobject.ofLE P Q hPQ) ≫ f) ≫ cokernel.π f := by rw [h1]
-        _ = cokernel.π (Subobject.ofLE P Q hPQ) ≫ (f ≫ cokernel.π f) := by
-              rw [Category.assoc]
-        _ = cokernel.π (Subobject.ofLE P Q hPQ) ≫ 0 := by rw [cokernel.condition]
-        _ = 0 := comp_zero)
-    hom_inv_id := by
-      ext
-      simp only [Category.comp_id, cokernel.π_desc,
-        Subobject.cokernelDescOfLE, cokernel.π_desc_assoc]
-    inv_hom_id := by
-      ext
-      simp only [Category.comp_id, Category.assoc, cokernel.π_desc_assoc,
-        Subobject.cokernelDescOfLE, cokernel.π_desc] }
+  Subobject.thirdIso P Q R hPQ hQR hPR
 
 end KIP126.Core.SpectralSequence.FilteredComplex

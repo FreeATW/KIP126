@@ -31,7 +31,7 @@ object.
 structure PageView (FC : FilteredComplex C) where
   shape : ℤ → ComplexShape (ℤ × ℤ)
   firstPage : ℤ
-  sequence : SpectralSequence C shape firstPage
+  sequence : CategoryTheory.SpectralSequence C shape firstPage
   /-- Translate Mathlib's integer page index to the canonical finite/infinite
   page index. -/
   pageNumber : ∀ (r : ℤ), firstPage ≤ r → WithTop ℕ
@@ -72,7 +72,7 @@ noncomputable def drop (r s k : ℤ) (hr : 0 ≤ r) :
   FC.filtration.inclusion (by omega) (k - 1)
 
 def datum (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ) :
-    DifferentialDatum (c := P.shape) (r₀ := P.firstPage) P.sequence where
+    MathlibModel.DifferentialDatum (c := P.shape) (r₀ := P.firstPage) P.sequence where
   page := r
   page_ge := hr
   source := (s, k)

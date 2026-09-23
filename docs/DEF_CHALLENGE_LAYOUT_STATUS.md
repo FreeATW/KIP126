@@ -111,6 +111,33 @@ hypotheses. `MilnorCooperations` contains the explicit foundational coordinates
 and their cocycle consequence, while `SphereClasses/Data` constructs the standard
 classes. Both final Challenge and Solution statements import that same module.
 
+The construction proof chain now proves tower composition, all three
+homotopy exactness statements, boundary inclusion in cycles, nesting of
+cycles, independence of the differential lift, linearity, vanishing on
+boundaries, square-zero, and vanishing of the current differential on
+next-page cycles. Polynomial concatenation preserves normalization and
+degree and is bilinear; the specified `h6` polynomial and its concatenation
+square are closed. `Checks/ClassicalAdams/Construction` audits these completed
+lemmas against the foundational axiom allowlist. Eleven of the fourteen
+previous foundation `sorry` bodies in the final theorem's local import cone
+have been replaced, without adding new placeholders.
+
+This does **not** complete either the comparison or the multiplication task.
+The remaining three existing foundation placeholders are
+`differentialPolynomial_mem`, `adamsNextBoundaries_le_ker`, and
+`adamsNextPageToHomology_bijective`. The general cobar square-zero and Leibniz
+proofs, multiplication on its homology, and the actual `E₂` product and square
+identity are not yet implemented. The normalized cocycle theorems still
+transitively depend on `differentialPolynomial_mem`, although their raw
+polynomial counterparts pass the axiom audit.
+
+`StableHomotopy/Cohomology/Multiplication/{Data,Proofs}` adds a monoid-object
+structure with unit equal to the specified `H.unit`, the graded groups
+`πₙ(H ∧ H)`, unit insertion, and the multiplication counit. It proves that
+the Adams unit on `H` splits and that one counit identity holds. It supplies
+neither Künneth nor a Milnor identification. `MilnorCooperations` remains an
+input to `SphereClasses` and the final theorem, whose proof is still open.
+
 The convergence witness structures now live in `Data`, their detection
 relation in `Predicates`, and the derived completion and detection results in
 `Proofs`. The provenance-bearing `EtaESSInput` and concrete eta ESS now live

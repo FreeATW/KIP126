@@ -6,6 +6,10 @@ target.  The reduction to $d_{12}$ and the conditions used in its exclusion
 belong to the later proof, not to these definitions.  The ambient category
 of spectra is abstract.  Its mod--$2$ Eilenberg--Mac Lane object and the
 explicit Milnor cooperation coordinates below are foundational inputs.
+The current implementation still takes those coordinates as an argument.
+The next comparison stage keeps the abstract background and derives them
+from the ring structure, cooperations, and tensor compatibility of $H$;
+that derivation is not yet implemented.
 
 % SOURCE: PROJECT_BOUNDARY.md, Confirmed design decision 1; abstract foundation
 % and Milnor cooperation boundary explicitly confirmed for this implementation.
@@ -20,6 +24,22 @@ explicit Milnor cooperation coordinates below are foundational inputs.
   Define $u:S^0\to H$ to be the map corresponding to $1\in\mathbb F_2$.
   The equation $\pi_nH=0$ means that every element of that group equals its
   zero element; it does not mean that the group is empty.
+\end{definition}
+
+\begin{definition}[Ring structure and cooperation maps of the chosen object]
+  \label{def:h6-ring-cooperations}
+  \lean{KIP126.StableHomotopy.Cohomology.Mod2RingStructure}
+  \lean{KIP126.StableHomotopy.Cohomology.Mod2Cooperations}
+  \lean{KIP126.StableHomotopy.Cohomology.cooperationDiagonalMap}
+  \lean{KIP126.StableHomotopy.Cohomology.cooperationCounit}
+  \uses{def:h6-em-object,def:unital-multiplication-data}
+  \leanok
+  Equip the specified $H$ with an associative unital algebra-object
+  structure whose unit is the specified $u$. Define the graded cooperation
+  groups to be $\pi_n(H\wedge H)$. Inserting $u$ between the two factors
+  gives a map to $\pi_n(H\wedge(H\wedge H))$, and multiplication gives
+  the counit to $\pi_nH$. No K\"unneth identification or Milnor polynomial
+  coordinates are part of these definitions.
 \end{definition}
 
 % SOURCE: the Adams resolution in def:hf2-adams-tower, made explicit by
@@ -46,6 +66,23 @@ explicit Milnor cooperation coordinates below are foundational inputs.
   extend the tower constantly to negative stages, and put
   $Q_s=\operatorname{cofib}(T_{s+1}\to T_s)$.
 \end{definition}
+
+\begin{proposition}[The Adams unit on the coefficient object splits]
+  \label{prop:h6-unit-splits}
+  \lean{KIP126.StableHomotopy.Cohomology.adamsUnit_mul}
+  \lean{KIP126.StableHomotopy.Cohomology.cooperationDiagonal_counit_right}
+  \uses{def:h6-ring-cooperations,def:h6-fiber-tower}
+  \leanok
+  Multiplication $H\wedge H\to H$ retracts the map
+  $H\to H\wedge H$ used in the Adams tower. Multiplying the final two
+  factors also retracts the middle-unit insertion
+  $H\wedge H\to H\wedge(H\wedge H)$.
+\end{proposition}
+\begin{proof}
+  Apply the left unit identity of the algebra object, then tensor that
+  identity with $H$.
+  \leanok
+\end{proof}
 
 \begin{definition}[Quotient pages from the Adams tower]
   \label{def:h6-tower-pages}
@@ -87,8 +124,29 @@ explicit Milnor cooperation coordinates below are foundational inputs.
   \]
   Thus the map is specified on representatives before descending to the
   quotient.  Its additivity, independence of the lift and representative,
-  and square-zero law are properties to prove, not inputs selecting a map.
+  and square-zero law are established in Proposition~\ref{prop:h6-tower-differential-laws}; they are not inputs selecting a map.
 \end{definition}
+
+\begin{proposition}[Well-definedness and square-zero of the tower differential]
+  \label{prop:h6-tower-differential-laws}
+  \lean{KIP126.Classical.Adams.adamsDifferentialValue_eq_of_lift}
+  \lean{KIP126.Classical.Adams.adamsDifferentialValue_add}
+  \lean{KIP126.Classical.Adams.adamsDifferentialValue_smul}
+  \lean{KIP126.Classical.Adams.adamsBoundaries_le_differential_ker}
+  \lean{KIP126.Classical.Adams.adamsPageD_comp}
+  \uses{def:h6-tower-differential}
+  \leanok
+  The differential is independent of the chosen lift, is additive and
+  integer-linear, vanishes on cycle boundaries, and satisfies $d_r^2=0$.
+\end{proposition}
+\begin{proof}
+  Two lifts differ by an element in the kernel of the tower composite,
+  so their layer images differ by a boundary. Use sums and scalar multiples
+  of lifts to establish linearity. Exactness gives $kj=0$; hence every
+  layer image has zero next differential, proving both boundary vanishing
+  and square-zero.
+  \leanok
+\end{proof}
 
 \begin{proposition}[Page passage for the constructed tower]
   \label{prop:h6-tower-page-passage}
@@ -149,6 +207,29 @@ explicit Milnor cooperation coordinates below are foundational inputs.
   The product $C^{s,t}\otimes C^{s',t'}\to C^{s+s',t+t'}$ concatenates slots.
 \end{definition}
 
+\begin{proposition}[Polynomial multiplication and the two closed representatives]
+  \label{prop:h6-polynomial-cocycles}
+  \lean{KIP126.Steenrod.Milnor.cupPolynomial_mem}
+  \lean{KIP126.Steenrod.Milnor.h6Polynomial_mem}
+  \lean{KIP126.Steenrod.Milnor.h6Polynomial_differential}
+  \lean{KIP126.Steenrod.Milnor.h6SquarePolynomial_differential}
+  \uses{def:h6-milnor-cobar}
+  \leanok
+  Concatenation preserves normalization and adds internal degrees.
+  The polynomial $[\xi_1^{64}]$ is normalized of internal degree $64$.
+  Its polynomial cobar differential and that of
+  $[\xi_1^{64}\mid\xi_1^{64}]$ both vanish.
+\end{proposition}
+\begin{proof}
+  Disjoint slot renamings preserve the weight. Augmentation of any slot
+  annihilates the corresponding factor of a concatenation. Since
+  $\xi_1$ is primitive, the characteristic-two identity
+  $(a+b)^{64}=a^{64}+b^{64}$ gives the two differential calculations.
+  These polynomial statements do not depend on the still-open assertion
+  that the differential preserves all normalized cochains.
+  \leanok
+\end{proof}
+
 % SOURCE: explicit abstract-foundation boundary confirmed for this task.
 % This node is a supplied mathematical structure, not a proved comparison theorem.
 \begin{definition}[Milnor coordinates of the mod--2 foundation]
@@ -184,6 +265,19 @@ explicit Milnor cooperation coordinates below are foundational inputs.
   the constructed page-passage isomorphism.  This defines respectively
   $h_6\in E_2^{1,64}$ and $h_6^2\in E_2^{2,128}$.
 \end{definition}
+
+\begin{proposition}[Second-page multiplication and the square identity]
+  \label{prop:h6-e2-square-identity}
+  \uses{def:h6-constructed-square,def:h6-milnor-cobar,prop:h6-tower-page-passage}
+  \notready
+  The cobar differential satisfies square-zero and the Leibniz identity;
+  concatenation descends to homology and corresponds under a multiplicative
+  comparison to a second-page product adding both bidegrees. Under this product,
+  the class currently named $h_6^2$ equals the product of $h_6$ with itself.
+  Bilinearity and the two individual cocycle calculations above do not
+  establish this descent or this second-page identity. Neither the
+  second-page product nor the asserted identity has a Lean implementation yet.
+\end{proposition}
 
 \begin{definition}[Pagewise nonzero permanence]
   \label{def:h6-pagewise-permanence}

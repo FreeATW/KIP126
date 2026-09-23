@@ -30,14 +30,14 @@ def IsLift (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ)
 def relation (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ)
     {T : C} (x : P.element r hr s k T)
     (y : P.element r hr (s + r) (k - 1) T) : Prop :=
-  DifferentialRelation P.sequence r hr (s, k) (target r s k) x y
+  MathlibModel.DifferentialRelation P.sequence r hr (s, k) (target r s k) x y
 
 /-- The canonical page-level crossing predicate for a relation. -/
 def crossed (r : ℤ) (hr : P.firstPage ≤ r) (s k : ℤ)
     {T : C} (x : P.element r hr s k T)
     (y : P.element r hr (s + r) (k - 1) T)
     (h : P.relation r hr s k x y) : Prop :=
-  RelationCrossedBy (P.datum r hr s k) x y h
+  MathlibModel.RelationCrossedBy (P.datum r hr s k) x y h
 
 end PageView
 

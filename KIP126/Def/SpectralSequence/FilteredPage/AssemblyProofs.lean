@@ -36,7 +36,7 @@ private lemma factor_cokernelMap {V : C}
     Subobject.ofLE Q R hQR ≫ cokernel.π (Subobject.ofLE P R hPR) =
       cokernel.π (Subobject.ofLE P Q hPQ) ≫
         Subobject.cokernelMapOfLE P Q R hPQ hQR hPR := by
-  simp [Subobject.cokernelMapOfLE, cokernel.π_desc]
+  simp [Subobject.cokernelMapOfLE, Subobject.cokernelMap_ofLE, cokernel.π_desc]
 
 private instance cokernelMapOfLE_mono {V : C}
     (P Q R : Subobject V) (hPQ : P ≤ Q) (hQR : Q ≤ R)
@@ -112,7 +112,8 @@ private noncomputable def nestedSubobjectHomologyIso {V : C}
     hi.lift (KernelFork.ofι f zero)
   have hjπ : j ≫ πMap = 0 := by
     simp only [j, πMap, Subobject.cokernelMapOfLE,
-      Subobject.cokernelDescOfLE]
+      Subobject.cokernelDescOfLE, Subobject.cokernelMap_ofLE,
+      Subobject.cokernelDesc_ofLE]
     ext
     simp only [cokernel.π_desc_assoc, cokernel.π_desc, comp_zero,
       Category.assoc, cokernel.condition]
