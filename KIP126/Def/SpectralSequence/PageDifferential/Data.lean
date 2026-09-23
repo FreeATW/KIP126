@@ -17,6 +17,8 @@ universe u v w
 variable {C : Type u} [Category.{v} C] [Abelian C]
 variable {κ : Type w} (c : ℤ → ComplexShape κ) (r₀ : ℤ)
 
+namespace MathlibModel
+
 /-- A generalized element of a fixed page object. -/
 abbrev PageElement (E : SpectralSequence C c r₀) (r : ℤ) (hr : r₀ ≤ r)
     (k : κ) (T : C) := T ⟶ (E.page r hr).X k
@@ -41,5 +43,7 @@ abbrev sourceDegree (D : DifferentialDatum (c := c) (r₀ := r₀) E) : ℤ :=
   D.filtrationDegree D.source
 
 end DifferentialDatum
+
+end MathlibModel
 
 end KIP126.Core.SpectralSequence

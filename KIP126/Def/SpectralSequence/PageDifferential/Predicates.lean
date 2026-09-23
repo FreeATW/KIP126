@@ -18,6 +18,8 @@ variable {C : Type u} [Category.{v} C] [Abelian C]
 variable {κ : Type w} {c : ℤ → ComplexShape κ} {r₀ : ℤ}
 variable {E : SpectralSequence C c r₀}
 
+namespace MathlibModel
+
 /-- A differential at `(r, source, target)` is essential when its page map is
 nonzero. Both indices are explicit, as in Mathlib's page differential API. -/
 def IsEssentialAt (E : SpectralSequence C c r₀) (r : ℤ) (hr : r₀ ≤ r)
@@ -77,5 +79,7 @@ def NoCrossingRange (D : DifferentialDatum (c := c) (r₀ := r₀) E) (p : ℤ) 
 condition. -/
 def NoCrossing (D : DifferentialDatum (c := c) (r₀ := r₀) E) : Prop :=
   NoCrossingRange D (D.sourceDegree + 1)
+
+end MathlibModel
 
 end KIP126.Core.SpectralSequence

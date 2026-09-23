@@ -5,6 +5,7 @@ import KIP126.Def.SpectralSequence.PageDifferential.Proofs
 namespace KIP126.Checks.SpectralSequence.PageDifferential
 
 open CategoryTheory CategoryTheory.Limits KIP126.Core.SpectralSequence
+open KIP126.Core.SpectralSequence.MathlibModel
 
 universe u v w
 

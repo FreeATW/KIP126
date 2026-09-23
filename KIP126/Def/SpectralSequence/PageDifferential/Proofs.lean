@@ -11,6 +11,8 @@ universe u v w
 variable {C : Type u} [Category.{v} C] [Abelian C]
 variable {κ : Type w} {c : ℤ → ComplexShape κ} {r₀ : ℤ}
 
+namespace MathlibModel
+
 theorem differentialRelation_iff (E : SpectralSequence C c r₀) (r : ℤ)
     (hr : r₀ ≤ r) (source target : κ) {T : C}
     (x : PageElement c r₀ E r hr source T)
@@ -43,5 +45,7 @@ theorem not_hasCrossingAt_of_noCrossing (D : DifferentialDatum (c := c) (r₀ :=
     htarget, hbound⟩
   exact ⟨a, ha, r', hr', source', target', hsource, hessential,
     htarget ▸ le_rfl, hbound⟩
+
+end MathlibModel
 
 end KIP126.Core.SpectralSequence
