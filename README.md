@@ -71,6 +71,9 @@ document:
   compilation regressions.  The
   [layout migration map](docs/DEF_CHALLENGE_LAYOUT_STATUS.md) records moved
   source modules and remaining open milestones.
+  The [E₂ table interface walkthrough](docs/ADAMS_E2_TABLE.md) explains the
+  small executable example connecting imported dimensions and multiplication
+  coefficients to an existing spectral sequence's page.
 - [`reference/source-inventory.json`](reference/source-inventory.json), the
   per-source status records under [`reference/`](reference/), and the Lean
   claim ledger own the catalogue and provenance of external inputs. They record

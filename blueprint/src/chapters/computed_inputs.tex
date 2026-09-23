@@ -3,6 +3,50 @@
 
 This chapter contains the concrete Lin outputs, appendix rows, and finite evidence certificates carried as external computation inputs.  Their schemas were defined earlier.
 
+\section{A reproducible low-degree $E_2$ example}
+
+% SOURCE: Weinan Lin, Cohomology of the Mod 2 Steenrod algebra, t261.2,
+% https://doi.org/10.5281/zenodo.7865526, S0_AdamsE2_csv.zip.
+% SHA-256: bb53d84a3450d58535f7119d3a4fa2123688f9574c396d592763c37be89de470.
+% LOCATORS: basis CSV IDs 0--15,17,19,20,22,23,35,42,50,51,401,2314;
+% multiplication obtained by reduction with the relations CSV.
+\begin{definition}[Low-degree table extracted from Lin's data]
+  \label{def:lin-low-degree-table}
+  \lean{KIP126.Examples.AdamsE2LowDegrees.table}
+  \uses{def:adams-e2-basis-table}
+  Extract the region $0\le s\le8$, $0\le t-s\le8$, together with
+  $(1,64),(2,128),(1,16),(4,18),(5,20)$, from Lin's version
+  \texttt{t261.2} of Zenodo record \texttt{7865526}.
+  Retain the published additive-basis order and compute each covered basis
+  product using the published polynomial relations.
+  The resulting numerical table has 86 covered cells and 27 basis vectors:
+  60 cells have dimension zero, 25 have dimension one, and $(5,20)$ has
+  dimension two, with basis $(h_1d_0,h_0^4h_4)$ (source IDs 50 and 51).
+  This construction imports numerical data; identifying it with the actual
+  sphere page remains an explicit presentation input, not a consequence of
+  parsing the file.  This dataset is distinct from the later near-$126$
+  differential and extension catalogues below.
+\end{definition}
+
+\begin{lemma}[Low-degree table relations and a two-dimensional component]
+  \label{lem:lin-low-degree-table-relations}
+  \lean{KIP126.Examples.AdamsE2LowDegrees.h0_h1_zero,KIP126.Examples.AdamsE2LowDegrees.h1_h2_zero,KIP126.Examples.AdamsE2LowDegrees.h0_c0_zero,KIP126.Examples.AdamsE2LowDegrees.h1_cube,KIP126.Examples.AdamsE2LowDegrees.h6_square,KIP126.Examples.AdamsE2LowDegrees.page_two_products_sum_ne_zero}
+  \uses{def:lin-low-degree-table,def:adams-e2-table-presentation}
+  In the model algebra, the table implies
+  $h_0h_1=h_1h_2=h_0c_0=0$, $h_1^3=h_0^2h_2$, and the specified
+  square relation for $h_6$.
+  For any presentation of this table on an existing page, the actual products
+  $h_1d_0$ and $h_0^4h_4$ are its two specified basis vectors at $(5,20)$.
+  Their sum has coordinates $(1,1)$ and is nonzero.
+\end{lemma}
+\begin{proof}
+  \uses{lem:adams-e2-table-product}
+  Evaluate the imported coefficients and impose the corresponding relations
+  in the quotient algebra.  Under a presentation, transport these equalities
+  to the page.  Applying the first basis-coordinate functional to the sum
+  gives $1$, which rules out zero.
+\end{proof}
+
 \section{Lin catalogues and appendix tables}
 
 % SOURCE: aimpaper/112.tex:5-1029, Figure Fig:near126; included at aimpaper/main.tex:2152; local PDF p.43.

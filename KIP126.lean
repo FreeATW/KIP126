@@ -1,7 +1,10 @@
 import KIP126.BlueprintRoots
 import KIP126.Def
+import KIP126.Def.AdamsE2
 import KIP126.External
 import KIP126.Challenge
+import KIP126.Examples.AdamsE2Table
+import KIP126.Examples.AdamsE2LowDegrees
 
 /-! Canonical library entry: mathematical definitions, explicit external inputs,
 and the open Challenge statements.  The parallel `KIP126.Solution` proof track

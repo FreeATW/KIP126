@@ -3,6 +3,91 @@
 
 This chapter defines the types used to state machine and appendix results.  It contains no Lin output, table row, or other computed value.
 
+\section{Finite presentations of an existing Adams page}
+
+% SOURCE: project interface design; this does not assert any real computed value.
+\begin{definition}[Finite basis multiplication table]
+  \label{def:adams-e2-basis-table}
+  \lean{KIP126.AdamsE2.Table}
+  \uses{def:classical-adams-e2-e3-shape-slice}
+  A table specifies a finite set $D$ of bidegrees containing $(0,0)$,
+  dimensions $n(p)$ for $p\in D$, coordinates for the unit, and coefficients
+  $c_{p,q,i,j,k}\in\mathbb F_2$ for every product whose source degrees
+  $p,q$ and target degree $p+q$ belong to $D$.
+  A degree outside $D$ is unknown, not a zero-dimensional space.
+\end{definition}
+
+\begin{definition}[Algebra presented by a multiplication table]
+  \label{def:adams-e2-table-model}
+  \lean{KIP126.AdamsE2.Table.Model,KIP126.AdamsE2.Table.piece}
+  \uses{def:adams-e2-basis-table}
+  Introduce a generator $X_{p,i}$ of degree $p$ for each recorded basis
+  index.  Let $A_T$ be the polynomial algebra over $\mathbb F_2$ modulo
+  the unit relation and all covered relations
+  \[
+    X_{p,i}X_{q,j}=\sum_k c_{p,q,i,j,k}X_{p+q,k}.
+  \]
+  No relation sets an uncovered product to zero.  The degree-$p$ subspace
+  is the image of the weighted homogeneous polynomials of degree $p$.
+  This is a model algebra, not a definition of the actual Adams page.
+\end{definition}
+
+\begin{definition}[Presentation of the actual $E_2$ page]
+  \label{def:adams-e2-table-presentation}
+  \lean{KIP126.AdamsE2.PageAlgebra,KIP126.AdamsE2.Presentation,KIP126.AdamsE2.Input}
+  \uses{def:adams-e2-table-model,def:classical-adams-e2-e3-shape-slice,def:external-evidence}
+  Fix an existing mod--$2$ Adams-shaped spectral sequence $E$ and a
+  degree-preserving commutative algebra structure on the direct sum of its
+  actual $E_2$ components.  A presentation consists of an algebra map
+  $A_T\to E_2$, compatible maps on every homogeneous component, and
+  bijectivity on each degree in $D$.  It also supplies bases of the actual
+  page components, of the recorded sizes, equal to the images of the
+  corresponding model generators.  Existence of this presentation is
+  supplied as explicit external evidence with provenance; reading the
+  numerical table does not prove it.
+\end{definition}
+
+\begin{lemma}[Transporting a table product to the page]
+  \label{lem:adams-e2-table-product}
+  \lean{KIP126.AdamsE2.Table.generator_mul,KIP126.AdamsE2.Presentation.basis_mul}
+  \uses{def:adams-e2-table-presentation}
+  Under a supplied presentation, every covered table relation is an
+  equality for the actual $E_2$ multiplication on the specified basis.
+\end{lemma}
+\begin{proof}
+  The polynomial relation is zero in the quotient model.  Apply the
+  presentation's algebra homomorphism and use injectivity of the inclusion
+  of the target component into the direct sum.
+\end{proof}
+
+\begin{definition}[The classes obtained from an imported table]
+  \label{def:adams-e2-imported-h6}
+  \lean{KIP126.AdamsE2.Input.h6,KIP126.AdamsE2.Input.h6Square}
+  \uses{def:adams-e2-table-presentation}
+  If the table contains $(1,64)$ with dimension one, define $h_6$ as the
+  image of its sole basis vector.  Define $h_6^2$ using the actual page
+  multiplication.  Its nonvanishing or permanence is not a field of this
+  definition.  This interface alone does not identify an arbitrary
+  Adams-shaped sequence with the sphere's sequence.
+\end{definition}
+
+\begin{lemma}[Three-cell illustration]
+  \label{lem:adams-e2-three-cell-example}
+  \lean{KIP126.Examples.AdamsE2Table.x_mul_x,KIP126.Examples.AdamsE2Table.y_ne_zero,KIP126.Examples.AdamsE2Table.x_mul_y_ne_zero,KIP126.Examples.AdamsE2Table.imported_h6_square_ne_zero}
+  \uses{def:adams-e2-imported-h6,lem:adams-e2-table-product}
+  Consider the illustrative table with one-dimensional cells at $(0,0)$,
+  $(1,64)$ and $(2,128)$, with unit and $x^2=y$.  In its model, $y\ne0$
+  and the uncovered product $xy\ne0$.  For any supplied presentation of
+  this table on an existing page, the resulting $h_6^2$ is nonzero.
+  This is not a claim that the illustration is actual sphere Adams data.
+\end{lemma}
+\begin{proof}
+  Map the model to $\mathbb F_2[X]$ by $x\mapsto X$, $y\mapsto X^2$
+  and the unit generator to $1$.  All table relations vanish, whereas
+  $X^2$ and $X^3$ are nonzero.  On the actual page, the table product is
+  the specified basis vector in degree $(2,128)$ and is therefore nonzero.
+\end{proof}
+
 \section{Typed catalogue schemas}
 
 % SOURCE: aimpaper/main.tex:1930-1977, Example exam:Mahowald.
