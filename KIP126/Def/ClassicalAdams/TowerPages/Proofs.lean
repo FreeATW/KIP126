@@ -53,6 +53,16 @@ theorem adamsI_comp (n s t z : ℤ) (hst : s ≤ t) (htz : t ≤ z)
       adamsI unit X n s z (by omega) x := by
   simp [adamsI, inducedMap, Category.assoc, adamsTowerMapAt_comp]
 
+/-- The boundary filtration increases with the page. -/
+theorem adamsBoundaries_le_succ (r : ℕ) (hr : 1 ≤ r) (s t : ℤ) :
+    adamsBoundaries unit X r hr s t ≤ adamsBoundaries unit X (r + 1) (by omega) s t := by
+  rintro x ⟨y, hy, rfl⟩
+  refine ⟨y, ?_, rfl⟩
+  change adamsI unit X (t - s) (s - r + 1) s (by omega) y = 0 at hy
+  change adamsI unit X (t - s) (s - (r + 1 : ℕ) + 1) s (by omega) y = 0
+  rw [← adamsI_comp unit X (t - s) (s - (r + 1 : ℕ) + 1) (s - r + 1) s
+    (by omega) (by omega), hy, map_zero]
+
 /-- A cycle which lifts one stage farther is in particular an `r`-cycle. -/
 theorem adamsCycles_succ_le (r : ℕ) (hr : 1 ≤ r) (s t : ℤ) :
     adamsCycles unit X (r + 1) (by omega) s t ≤ adamsCycles unit X r hr s t := by

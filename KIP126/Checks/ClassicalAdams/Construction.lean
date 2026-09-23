@@ -1,4 +1,4 @@
-import KIP126.Def.ClassicalAdams.TowerSequence.NextCycles.Proofs
+import KIP126.Def.ClassicalAdams.SphereClasses.Data
 import KIP126.Def.Steenrod.MilnorCobar.Proofs
 import KIP126.Def.StableHomotopy.Cohomology.Multiplication.Proofs
 import Lean.Elab.Command
@@ -6,9 +6,9 @@ import Lean.Elab.Command
 /-!
 # Axiom regression for the completed Adams construction lemmas
 
-Audit declarations individually: the normalized cobar differential and page
-passage still have open dependencies. In particular this does not certify
-`mod2SphereAdams`, the transported `h6` classes, or the final theorem.
+Audit the constructed spectral sequence, normalized cochains, and specified
+classes. The Milnor comparison is still an explicit input to the class
+construction; the final survival theorem is outside this construction audit.
 -/
 
 open Lean Elab Command in
@@ -26,6 +26,15 @@ run_cmd do
       ``KIP126.Classical.Adams.adamsPageD_comp,
       ``KIP126.Classical.Adams.adamsNextCycle_d_zero,
       ``KIP126.Classical.Adams.adamsCycle_of_lift,
+      ``KIP126.Classical.Adams.adamsDifferentialValue_eq_zero_iff,
+      ``KIP126.Classical.Adams.adamsNextBoundaries_le_ker,
+      ``KIP126.Classical.Adams.adamsNextPageToHomology_bijective,
+      ``KIP126.Classical.Adams.mod2SphereAdams,
+      ``KIP126.Classical.Adams.Sphere.h6,
+      ``KIP126.Classical.Adams.Sphere.h6Square,
+      ``KIP126.Steenrod.Milnor.differentialPolynomial_mem,
+      ``KIP126.Steenrod.Milnor.h6Cochain_isCycle,
+      ``KIP126.Steenrod.Milnor.h6SquareCochain_isCycle,
       ``KIP126.Steenrod.Milnor.cupPolynomial_mem,
       ``KIP126.Steenrod.Milnor.cup_add_left,
       ``KIP126.Steenrod.Milnor.cup_add_right,

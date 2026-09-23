@@ -4,8 +4,6 @@ import KIP126.Def.ClassicalAdams.Tower.Data
 
 namespace KIP126.Classical.Adams
 
-set_option backward.isDefEq.respectTransparency false
-
 open CategoryTheory CategoryTheory.MonoidalCategory KIP126.StableHomotopy
 
 universe u v

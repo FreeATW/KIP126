@@ -1,4 +1,4 @@
-import KIP126.Def.Steenrod.MilnorCobar.Polynomial.Predicates
+import KIP126.Def.Steenrod.MilnorCobar.Polynomial.Normalization.Proofs
 import Mathlib.Algebra.CharP.Lemmas
 import Mathlib.Algebra.CharP.Two
 
@@ -16,35 +16,23 @@ noncomputable section
 
 open KIP126.Core.Algebra MvPolynomial
 
-/-- Renaming tensor slots does not change internal degree. -/
-theorem homogeneous_rename_slots {s s' t : ℕ} (f : Fin s → Fin s')
-    {x : TensorPower s} (hx : IsWeightedHomogeneous weight x t) :
-    IsWeightedHomogeneous weight (rename (fun a : Fin s × ℕ => (f a.1, a.2)) x) t := by
-  induction hx using IsWeightedHomogeneous.induction_on with
-  | zero => simpa using isWeightedHomogeneous_zero F2 (@weight s') t
-  | add x y hx hy ihx ihy => simpa using ihx.add ihy
-  | monomial d r hd =>
-    rw [rename_monomial]
-    apply isWeightedHomogeneous_monomial
-    rw [← hd]
-    simp only [Finsupp.weight_apply, weight, smul_eq_mul]
-    rw [Finsupp.sum_mapDomain_index (by simp) (by intros; simp [add_mul])]
-
-/-- Augmenting a renamed slot agrees with renaming after augmentation. -/
-theorem augmentSlot_rename {s s' : ℕ} (f : Fin s → Fin s')
-    (hf : Function.Injective f) (slot : Fin s) (x : TensorPower s) :
-    augmentSlot (f slot) (rename (fun a : Fin s × ℕ => (f a.1, a.2)) x) =
-      rename (fun a : Fin s × ℕ => (f a.1, a.2)) (augmentSlot slot x) := by
-  have h : (augmentSlot (f slot)).comp (rename (fun a : Fin s × ℕ => (f a.1, a.2))) =
-      (rename (fun a : Fin s × ℕ => (f a.1, a.2))).comp (augmentSlot slot) := by
-    ext a : 1
-    by_cases ha : a.1 = slot <;> simp [augmentSlot, hf.eq_iff, ha]
-  exact DFunLike.congr_fun h x
-
 /-- The coproduct differential preserves normalization and internal degree. -/
 theorem differentialPolynomial_mem (s t : ℕ) (x : cochains s t) :
     IsCochain t (differentialPolynomial s x) := by
-  sorry
+  constructor
+  · change IsWeightedHomogeneous weight (differentialPolynomial s x.val) t
+    simp only [differentialPolynomial, LinearMap.add_apply, LinearMap.sum_apply,
+      AlgHom.toLinearMap_apply]
+    exact ((homogeneous_rename_slots Fin.succ x.property.1).add
+      (homogeneous_rename_slots Fin.castSucc x.property.1)).add
+      (IsWeightedHomogeneous.sum Finset.univ (fun slot => splitSlot slot x.val) t
+        (fun slot _ => homogeneous_splitSlot slot x.property.1))
+  · change differentialPolynomial s x.val ∈
+      (⨅ slot : Fin (s + 1), LinearMap.ker (augmentSlot slot).toLinearMap)
+    rw [Submodule.mem_iInf]
+    intro slot
+    exact differentialPolynomial_normalized x.val
+      (fun i => (Submodule.mem_iInf _).mp x.property.2 i) slot
 
 /-- Concatenation preserves normalization and adds the two internal degrees. -/
 theorem cupPolynomial_mem {s s' t t' : ℕ} (x : cochains s t) (y : cochains s' t') :
