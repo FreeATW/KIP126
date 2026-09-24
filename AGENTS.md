@@ -48,26 +48,36 @@ clarified.
   separately from the intentionally unproved Challenge statements; a Challenge
   placeholder is never evidence of proof completion.
 
-## Data, predicates, and proofs
+## Data, predicates, axioms, and proofs
 
 - Organize each mathematical component under `KIP126/Def/` into separate
-  `Data.lean`, `Predicates.lean`, and `Proofs.lean` modules as applicable. Do not
-  mix these responsibilities in one implementation file or create empty layers
-  solely to satisfy the naming convention.
+  `Data.lean`, `Predicates.lean`, `Axiom.lean`, and `Proofs.lean` modules as
+  applicable. Do not mix these responsibilities in one implementation file or
+  create empty layers solely to satisfy the naming convention.
 - `Data.lean` owns concrete mathematical objects, structures, and operations.
   It must not contain named lemmas/theorems or unfinished property proofs, and
   must not hide `sorry` in data definitions. Required proof fields in a
   construction may use lower-layer property declarations.
 - `Predicates.lean` owns the definitions of mathematical conditions and
   relations on those objects. It states predicates, not proofs of them.
+- `Axiom.lean`, when needed, owns only statements deliberately introduced with
+  Lean's `axiom` command. Keep it beside the other layers of the relevant
+  mathematical component, and document each statement's source, intended
+  meaning, and reason it is being assumed. These are named project assumptions
+  for separate audit, not completed proofs. Do not move an unfinished theorem
+  here or turn `by sorry` into an `axiom` to hide proof debt. Literature and
+  computation inputs still belong under `KIP126/External/`.
 - `Proofs.lean` owns lemmas and theorems about the data and predicates,
-  including explicitly unfinished property proofs during development. It must
-  not serve as the hidden home of new mathematical data definitions.
-- Follow the dependency order `Data → Predicates → Proofs`, where each later
-  module imports the earlier layers it needs. When a further construction
-  needs preservation or well-definedness theorems, put it in a subsequent
-  component's `Data.lean` importing the lower component's `Proofs.lean`, then
-  separate its predicates and proofs in turn. Do not create cyclic imports or
+  including theorem statements whose proofs temporarily use `by sorry` during
+  development. It must not serve as the hidden home of new mathematical data
+  definitions or explicit `axiom` declarations.
+- Follow the dependency order `Data → Predicates → Axiom → Proofs` where those
+  layers are present; a component without axioms may import its predicates
+  directly into proofs. Each later module imports only the earlier layers it
+  needs. When a further construction needs preservation or well-definedness
+  theorems, put it in a subsequent component's `Data.lean` importing the lower
+  component's `Proofs.lean`, then separate its predicates and proofs in turn.
+  Do not create cyclic imports or
   turn these provable properties into new input hypotheses to avoid the split.
 - A public entry module may re-export these layers using imports only.
   Preserve public declaration names when reorganizing files unless the task
@@ -106,12 +116,19 @@ and review evidence when they affect readiness. If those sources are missing,
 stale, or contradictory, stop and report the conflict instead of guessing.
 
 An unfinished Solution or definition-property proof may temporarily use `sorry`
-while it is being developed; Challenge proofs remain `sorry` by the rule above.
-Do not mark an unproved declaration or its Blueprint node as complete. A pull
-request is not mergeable while the required axiom audit still reports `sorryAx`. Never add a
-project-defined `axiom`. External hypotheses belong under `KIP126/External/` as
-provenance-carrying `ExternalResult` or `ExternalEvidence` inputs, and conclusions
-that use them must remain conditional statements taking those inputs explicitly.
+while it is being developed; the latter remains in its component's `Proofs.lean`.
+Challenge proofs remain `sorry` by the rule above. A deliberately introduced
+project `axiom` instead belongs in that component's `Axiom.lean` and must be
+audited by name and by its downstream dependency cone, separately from
+`sorryAx`. Do not mark an unproved or axiom-dependent declaration or its
+Blueprint node as complete. A pull request is not mergeable while the required
+axiom audit still reports `sorryAx`; this layout policy does not waive any
+required check. Before introducing the first canonical `Axiom.lean`, update the
+compiled audit and CI to inventory its named axioms separately, reject project
+axioms declared elsewhere, and retain the final proof-completion gate.
+External hypotheses belong under `KIP126/External/` as provenance-carrying
+`ExternalResult` or `ExternalEvidence` inputs, and conclusions that use them
+must remain conditional statements taking those inputs explicitly.
 
 ## Validation policy
 
