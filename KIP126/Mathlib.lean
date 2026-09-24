@@ -9,9 +9,10 @@ import Mathlib.CategoryTheory.Triangulated.HomologicalFunctor
 import Mathlib.CategoryTheory.Triangulated.Pretriangulated
 
 /-!
-# Mathlib roots named by the Blueprint
+# Mathlib dependencies
 
-This import-only module makes every exact Mathlib declaration referenced by a
-mathlib-ok Blueprint node available to declaration checking. It introduces no
-project definition and no additional mathematical assumption.
+This import-only module collects the upstream Mathlib modules needed by the
+canonical KIP126 entry point, including declarations referenced directly by
+Blueprint annotations. It introduces no project definition or additional
+mathematical assumption.
 -/
